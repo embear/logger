@@ -18,6 +18,7 @@ DEPS := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:%.c=%.d)))
 
 
 CFLAGS := -g -Wall
+LINTFLAGS := -nullstate
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
 
@@ -34,7 +35,7 @@ clean:
 	@$(RM) -rf $(APP) $(OBJS) $(DEPS)
 
 lint:
-	$(LINT) $(INCLUDE) $(SRCS)
+	$(LINT) $(LINTFLAGS) $(INCLUDE) $(SRCS)
 
 $(APP): $(OBJS)
 	@$(ECHO) "Linking $@"
