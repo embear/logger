@@ -141,6 +141,26 @@ int main(int  argc,
 
   printf("Ending test %d ....\n", test);
 
+  test++;
+  printf("Starting test %d -- verbose logging ....\n", test);
+
+  logger_add_output(stdout);
+  logger_enable_module(LOGGER_MODULE_1);
+  logger_set_module_severity(LOGGER_MODULE_1, LOGGER_DEBUG);
+
+  logger_verbose(LOGGER_MODULE_1, LOGGER_DEBUG, "test %d LOGGER_MODULE_1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_INFO, "test %d LOGGER_MODULE_1 - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_NOTICE, "test %d LOGGER_MODULE_1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_WARNING, "test %d LOGGER_MODULE_1 - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_ERR, "test %d LOGGER_MODULE_1 - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_CRIT, "test %d LOGGER_MODULE_1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_ALERT, "test %d LOGGER_MODULE_1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger_verbose(LOGGER_MODULE_1, LOGGER_EMERG, "test %d LOGGER_MODULE_1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+
+  logger_del_output(stdout);
+
+  printf("Ending test %d ....\n", test);
+
   return(0);
 }
 
