@@ -13,14 +13,12 @@
 #ifndef LOGGER_DISABLE
 
 #define LOGGER_OUTPUTS_MAX    16 /**< number of possible simultaneous outputs */
+#define LOGGER_MODULES_MAX    16 /**< number of possible modules */
 
-typedef unsigned char  logger_bool_t;                       /**< logger boolean type */
-static const logger_bool_t logger_true  = (logger_bool_t)1; /**< logger boolean true */
-static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean false */
-
-static logger_bool_t     logger_module_enabled[LOGGER_MODULE_MAX];  /**< which modules are enabled */
-static logger_severity_t logger_module_severity[LOGGER_MODULE_MAX]; /**< which severity for which module */
-static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];       /**< storage for possible output streams */
+static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];        /**< storage for possible output streams */
+static logger_bool_t     logger_modules[LOGGER_MODULES_MAX];         /**< storage for possible modules */
+static logger_bool_t     logger_modules_enabled[LOGGER_MODULES_MAX];  /**< which modules are enabled */
+static logger_severity_t logger_modules_severity[LOGGER_MODULES_MAX]; /**< which severity for which module */
 
 /** ************************************************************************//**
  * \brief  initialize logger
@@ -31,8 +29,9 @@ logger_return_t __logger_init(void)
 {
   logger_return_t ret = LOGGER_OK;
 
-  memset(logger_module_enabled, 0, sizeof(logger_module_enabled));
-  memset(logger_module_severity, LOGGER_DEBUG, sizeof(logger_module_severity));
+  memset(logger_modules, 0, sizeof(logger_modules));
+  memset(logger_modules_enabled, 0, sizeof(logger_modules_enabled));
+  memset(logger_modules_severity, LOGGER_DEBUG, sizeof(logger_modules_severity));
   memset(logger_outputs, 0, sizeof(logger_outputs));
 
   return(ret);
@@ -49,7 +48,7 @@ logger_return_t __logger_init(void)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_add_output(FILE *stream)
+logger_return_t __logger_output_register(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
   int             index;
@@ -78,7 +77,7 @@ logger_return_t __logger_add_output(FILE *stream)
       }
     }
 
-    /* found a empty slot */
+    /* found an empty slot */
     if (found == logger_true) {
       logger_outputs[index] = stream;
     }
@@ -98,7 +97,7 @@ logger_return_t __logger_add_output(FILE *stream)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_del_output(FILE *stream)
+logger_return_t __logger_output_deregister(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
   int             index;
@@ -113,12 +112,74 @@ logger_return_t __logger_del_output(FILE *stream)
     }
   }
 
-  /* found a empty slot */
+  /* found an empty slot */
   if (found == logger_true) {
     logger_outputs[index] = (FILE *)NULL;
   }
   else {
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  request a module from logger
+ *
+ * \return     module number if module is available, error code otherwise
+ ******************************************************************************/
+logger_module_t __logger_module_request(void)
+{
+  logger_return_t ret = LOGGER_OK;
+  int             index;
+  logger_bool_t   found;
+
+  /* search for an available module */
+  found = logger_false;
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    if (logger_modules[index] == logger_false) {
+      found = logger_true;
+      break;
+    }
+  }
+
+  /* found an empty slot */
+  if (found == logger_true) {
+    logger_modules[index] = logger_true;
+    ret = index;
+  }
+  else {
+    ret = LOGGER_ERR_MODULES_FULL;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  release a logger module
+ *
+ * \param[in]     module module to enable
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_module_release(logger_module_t module)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* check for valid module */
+  if ((module >= 0) &&
+      (module < LOGGER_MODULES_MAX)) {
+    if (logger_modules[module] == logger_true) {
+      /* reset all module dependend values to defaults */
+      logger_modules[module]         = logger_false;
+      logger_modules_enabled[module]  = logger_false;
+      logger_modules_severity[module] = LOGGER_DEBUG;
+    }
+    else {
+      ret = LOGGER_ERR_MODULE_NOT_FOUND;
+    }
   }
 
   return(ret);
@@ -132,18 +193,18 @@ logger_return_t __logger_del_output(FILE *stream)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_enable_module(logger_module_t module)
+logger_return_t __logger_module_enable(logger_module_t module)
 {
   logger_return_t ret = LOGGER_OK;
 
   /* check for valid module */
   if ((module >= 0) &&
-      (module < LOGGER_MODULE_MAX)) {
+      (module < LOGGER_MODULES_MAX)) {
     /* enable given module */
-    logger_module_enabled[module] = logger_true;
+    logger_modules_enabled[module] = logger_true;
   }
   else {
-    ret = LOGGER_ERR_UNKNOWN_MODULE;
+    ret = LOGGER_ERR_MODULE_UNKNOWN;
   }
 
   return(ret);
@@ -157,18 +218,18 @@ logger_return_t __logger_enable_module(logger_module_t module)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_disable_module(logger_module_t module)
+logger_return_t __logger_module_disable(logger_module_t module)
 {
   logger_return_t ret = LOGGER_OK;
 
   /* check for valid module */
   if ((module >= 0) &&
-      (module < LOGGER_MODULE_MAX)) {
+      (module < LOGGER_MODULES_MAX)) {
     /* disable given module */
-    logger_module_enabled[module] = logger_false;
+    logger_modules_enabled[module] = logger_false;
   }
   else {
-    ret = LOGGER_ERR_UNKNOWN_MODULE;
+    ret = LOGGER_ERR_MODULE_UNKNOWN;
   }
 
   return(ret);
@@ -183,26 +244,26 @@ logger_return_t __logger_disable_module(logger_module_t module)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_set_module_severity(logger_module_t   module,
+logger_return_t __logger_module_severity_set(logger_module_t   module,
                                              logger_severity_t severity)
 {
   logger_return_t ret = LOGGER_OK;
 
   /* check for valid module */
   if ((module >= 0) &&
-      (module < LOGGER_MODULE_MAX)) {
+      (module < LOGGER_MODULES_MAX)) {
     /* check for valid severity */
     if ((severity >= LOGGER_DEBUG) &&
         (severity <= LOGGER_MAX)) {
       /* set module severity */
-      logger_module_severity[module] = severity;
+      logger_modules_severity[module] = severity;
     }
     else {
-      ret = LOGGER_ERR_UNKNOWN_SEVERITY;
+      ret = LOGGER_ERR_SEVERITY_UNKNOWN;
     }
   }
   else {
-    ret = LOGGER_ERR_UNKNOWN_MODULE;
+    ret = LOGGER_ERR_MODULE_UNKNOWN;
   }
 
   return(ret);
@@ -230,13 +291,13 @@ logger_return_t __logger(logger_module_t   module,
 
   /* check for valid module */
   if ((module >= 0) &&
-      (module < LOGGER_MODULE_MAX)) {
+      (module < LOGGER_MODULES_MAX)) {
     /* check for valid severity */
     if ((severity >= LOGGER_DEBUG) &&
         (severity <= LOGGER_MAX)) {
       /* check if module is enabled and severity is high enough */
-      if ((logger_module_enabled[module] == logger_true) &&
-          (logger_module_severity[module] <= severity)) {
+      if ((logger_modules_enabled[module] == logger_true) &&
+          (logger_modules_severity[module] <= severity)) {
         va_start(argp, format);
 
         /* loop over all possibe outputs */
@@ -249,11 +310,11 @@ logger_return_t __logger(logger_module_t   module,
       }
     }
     else {
-      ret = LOGGER_ERR_UNKNOWN_SEVERITY;
+      ret = LOGGER_ERR_SEVERITY_UNKNOWN;
     }
   }
   else {
-    ret = LOGGER_ERR_UNKNOWN_MODULE;
+    ret = LOGGER_ERR_MODULE_UNKNOWN;
   }
 
   return(ret);
