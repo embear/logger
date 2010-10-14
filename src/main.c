@@ -2,8 +2,7 @@
 #include "logger.h"
 
 int main(int  argc,
-         char *argv[],
-         char *envp[])
+         char *argv[])
 {
   int             test = 0;
   FILE            *stream;

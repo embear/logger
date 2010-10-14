@@ -15,8 +15,8 @@
 #define LOGGER_OUTPUTS_MAX    16 /**< number of possible simultaneous outputs */
 #define LOGGER_MODULES_MAX    16 /**< number of possible modules */
 
-static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];        /**< storage for possible output streams */
-static logger_bool_t     logger_modules[LOGGER_MODULES_MAX];         /**< storage for possible modules */
+static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];         /**< storage for possible output streams */
+static logger_bool_t     logger_modules[LOGGER_MODULES_MAX];          /**< storage for possible modules */
 static logger_bool_t     logger_modules_enabled[LOGGER_MODULES_MAX];  /**< which modules are enabled */
 static logger_severity_t logger_modules_severity[LOGGER_MODULES_MAX]; /**< which severity for which module */
 
