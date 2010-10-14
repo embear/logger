@@ -9,13 +9,9 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
+/* TODO: add functions logger_add_module() and logger_del_module() which adds and removes modules */
+
 #include <stdio.h>
-
-#define LOGGER_OUTPUTS_MAX    4
-
-typedef unsigned char  logger_bool_t;
-static const logger_bool_t logger_true  = (logger_bool_t)1;
-static const logger_bool_t logger_false = (logger_bool_t)0;
 
 typedef enum logger_severity_e {
   LOGGER_DEBUG   = 0, /**< debug-level message */
@@ -50,22 +46,25 @@ typedef enum logger_return_e {
 
 
 #ifdef LOGGER_DISABLE
-#define logger_init()                                   ((void)(0))
-#define logger_add_output(stream)                       ((void)(0))
-#define logger_del_output(stream)                       ((void)(0))
-#define logger_enable_module(module)                    ((void)(0))
-#define logger_disable_module(module)                   ((void)(0))
-#define logger_set_module_severity(module, severity)    ((void)(0))
-#define logger(module, severity, format, ...)           ((void)(0))
+#define logger_init()                                         ((void)(0))
+#define logger_add_output(stream)                             ((void)(0))
+#define logger_del_output(stream)                             ((void)(0))
+#define logger_enable_module(module)                          ((void)(0))
+#define logger_disable_module(module)                         ((void)(0))
+#define logger_set_module_severity(module, severity)          ((void)(0))
+#define logger(module, severity, format, ...)                 ((void)(0))
+#define logger_verbose(module, severity, format, args ...)    ((void)(0))
 #else  /* LOGGER_ENABLE */
-#define logger_init()                                   __logger_init()
-#define logger_add_output(stream)                       __logger_add_output(stream)
-#define logger_del_output(stream)                       __logger_del_output(stream)
-#define logger_enable_module(module)                    __logger_enable_module(module)
-#define logger_disable_module(module)                   __logger_disable_module(module)
-#define logger_set_module_severity(module, severity)    __logger_set_module_severity(module, severity)
-#define logger(module, severity, format, args...)      __logger(module, severity, format, ## args)
-#endif /* LOGGER_ENABLE */
+#define LOGGER_STRINGIFY_(x)                                  # x
+#define LOGGER_STRINGIFY(x)                                   LOGGER_STRINGIFY_(x)
+#define logger_init()                                         __logger_init()
+#define logger_add_output(stream)                             __logger_add_output(stream)
+#define logger_del_output(stream)                             __logger_del_output(stream)
+#define logger_enable_module(module)                          __logger_enable_module(module)
+#define logger_disable_module(module)                         __logger_disable_module(module)
+#define logger_set_module_severity(module, severity)          __logger_set_module_severity(module, severity)
+#define logger(module, severity, format, args...)            __logger(module, severity, format, ##args)
+#define logger_verbose(module, severity, format, args...)    __logger(module, severity, LOGGER_STRINGIFY(module) ":" LOGGER_STRINGIFY(severity) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ##args)
 
 logger_return_t __logger_init(void);
 logger_return_t __logger_add_output(FILE *stream);
@@ -78,5 +77,6 @@ logger_return_t __logger(logger_module_t   module,
                          logger_severity_t severity,
                          const char        *format,
                          ...);
+#endif /* LOGGER_ENABLE */
 
 #endif /* end of include guard: __LOGGERGER_H__ */

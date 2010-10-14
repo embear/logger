@@ -11,10 +11,22 @@
 #include "logger.h"
 
 #ifndef LOGGER_DISABLE
-static logger_bool_t     logger_module_enabled[LOGGER_MODULE_MAX];
-static logger_severity_t logger_module_severity[LOGGER_MODULE_MAX];
-static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];
 
+#define LOGGER_OUTPUTS_MAX    16 /**< number of possible simultaneous outputs */
+
+typedef unsigned char  logger_bool_t;                       /**< logger boolean type */
+static const logger_bool_t logger_true  = (logger_bool_t)1; /**< logger boolean true */
+static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean false */
+
+static logger_bool_t     logger_module_enabled[LOGGER_MODULE_MAX];  /**< which modules are enabled */
+static logger_severity_t logger_module_severity[LOGGER_MODULE_MAX]; /**< which severity for which module */
+static FILE              *logger_outputs[LOGGER_OUTPUTS_MAX];       /**< storage for possible output streams */
+
+/** ************************************************************************//**
+ * \brief  initialize logger
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_init(void)
 {
   logger_return_t ret = LOGGER_OK;
@@ -27,6 +39,16 @@ logger_return_t __logger_init(void)
 }
 
 
+/** ************************************************************************//**
+ * \brief  register an output stream to logger
+ *
+ * the given file stream may be on of stdout, stderr or a file stream opened by
+ * the user.
+ *
+ * \param[in]     stream opened file stream
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_add_output(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
@@ -69,6 +91,13 @@ logger_return_t __logger_add_output(FILE *stream)
 }
 
 
+/** ************************************************************************//**
+ * \brief  deregister an output stream to logger
+ *
+ * \param[in]     stream previous registered file stream
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_del_output(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
@@ -96,6 +125,13 @@ logger_return_t __logger_del_output(FILE *stream)
 }
 
 
+/** ************************************************************************//**
+ * \brief  enable a logger module for output
+ *
+ * \param[in]     module module to enable
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_enable_module(logger_module_t module)
 {
   logger_return_t ret = LOGGER_OK;
@@ -114,6 +150,13 @@ logger_return_t __logger_enable_module(logger_module_t module)
 }
 
 
+/** ************************************************************************//**
+ * \brief  disable a logger module for output
+ *
+ * \param[in]     module module to disable
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_disable_module(logger_module_t module)
 {
   logger_return_t ret = LOGGER_OK;
@@ -132,6 +175,14 @@ logger_return_t __logger_disable_module(logger_module_t module)
 }
 
 
+/** ************************************************************************//**
+ * \brief  set required minimum severity for log output
+ *
+ * \param[in]     module module for setting severity
+ * \param[in]     severity severity to set
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger_set_module_severity(logger_module_t   module,
                                              logger_severity_t severity)
 {
@@ -158,6 +209,16 @@ logger_return_t __logger_set_module_severity(logger_module_t   module,
 }
 
 
+/** ************************************************************************//**
+ * \brief  output log message
+ *
+ * \param[in]     module module outputting this message
+ * \param[in]     severity severity of this message
+ * \param[in]     format printf like format string
+ * \param[in]     va_args argument list
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
 logger_return_t __logger(logger_module_t   module,
                          logger_severity_t severity,
                          const char        *format,
