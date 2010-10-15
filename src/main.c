@@ -4,193 +4,283 @@
 int main(int  argc,
          char *argv[])
 {
-  int             test = 0;
-  FILE            *stream;
-  logger_module_t module1 = logger_module_unknown;
-  logger_module_t module2 = logger_module_unknown;
+  int            test = 0;
+  FILE           *stream;
+  logger_level_t level;
+  logger_id_t    id  = logger_id_unknown;
+  logger_id_t    id2 = logger_id_unknown;
 
   logger_init();
 
   test++;
-  printf("Starting test %d -- module1 not registered ....\n", test);
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- id not registered ....\n", test);
+
+  puts("No log message will be shown because id is not registered");
 
   logger_output_register(stdout);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
 
   printf("Ending test %d ....\n", test);
 
   test++;
-  printf("Starting test %d -- module1 not enabled ....\n", test);
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- id not enabled ....\n", test);
+
+  puts("No log message will be shown because id is not enabled");
 
   logger_output_register(stdout);
-  module1 = logger_module_request();
+  id = logger_id_request();
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
-  printf("Starting test %d -- severity not set ....\n", test);
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- level not set ....\n", test);
+
+  puts("All log messages will be shown because id level is not set ( -> level is DEBUG by default)");
 
   logger_output_register(stdout);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
+  id = logger_id_request();
+  logger_id_enable(id);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
-  printf("Starting test %d -- severity set to LOGGER_WARNING ....\n", test);
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- level set to LOGGER_WARNING ....\n", test);
+
+  puts("Only log messages with level above or equal to WARNING will be shown");
 
   logger_output_register(stdout);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
-  logger_module_severity_set(module1, LOGGER_WARNING);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_WARNING);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
-  printf("Starting test %d -- module1 enabled, module2 not ....\n", test);
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- id enabled, id2 not ....\n", test);
+
+  puts("Only log messages of id will be shown");
 
   logger_output_register(stdout);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
+  id = logger_id_request();
+  logger_id_enable(id);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
-  logger(module2, LOGGER_DEBUG, "test %d module2 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_INFO, "test %d module2 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_NOTICE, "test %d module2 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_WARNING, "test %d module2 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_ERR, "test %d module2 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_CRIT, "test %d module2 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_ALERT, "test %d module2 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module2, LOGGER_EMERG, "test %d module2 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id2, LOGGER_EMERG, "test %d id2 - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- output to stdout and stderr ....\n", test);
+
+  puts("All log messages will be printed to stdout and stderr");
 
   logger_output_register(stdout);
   logger_output_register(stderr);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
-  logger_module_severity_set(module1, LOGGER_ERR);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_ERR);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
   logger_output_deregister(stderr);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- output to stdout and file ....\n", test);
+
+  puts("All log messages will be printed to stdout and appended to file \"logfile\"");
 
   stream = fopen("logfile", "a");
   logger_output_register(stdout);
   logger_output_register(stream);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
-  logger_module_severity_set(module1, LOGGER_ERR);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_ERR);
 
-  logger(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
   logger_output_deregister(stream);
   fclose(stream);
-  logger_module_release(module1);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 
   test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- verbose logging ....\n", test);
 
-  logger_output_register(stdout);
-  module1 = logger_module_request();
-  logger_module_enable(module1);
-  logger_module_severity_set(module1, LOGGER_DEBUG);
+  puts("Log messages have a verbose prefix");
 
-  logger_verbose(module1, LOGGER_DEBUG, "test %d module1 - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_INFO, "test %d module1 - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_NOTICE, "test %d module1 - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_WARNING, "test %d module1 - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_ERR, "test %d module1 - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_CRIT, "test %d module1 - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_ALERT, "test %d module1 - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger_verbose(module1, LOGGER_EMERG, "test %d module1 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger_output_register(stdout);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_DEBUG);
+
+  logger_verbose(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
 
   logger_output_deregister(stdout);
-  logger_module_release(module1);
+  logger_id_release(id);
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- using control functions ....\n", test);
+
+  puts("Changing and restoring logging level");
+
+  logger_output_register(stdout);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_WARNING);
+
+  if (logger_id_is_enabled(id)) {
+    puts("Logging level is WARNING");
+    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+
+    level = logger_id_level_get(id);
+    logger_id_level_set(id, LOGGER_ALERT);
+
+    puts("Logging level is changed to ALERT");
+    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+
+    logger_id_level_set(id, level);
+
+    puts("Logging level is restored");
+    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  }
+
+  logger_output_deregister(stdout);
+  logger_id_release(id);
 
   printf("Ending test %d ....\n", test);
 

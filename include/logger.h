@@ -16,7 +16,7 @@ static const logger_bool_t logger_true  = (logger_bool_t)1; /**< logger boolean 
 static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean false */
 
 
-typedef enum logger_severity_e {
+typedef enum logger_level_e {
   LOGGER_DEBUG   = 0, /**< debug-level message */
   LOGGER_INFO    = 1, /**< informational message */
   LOGGER_NOTICE  = 2, /**< normal, but significant, condition */
@@ -25,63 +25,71 @@ typedef enum logger_severity_e {
   LOGGER_CRIT    = 5, /**< critical conditions */
   LOGGER_ALERT   = 6, /**< action must be taken immediately */
   LOGGER_EMERG   = 7, /**< system is unusable */
-  LOGGER_MAX     = 8  /**< last entry, always! */
-} logger_severity_t;
+  LOGGER_UNKNOWN = 8, /**< unknown level */
+  LOGGER_MAX     = 9  /**< last entry, always! */
+} logger_level_t;
 
 
-typedef int  logger_module_t;                                             /**< logger module type */
-static const logger_module_t logger_module_unknown = (logger_module_t)-1; /**< unknown logger module */
+typedef int  logger_id_t;                                     /**< logger id type */
+static const logger_id_t logger_id_unknown = (logger_id_t)-1; /**< unknown logger id */
 
 
 typedef enum logger_return_e {
   LOGGER_OK                    = 0,  /**< ok */
-  LOGGER_ERR_OUTPUTS_FULL      = -1, /**< all available outputs are used */
-  LOGGER_ERR_OUTPUT_REGISTERED = -2, /**< output already registered */
-  LOGGER_ERR_OUTPUT_NOT_FOUND  = -3, /**< output not registered */
-  LOGGER_ERR_MODULES_FULL      = -4, /**< all available modules are used */
-  LOGGER_ERR_MODULE_NOT_FOUND  = -5, /**< module not registered */
-  LOGGER_ERR_MODULE_UNKNOWN    = -6, /**< module is unknown */
-  LOGGER_ERR_SEVERITY_UNKNOWN  = -7, /**< severity is unknown */
+  LOGGER_ERR_OUTPUT_INVALID    = -1, /**< given output stream is invalid */
+  LOGGER_ERR_OUTPUTS_FULL      = -2, /**< all available outputs are used */
+  LOGGER_ERR_OUTPUT_REGISTERED = -3, /**< output already registered */
+  LOGGER_ERR_OUTPUT_NOT_FOUND  = -4, /**< output not registered */
+  LOGGER_ERR_IDS_FULL          = -5, /**< all available ids are used */
+  LOGGER_ERR_ID_NOT_FOUND      = -6, /**< id not registered */
+  LOGGER_ERR_ID_UNKNOWN        = -7, /**< id is unknown */
+  LOGGER_ERR_LEVEL_UNKNOWN     = -8, /**< level is unknown */
 } logger_return_t;
 
 
 #ifdef LOGGER_DISABLE
-#define logger_init()                                        ((void)(0))
-#define logger_output_register(stream)                       ((void)(0))
-#define logger_output_deregister(stream)                     ((void)(0))
-#define logger_module_request()                              ((void)(0))
-#define logger_module_release(module)                        ((void)(0))
-#define logger_module_enable(module)                         ((void)(0))
-#define logger_module_disable(module)                        ((void)(0))
-#define logger_module_severity_set(module, severity)         ((void)(0))
-#define logger(module, severity, format,...)                 ((void)(0))
-#define logger_verbose(module, severity, format, args...)    ((void)(0))
+#define logger_init()                                  ((void)(0))
+#define logger_output_register(stream)                 ((void)(0))
+#define logger_output_deregister(stream)               ((void)(0))
+#define logger_id_request()                            ((void)(0))
+#define logger_id_release(id)                          ((void)(0))
+#define logger_id_enable(id)                           ((void)(0))
+#define logger_id_disable(id)                          ((void)(0))
+#define logger_id_is_enabled(id)                       ((void)(0))
+#define logger_id_level_set(id, level)                 ((void)(0))
+#define logger_id_level_get(id)                        ((void)(0))
+#define logger(id, level, format, ...)                 ((void)(0))
+#define logger_verbose(id, level, format, args ...)    ((void)(0))
 #else  /* LOGGER_ENABLE */
-#define LOGGER_STRINGIFY_(x)                                 # x
-#define LOGGER_STRINGIFY(x)                                  LOGGER_STRINGIFY_(x)
-#define logger_init()                                        __logger_init()
-#define logger_output_register(stream)                       __logger_output_register(stream)
-#define logger_output_deregister(stream)                     __logger_output_deregister(stream)
-#define logger_module_request()                              __logger_module_request()
-#define logger_module_release(module)                        __logger_module_release(module)
-#define logger_module_enable(module)                         __logger_module_enable(module)
-#define logger_module_disable(module)                        __logger_module_disable(module)
-#define logger_module_severity_set(module, severity)         __logger_module_severity_set(module, severity)
-#define logger(module, severity, format, args...)            __logger(module, severity, format, ##args)
-#define logger_verbose(module, severity, format, args...)    __logger(module, severity, LOGGER_STRINGIFY(module) ":" LOGGER_STRINGIFY(severity) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ##args)
+#define LOGGER_STRINGIFY_(x)                           # x
+#define LOGGER_STRINGIFY(x)                            LOGGER_STRINGIFY_(x)
+#define logger_init()                                  __logger_init()
+#define logger_output_register(stream)                 __logger_output_register(stream)
+#define logger_output_deregister(stream)               __logger_output_deregister(stream)
+#define logger_id_request()                            __logger_id_request()
+#define logger_id_release(id)                          __logger_id_release(id)
+#define logger_id_enable(id)                           __logger_id_enable(id)
+#define logger_id_disable(id)                          __logger_id_disable(id)
+#define logger_id_is_enabled(id)                       __logger_id_is_enabled(id)
+#define logger_id_level_set(id, level)                 __logger_id_level_set(id, level)
+#define logger_id_level_get(id)                        __logger_id_level_get(id)
+#define logger(id, level, format, args ...)            __logger(id, level, format, ## args)
+#define logger_verbose(id, level, format, args ...)    __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ## args)
 
 logger_return_t __logger_init(void);
 logger_return_t __logger_output_register(FILE *stream);
 logger_return_t __logger_output_deregister(FILE *stream);
-logger_module_t __logger_module_request(void);
-logger_return_t __logger_module_release(logger_module_t module);
-logger_return_t __logger_module_enable(logger_module_t module);
-logger_return_t __logger_module_disable(logger_module_t module);
-logger_return_t __logger_module_severity_set(logger_module_t   module,
-                                             logger_severity_t severity);
-logger_return_t __logger(logger_module_t   module,
-                         logger_severity_t severity,
-                         const char        *format,
+logger_id_t __logger_id_request(void);
+logger_return_t __logger_id_release(logger_id_t id);
+logger_return_t __logger_id_enable(logger_id_t id);
+logger_return_t __logger_id_disable(logger_id_t id);
+logger_bool_t __logger_id_is_enabled(logger_id_t id);
+logger_return_t __logger_id_level_set(logger_id_t    id,
+                                      logger_level_t level);
+logger_level_t __logger_id_level_get(logger_id_t id);
+logger_return_t __logger(logger_id_t    id,
+                         logger_level_t level,
+                         const char     *format,
                          ...);
 #endif /* LOGGER_ENABLE */
 
