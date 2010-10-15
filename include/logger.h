@@ -73,8 +73,8 @@ typedef enum logger_return_e {
 #define logger_id_is_enabled(id)                       __logger_id_is_enabled(id)
 #define logger_id_level_set(id, level)                 __logger_id_level_set(id, level)
 #define logger_id_level_get(id)                        __logger_id_level_get(id)
-#define logger(id, level, format, args ...)            __logger(id, level, format, ## args)
-#define logger_verbose(id, level, format, args ...)    __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ## args)
+#define logger(id, level, format, args...)             __logger(id, level, format, ##args)
+#define logger_verbose(id, level, format, args...)     __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ##args)
 
 logger_return_t __logger_init(void);
 logger_return_t __logger_output_register(FILE *stream);
