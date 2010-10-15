@@ -18,7 +18,7 @@ DEPS := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:%.c=%.d)))
 
 
 CFLAGS := -g -Wall
-LINTFLAGS := -nullstate
+LINTFLAGS := -nullstate -varuse 
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
 
