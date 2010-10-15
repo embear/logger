@@ -22,6 +22,8 @@ LINTFLAGS := -nullstate
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
 
+.PHONY: all print clean lint
+
 all: $(APP)
 
 print: 
