@@ -24,14 +24,14 @@ int main(int  argc,
 
   logger_output_register(stdout);
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
 
@@ -50,14 +50,14 @@ int main(int  argc,
   logger_output_register(stdout);
   id = logger_id_request();
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_id_release(id);
@@ -78,14 +78,14 @@ int main(int  argc,
   id = logger_id_request();
   logger_id_enable(id);
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_id_release(id);
@@ -107,14 +107,14 @@ int main(int  argc,
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_WARNING);
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_id_release(id);
@@ -135,9 +135,9 @@ int main(int  argc,
   id = logger_id_request();
   logger_id_enable(id);
 
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
-  logger(id2, LOGGER_EMERG, "test %d id2 - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id2, LOGGER_EMERG, "test %d - id %d2 - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_id_release(id);
@@ -160,9 +160,9 @@ int main(int  argc,
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_ERR);
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_output_deregister(stderr);
@@ -187,9 +187,9 @@ int main(int  argc,
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_ERR);
 
-  logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_output_deregister(stream);
@@ -213,14 +213,14 @@ int main(int  argc,
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 
-  logger_verbose(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-  logger_verbose(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+  logger_verbose(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+  logger_verbose(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
   logger_output_deregister(stdout);
   logger_id_release(id);
@@ -244,39 +244,39 @@ int main(int  argc,
 
   if (logger_id_is_enabled(id)) {
     puts("Logging level is WARNING");
-    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
     level = logger_id_level_get(id);
     logger_id_level_set(id, LOGGER_ALERT);
 
     puts("Logging level is changed to ALERT");
-    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
 
     logger_id_level_set(id, level);
 
     puts("Logging level is restored");
-    logger(id, LOGGER_DEBUG, "test %d id - LOGGER_DEBUG   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_INFO, "test %d id - LOGGER_INFO    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_NOTICE, "test %d id - LOGGER_NOTICE  in line %d\n", test, __LINE__);
-    logger(id, LOGGER_WARNING, "test %d id - LOGGER_WARNING in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ERR, "test %d id - LOGGER_ERR     in line %d\n", test, __LINE__);
-    logger(id, LOGGER_CRIT, "test %d id - LOGGER_CRIT    in line %d\n", test, __LINE__);
-    logger(id, LOGGER_ALERT, "test %d id - LOGGER_ALERT   in line %d\n", test, __LINE__);
-    logger(id, LOGGER_EMERG, "test %d id - LOGGER_EMERG   in line %d\n", test, __LINE__);
+    logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_INFO, "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_NOTICE, "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ERR, "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_CRIT, "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_ALERT, "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
+    logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
   }
 
   logger_output_deregister(stdout);
