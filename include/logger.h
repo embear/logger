@@ -46,21 +46,41 @@ typedef enum logger_return_e {
   LOGGER_ERR_LEVEL_UNKNOWN     = -8, /**< level is unknown */
 } logger_return_t;
 
+/* macros for color text output */
+typedef enum logger_text_attr_e {
+  LOGGER_ATTR_RESET     = 0, /**< reset attributes */
+  LOGGER_ATTR_BRIGHT    = 1, /**< bright attribute */
+  LOGGER_ATTR_DIM       = 2, /**< dim attribute */
+  LOGGER_ATTR_UNDERLINE = 3, /**< underline attribute */
+  LOGGER_ATTR_BLINK     = 5, /**< blink attribute */
+  LOGGER_ATTR_REVERSE   = 7, /**< reverse attribute */
+  LOGGER_ATTR_HIDDEN    = 8  /**< hidden attribute */
+} logger_text_attr_t;
 
-#ifdef LOGGER_DISABLE
-#define logger_init()                                  ((void)(0))
-#define logger_output_register(stream)                 ((void)(0))
-#define logger_output_deregister(stream)               ((void)(0))
-#define logger_id_request()                            ((void)(0))
-#define logger_id_release(id)                          ((void)(0))
-#define logger_id_enable(id)                           ((void)(0))
-#define logger_id_disable(id)                          ((void)(0))
-#define logger_id_is_enabled(id)                       ((void)(0))
-#define logger_id_level_set(id, level)                 ((void)(0))
-#define logger_id_level_get(id)                        ((void)(0))
-#define logger(id, level, format, ...)                 ((void)(0))
-#define logger_verbose(id, level, format, args ...)    ((void)(0))
-#else  /* LOGGER_ENABLE */
+typedef enum logger_text_bg_e {
+  LOGGER_BG_BLACK   = 30, /**< black background color */
+  LOGGER_BG_RED     = 31, /**< red background color */
+  LOGGER_BG_GREEN   = 32, /**< green background color */
+  LOGGER_BG_YELLOW  = 33, /**< yellow background color */
+  LOGGER_BG_BLUE    = 34, /**< blue background color */
+  LOGGER_BG_MAGENTA = 35, /**< magenta background color */
+  LOGGER_BG_CYAN    = 36, /**< cyan background color */
+  LOGGER_BG_WHITE   = 37  /**< white background color */
+} logger_text_bg_t;
+
+typedef enum logger_text_fg_e {
+  LOGGER_FG_BLACK   = 40, /**< black background color */
+  LOGGER_FG_RED     = 41, /**< red background color */
+  LOGGER_FG_GREEN   = 42, /**< green background color */
+  LOGGER_FG_YELLOW  = 43, /**< yellow background color */
+  LOGGER_FG_BLUE    = 44, /**< blue background color */
+  LOGGER_FG_MAGENTA = 45, /**< magenta background color */
+  LOGGER_FG_CYAN    = 46, /**< cyan background color */
+  LOGGER_FG_WHITE   = 47  /**< white background color */
+} logger_text_fg_t;
+
+
+#ifdef LOGGER_ENABLE
 #define LOGGER_STRINGIFY_(x)                           # x
 #define LOGGER_STRINGIFY(x)                            LOGGER_STRINGIFY_(x)
 #define logger_init()                                  __logger_init()
@@ -73,8 +93,17 @@ typedef enum logger_return_e {
 #define logger_id_is_enabled(id)                       __logger_id_is_enabled(id)
 #define logger_id_level_set(id, level)                 __logger_id_level_set(id, level)
 #define logger_id_level_get(id)                        __logger_id_level_get(id)
-#define logger(id, level, format, args...)             __logger(id, level, format, ##args)
-#define logger_verbose(id, level, format, args...)     __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ##args)
+#ifdef LOGGER_COLORS
+#define logger_text_color_set(fg, bg)                  __logger_text_color_set(fg, bg)
+#define logger_text_attr_set(attr)                     __logger_text_attr_set(attr)
+#define logger_text_reset()                            __logger_text_reset()
+#else /* LOGGER_COLORS */
+#define logger_text_color_set(fg, bg)                  ((void)(0))
+#define logger_text_attr_set(attr)                     ((void)(0))
+#define logger_text_reset()                            ((void)(0))
+#endif /* LOGGER_COLORS */
+#define logger(id, level, format, args ...)            __logger(id, level, format, ## args)
+#define logger_verbose(id, level, format, args ...)    __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ## args)
 
 logger_return_t __logger_init(void);
 logger_return_t __logger_output_register(FILE *stream);
@@ -87,10 +116,31 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id);
 logger_return_t __logger_id_level_set(logger_id_t    id,
                                       logger_level_t level);
 logger_level_t __logger_id_level_get(logger_id_t id);
+logger_return_t __logger_text_color_set(logger_text_fg_t fg,
+                                        logger_text_bg_t bg);
+logger_return_t __logger_text_attr_set(logger_text_attr_t attr);
+logger_return_t __logger_text_reset(void);
 logger_return_t __logger(logger_id_t    id,
                          logger_level_t level,
                          const char     *format,
                          ...);
+
+#else  /* LOGGER_ENABLE */
+#define logger_init()                                  ((void)(0))
+#define logger_output_register(stream)                 ((void)(0))
+#define logger_output_deregister(stream)               ((void)(0))
+#define logger_id_request()                            ((void)(0))
+#define logger_id_release(id)                          ((void)(0))
+#define logger_id_enable(id)                           ((void)(0))
+#define logger_id_disable(id)                          ((void)(0))
+#define logger_id_is_enabled(id)                       ((void)(0))
+#define logger_id_level_set(id, level)                 ((void)(0))
+#define logger_id_level_get(id)                        ((void)(0))
+#define logger_text_color_set(fg, bg)                  ((void)(0))
+#define logger_text_attr_set(attr)                     ((void)(0))
+#define logger_text_reset()                            ((void)(0))
+#define logger(id, level, format, ...)                 ((void)(0))
+#define logger_verbose(id, level, format, args ...)    ((void)(0))
 #endif /* LOGGER_ENABLE */
 
 #endif /* end of include guard: __LOGGERGER_H__ */

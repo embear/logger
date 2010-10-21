@@ -284,6 +284,43 @@ int main(int  argc,
 
   printf("Ending test %d ....\n", test);
 
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- colors in text output ....\n", test);
+
+  puts("Print log messages in different colors");
+
+  logger_output_register(stdout);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_DEBUG);
+
+  logger_text_color_set(LOGGER_FG_RED, LOGGER_BG_YELLOW);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_attr_set(LOGGER_ATTR_BRIGHT);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_attr_set(LOGGER_ATTR_BLINK);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_attr_set(LOGGER_ATTR_REVERSE);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_color_set(LOGGER_FG_BLUE, LOGGER_BG_GREEN);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_color_set(LOGGER_FG_YELLOW, LOGGER_BG_BLACK);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_color_set(LOGGER_FG_GREEN, LOGGER_BG_WHITE);
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  logger_text_reset();
+  logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+
+  logger_output_deregister(stdout);
+  logger_id_release(id);
+
+  printf("Ending test %d ....\n", test);
+
   return(0);
 }
 

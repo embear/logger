@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include "logger.h"
 
-#ifndef LOGGER_DISABLE
+#ifdef LOGGER_ENABLE
 
 #define LOGGER_OUTPUTS_MAX    16 /**< number of possible simultaneous outputs */
 #define LOGGER_IDS_MAX        16 /**< number of possible ids */
@@ -321,6 +321,83 @@ logger_level_t __logger_id_level_get(logger_id_t id)
 
 
 /** ************************************************************************//**
+ * \brief  change terminal text color and reset attributes
+ *
+ * \param[in]     fg      text foreground
+ * \param[in]     bg      text background
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_text_color_set(logger_text_fg_t fg,
+                                        logger_text_bg_t bg)
+{
+  logger_level_t ret = LOGGER_OK;
+  int            index;
+
+  /* loop over all possibe outputs */
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    /* use colors only on stdout and stderr, files will just be cluttered */
+    if ((logger_outputs[index] == stdout) ||
+        (logger_outputs[index] == stderr)) {
+      (void)fprintf(logger_outputs[index], "%c[%d;%d;%dm", 0x1B, LOGGER_ATTR_RESET, fg, bg);
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  change terminal text attributes
+ *
+ * must be called after setting colors
+ *
+ * \param[in]     attr    text attribute
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_text_attr_set(logger_text_attr_t attr)
+{
+  logger_level_t ret = LOGGER_OK;
+  int            index;
+
+  /* loop over all possibe outputs */
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    /* use colors only on stdout and stderr, files will just be cluttered */
+    if ((logger_outputs[index] == stdout) ||
+        (logger_outputs[index] == stderr)) {
+      (void)fprintf(logger_outputs[index], "%c[%dm", 0x1B, attr);
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  reset terminal text color and attributes
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_text_reset(void)
+{
+  logger_level_t ret = LOGGER_OK;
+  int            index;
+
+  /* loop over all possibe outputs */
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    /* use colors only on stdout and stderr, files will just be cluttered */
+    if ((logger_outputs[index] == stdout) ||
+        (logger_outputs[index] == stderr)) {
+      (void)fprintf(logger_outputs[index], "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  output log message
  *
  * \param[in]     id      id outputting this message
@@ -371,4 +448,4 @@ logger_return_t __logger(logger_id_t    id,
 }
 
 
-#endif /* LOGGER_DISABLE */
+#endif /* LOGGER_ENABLE */
