@@ -17,7 +17,8 @@ OBJS := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:%.c=%.o)))
 DEPS := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:%.c=%.d)))
 
 
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -DLOGGER_ENABLE -DLOGGER_COLORS
+#CFLAGS := -g -Wall
 LINTFLAGS := -nullstate -varuse 
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
