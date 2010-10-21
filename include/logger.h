@@ -129,13 +129,13 @@ logger_return_t __logger(logger_id_t    id,
 #define logger_init()                                  ((void)(0))
 #define logger_output_register(stream)                 ((void)(0))
 #define logger_output_deregister(stream)               ((void)(0))
-#define logger_id_request()                            ((void)(0))
+#define logger_id_request()                            LOGGER_ERR_ID_UNKNOWN
 #define logger_id_release(id)                          ((void)(0))
 #define logger_id_enable(id)                           ((void)(0))
 #define logger_id_disable(id)                          ((void)(0))
-#define logger_id_is_enabled(id)                       ((void)(0))
+#define logger_id_is_enabled(id)                       logger_false
 #define logger_id_level_set(id, level)                 ((void)(0))
-#define logger_id_level_get(id)                        ((void)(0))
+#define logger_id_level_get(id)                        LOGGER_ERR_LEVEL_UNKNOWN
 #define logger_text_color_set(fg, bg)                  ((void)(0))
 #define logger_text_attr_set(attr)                     ((void)(0))
 #define logger_text_reset()                            ((void)(0))
