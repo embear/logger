@@ -58,25 +58,25 @@ typedef enum logger_text_attr_e {
 } logger_text_attr_t;
 
 typedef enum logger_text_bg_e {
-  LOGGER_BG_BLACK   = 30, /**< black background color */
-  LOGGER_BG_RED     = 31, /**< red background color */
-  LOGGER_BG_GREEN   = 32, /**< green background color */
-  LOGGER_BG_YELLOW  = 33, /**< yellow background color */
-  LOGGER_BG_BLUE    = 34, /**< blue background color */
-  LOGGER_BG_MAGENTA = 35, /**< magenta background color */
-  LOGGER_BG_CYAN    = 36, /**< cyan background color */
-  LOGGER_BG_WHITE   = 37  /**< white background color */
+  LOGGER_BG_BLACK   = 40, /**< black background color */
+  LOGGER_BG_RED     = 41, /**< red background color */
+  LOGGER_BG_GREEN   = 42, /**< green background color */
+  LOGGER_BG_YELLOW  = 43, /**< yellow background color */
+  LOGGER_BG_BLUE    = 44, /**< blue background color */
+  LOGGER_BG_MAGENTA = 45, /**< magenta background color */
+  LOGGER_BG_CYAN    = 46, /**< cyan background color */
+  LOGGER_BG_WHITE   = 47  /**< white background color */
 } logger_text_bg_t;
 
 typedef enum logger_text_fg_e {
-  LOGGER_FG_BLACK   = 40, /**< black background color */
-  LOGGER_FG_RED     = 41, /**< red background color */
-  LOGGER_FG_GREEN   = 42, /**< green background color */
-  LOGGER_FG_YELLOW  = 43, /**< yellow background color */
-  LOGGER_FG_BLUE    = 44, /**< blue background color */
-  LOGGER_FG_MAGENTA = 45, /**< magenta background color */
-  LOGGER_FG_CYAN    = 46, /**< cyan background color */
-  LOGGER_FG_WHITE   = 47  /**< white background color */
+  LOGGER_FG_BLACK   = 30, /**< black background color */
+  LOGGER_FG_RED     = 31, /**< red background color */
+  LOGGER_FG_GREEN   = 32, /**< green background color */
+  LOGGER_FG_YELLOW  = 33, /**< yellow background color */
+  LOGGER_FG_BLUE    = 34, /**< blue background color */
+  LOGGER_FG_MAGENTA = 35, /**< magenta background color */
+  LOGGER_FG_CYAN    = 36, /**< cyan background color */
+  LOGGER_FG_WHITE   = 37  /**< white background color */
 } logger_text_fg_t;
 
 
@@ -140,7 +140,7 @@ logger_return_t __logger(logger_id_t    id,
 #define logger_text_attr_set(attr)                     ((void)(0))
 #define logger_text_reset()                            ((void)(0))
 #define logger(id, level, format, ...)                 ((void)(0))
-#define logger_verbose(id, level, format, args ...)    ((void)(0))
+#define logger_verbose(id, level, format, args...)     ((void)(0))
 #endif /* LOGGER_ENABLE */
 
 #endif /* end of include guard: __LOGGERGER_H__ */
