@@ -17,16 +17,16 @@ static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean 
 
 
 typedef enum logger_level_e {
-  LOGGER_DEBUG   = 0, /**< debug-level message */
-  LOGGER_INFO    = 1, /**< informational message */
-  LOGGER_NOTICE  = 2, /**< normal, but significant, condition */
-  LOGGER_WARNING = 3, /**< warning conditions */
-  LOGGER_ERR     = 4, /**< error conditions */
-  LOGGER_CRIT    = 5, /**< critical conditions */
-  LOGGER_ALERT   = 6, /**< action must be taken immediately */
-  LOGGER_EMERG   = 7, /**< system is unusable */
-  LOGGER_UNKNOWN = 8, /**< unknown level */
-  LOGGER_MAX     = 9  /**< last entry, always! */
+  LOGGER_UNKNOWN =  0, /**< unknown level */
+  LOGGER_DEBUG   =  1, /**< debug-level message */
+  LOGGER_INFO    =  2, /**< informational message */
+  LOGGER_NOTICE  =  3, /**< normal, but significant, condition */
+  LOGGER_WARNING =  4, /**< warning conditions */
+  LOGGER_ERR     =  5, /**< error conditions */
+  LOGGER_CRIT    =  6, /**< critical conditions */
+  LOGGER_ALERT   =  7, /**< action must be taken immediately */
+  LOGGER_EMERG   =  8, /**< system is unusable */
+  LOGGER_MAX     =  9  /**< last entry, always! */
 } logger_level_t;
 
 
