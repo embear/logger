@@ -8,6 +8,8 @@
  ******************************************************************************/
 #include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "logger.h"
 
 #ifdef LOGGER_ENABLE
@@ -15,7 +17,13 @@
 #define LOGGER_OUTPUTS_MAX    16                           /**< number of possible simultaneous outputs */
 #define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
-static FILE           *logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
+typedef struct logger_output_s {
+ int count; /**< number of registrations for this stream */
+ FILE *stream; /**< file pointer given during registration */
+ FILE *fp; /**< duplicated file pointer with changed properties (non blocking) */
+} logger_output_t;
+
+static logger_output_t logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
 static logger_bool_t  logger_ids[LOGGER_IDS_MAX];          /**< storage for possible ids */
 static logger_bool_t  logger_ids_enabled[LOGGER_IDS_MAX];  /**< which ids are enabled */
 static logger_level_t logger_ids_level[LOGGER_IDS_MAX];    /**< which level for which id */
@@ -59,8 +67,9 @@ logger_return_t __logger_output_register(FILE *stream)
     /* check if this output is already registered */
     found = logger_false;
     for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-      if (logger_outputs[index] == stream) {
+      if (logger_outputs[index].stream == stream) {
         found = logger_true;
+        logger_outputs[index].count++;
         break;
       }
       else {
@@ -73,7 +82,7 @@ logger_return_t __logger_output_register(FILE *stream)
       /* search for an empty slot */
       found = logger_false;
       for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-        if (logger_outputs[index] == NULL) {
+        if (logger_outputs[index].count == 0) {
           found = logger_true;
           break;
         }
@@ -81,7 +90,10 @@ logger_return_t __logger_output_register(FILE *stream)
 
       /* found an empty slot */
       if (found == logger_true) {
-        logger_outputs[index] = stream;
+        logger_outputs[index].count++;
+        logger_outputs[index].stream = stream;
+        logger_outputs[index].fp = stream;
+        //logger_outputs[index].fp = fdopen(fcntl(fileno(stream), F_SETFL, O_NONBLOCK), "w");
       }
       else {
         ret = LOGGER_ERR_OUTPUTS_FULL;
@@ -112,15 +124,22 @@ logger_return_t __logger_output_deregister(FILE *stream)
   /* check if this output is already registered */
   found = logger_false;
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    if (logger_outputs[index] == stream) {
+    if (logger_outputs[index].stream == stream) {
       found = logger_true;
       break;
     }
   }
 
-  /* found an empty slot */
+  /* found given stream in a slot */
   if (found == logger_true) {
-    logger_outputs[index] = (FILE *)NULL;
+    logger_outputs[index].count--;
+    /* remove this stream if this was the last reference */
+    if (logger_outputs[index].count <= 0) {
+      logger_outputs[index].count = 0;
+      logger_outputs[index].stream = (FILE *)NULL;
+      //fclose(logger_outputs[index].fp);
+      logger_outputs[index].fp = (FILE *)NULL;
+    }
   }
   else {
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
@@ -337,9 +356,9 @@ logger_return_t __logger_text_color_set(logger_text_fg_t fg,
   /* loop over all possibe outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index] == stdout) ||
-        (logger_outputs[index] == stderr)) {
-      (void)fprintf(logger_outputs[index], "%c[%d;%d;%dm", 0x1B, LOGGER_ATTR_RESET, fg, bg);
+    if ((logger_outputs[index].stream == stdout) ||
+        (logger_outputs[index].stream == stderr)) {
+      (void)fprintf(logger_outputs[index].fp, "%c[%d;%d;%dm", 0x1B, LOGGER_ATTR_RESET, fg, bg);
     }
   }
 
@@ -364,9 +383,9 @@ logger_return_t __logger_text_attr_set(logger_text_attr_t attr)
   /* loop over all possibe outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index] == stdout) ||
-        (logger_outputs[index] == stderr)) {
-      (void)fprintf(logger_outputs[index], "%c[%dm", 0x1B, attr);
+    if ((logger_outputs[index].stream == stdout) ||
+        (logger_outputs[index].stream == stderr)) {
+      (void)fprintf(logger_outputs[index].fp, "%c[%dm", 0x1B, attr);
     }
   }
 
@@ -387,9 +406,9 @@ logger_return_t __logger_text_reset(void)
   /* loop over all possibe outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index] == stdout) ||
-        (logger_outputs[index] == stderr)) {
-      (void)fprintf(logger_outputs[index], "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+    if ((logger_outputs[index].stream == stdout) ||
+        (logger_outputs[index].stream == stderr)) {
+      (void)fprintf(logger_outputs[index].fp, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
     }
   }
 
@@ -429,8 +448,8 @@ logger_return_t __logger(logger_id_t    id,
 
         /* loop over all possibe outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-          if (logger_outputs[index] != NULL) {
-            (void)vfprintf(logger_outputs[index], format, argp);
+          if (logger_outputs[index].count > 0) {
+            (void)vfprintf(logger_outputs[index].fp, format, argp);
           }
         }
         va_end(argp);
