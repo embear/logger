@@ -7,36 +7,34 @@
  ******************************************************************************/
 
 /***************************************************************************//**
-\mainpage
-
-\section sec_intro Introduction
-
-Logger is a simple logging facility for the C language.
-It is possible to output logging information to different output stream and to use different logging severities.
-
-\section sec_usage Usage
-
-Logger needs to be enabled using the global define LOGGER_ENABLE.
-Otherwise all functions will be excluded from compilation.
-
-Basic usage of logger:
-
-\code
-logger_id_t    id  = logger_id_unknown;
-
-logger_output_register(stdout);
-id = logger_id_request();
-logger_id_enable(id);
-logger_id_level_set(id, LOGGER_WARNING);
-
-logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
-
-logger_output_deregister(stdout);
-logger_id_release(id);
-\endcode
-
-*/
-
+ * \mainpage
+ *
+ * \section sec_intro Introduction
+ *
+ * Logger is a simple logging facility for the C language.
+ * It is possible to output logging information to different output stream and to use different logging severities.
+ *
+ * \section sec_usage Usage
+ *
+ * Logger needs to be enabled using the global define LOGGER_ENABLE.
+ * Otherwise all functions will be excluded from compilation.
+ *
+ * Basic usage of logger:
+ *
+ * \code
+ * logger_id_t    id  = logger_id_unknown;
+ *
+ * logger_output_register(stdout);
+ * id = logger_id_request();
+ * logger_id_enable(id);
+ * logger_id_level_set(id, LOGGER_WARNING);
+ *
+ * logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
+ *
+ * logger_output_deregister(stdout);
+ * logger_id_release(id);
+ * \endcode
+ */
 #ifndef LOGGER_H
 #define LOGGER_H
 

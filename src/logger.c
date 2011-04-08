@@ -18,15 +18,15 @@
 #define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
 typedef struct logger_output_s {
- int count; /**< number of registrations for this stream */
- FILE *stream; /**< file pointer given during registration */
- FILE *fp; /**< duplicated file pointer with changed properties (non blocking) */
+  int  count;   /**< number of registrations for this stream */
+  FILE *stream; /**< file pointer given during registration */
+  FILE *fp;     /**< duplicated file pointer with changed properties (non blocking) */
 } logger_output_t;
 
 static logger_output_t logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
-static logger_bool_t  logger_ids[LOGGER_IDS_MAX];          /**< storage for possible ids */
-static logger_bool_t  logger_ids_enabled[LOGGER_IDS_MAX];  /**< which ids are enabled */
-static logger_level_t logger_ids_level[LOGGER_IDS_MAX];    /**< which level for which id */
+static logger_bool_t   logger_ids[LOGGER_IDS_MAX];         /**< storage for possible ids */
+static logger_bool_t   logger_ids_enabled[LOGGER_IDS_MAX]; /**< which ids are enabled */
+static logger_level_t  logger_ids_level[LOGGER_IDS_MAX];   /**< which level for which id */
 
 /** ************************************************************************//**
  * \brief  initialize logger
@@ -92,7 +92,7 @@ logger_return_t __logger_output_register(FILE *stream)
       if (found == logger_true) {
         logger_outputs[index].count++;
         logger_outputs[index].stream = stream;
-        logger_outputs[index].fp = stream;
+        logger_outputs[index].fp     = stream;
         //logger_outputs[index].fp = fdopen(fcntl(fileno(stream), F_SETFL, O_NONBLOCK), "w");
       }
       else {
@@ -133,9 +133,10 @@ logger_return_t __logger_output_deregister(FILE *stream)
   /* found given stream in a slot */
   if (found == logger_true) {
     logger_outputs[index].count--;
+
     /* remove this stream if this was the last reference */
     if (logger_outputs[index].count <= 0) {
-      logger_outputs[index].count = 0;
+      logger_outputs[index].count  = 0;
       logger_outputs[index].stream = (FILE *)NULL;
       //fclose(logger_outputs[index].fp);
       logger_outputs[index].fp = (FILE *)NULL;
