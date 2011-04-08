@@ -14,6 +14,7 @@
 
 #ifdef LOGGER_ENABLE
 
+//#define NEW_STREAM
 #define LOGGER_OUTPUTS_MAX    16                           /**< number of possible simultaneous outputs */
 #define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
@@ -92,8 +93,12 @@ logger_return_t __logger_output_register(FILE *stream)
       if (found == logger_true) {
         logger_outputs[index].count++;
         logger_outputs[index].stream = stream;
-        logger_outputs[index].fp     = stream;
-        //logger_outputs[index].fp = fdopen(fcntl(fileno(stream), F_SETFL, O_NONBLOCK), "w");
+#ifdef NEW_STREAM
+        /* duplicate descriptor of stream and make a nonblocking stream of it */
+        logger_outputs[index].fp = fdopen(fcntl(dup(fileno(stream)), F_SETFL, O_NONBLOCK), "w");
+#else /* NEW_STREAM */
+        logger_outputs[index].fp = stream;
+#endif /* NEW_STREAM */
       }
       else {
         ret = LOGGER_ERR_OUTPUTS_FULL;
@@ -138,7 +143,11 @@ logger_return_t __logger_output_deregister(FILE *stream)
     if (logger_outputs[index].count <= 0) {
       logger_outputs[index].count  = 0;
       logger_outputs[index].stream = (FILE *)NULL;
-      //fclose(logger_outputs[index].fp);
+#ifdef NEW_STREAM
+      if (logger_outputs[index].fp != (FILE *)NULL) {
+          fclose(logger_outputs[index].fp);
+      }
+#endif /* NEW_STREAM */
       logger_outputs[index].fp = (FILE *)NULL;
     }
   }
