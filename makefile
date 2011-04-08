@@ -17,37 +17,37 @@ OBJS := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:%.c=%.o)))
 DEPS := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:%.c=%.d)))
 
 
-CFLAGS := \
-  -g \
-  -DLOGGER_ENABLE \
-  -DLOGGER_COLORS \
-  -O1 \
-  -Wall \
-  -Werror=address \
-  -Werror=format \
-  -Werror=format-extra-args \
-  -Werror=implicit-function-declaration \
-  -Werror=implicit-int \
-  -Werror=missing-braces \
-  -Werror=missing-declarations \
-  -Werror=missing-prototypes \
-  -Werror=overflow \
-  -Werror=parentheses \
-  -Werror=return-type \
-  -Werror=sign-compare \
-  -Werror=switch \
-  -Werror=undef \
-  -Werror=unused-value \
-  -Wextra \
-  -Wno-comments \
-  -Wno-error=ignored-qualifiers \
-  -Wno-error=variadic-macros \
-  -Wno-missing-field-initializers \
-  -Wno-unknown-pragmas \
-  -Wno-unused-parameter \
-  -Wuninitialized \
-  -fdiagnostics-show-option \
-  -fmessage-length=0
+CFLAGS :=
+CFLAGS += -g
+CFLAGS += -DLOGGER_ENABLE
+CFLAGS += -DLOGGER_COLORS
+CFLAGS += -O1
+CFLAGS += -Wall
+CFLAGS += -Werror=address
+CFLAGS += -Werror=format
+CFLAGS += -Werror=format-extra-args
+CFLAGS += -Werror=implicit-function-declaration
+CFLAGS += -Werror=implicit-int
+CFLAGS += -Werror=missing-braces
+CFLAGS += -Werror=missing-declarations
+CFLAGS += -Werror=missing-prototypes
+CFLAGS += -Werror=overflow
+CFLAGS += -Werror=parentheses
+CFLAGS += -Werror=return-type
+CFLAGS += -Werror=sign-compare
+CFLAGS += -Werror=switch
+CFLAGS += -Werror=undef
+CFLAGS += -Werror=unused-value
+CFLAGS += -Wextra
+CFLAGS += -Wno-comments
+CFLAGS += -Wno-error=ignored-qualifiers
+CFLAGS += -Wno-error=variadic-macros
+CFLAGS += -Wno-missing-field-initializers
+CFLAGS += -Wno-unknown-pragmas
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wuninitialized
+CFLAGS += -fdiagnostics-show-option
+CFLAGS += -fmessage-length=0
 LINTFLAGS := -nullstate -varuse 
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
