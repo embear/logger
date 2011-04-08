@@ -6,8 +6,8 @@
  * \date   2010-10-13
  * \note   TODO: additional notes
  ******************************************************************************/
-#ifndef __LOGGER_H__
-#define __LOGGER_H__
+#ifndef LOGGER_H
+#define LOGGER_H
 
 #include <stdio.h>
 
@@ -17,16 +17,16 @@ static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean 
 
 
 typedef enum logger_level_e {
-  LOGGER_UNKNOWN =  0, /**< unknown level */
-  LOGGER_DEBUG   =  1, /**< debug-level message */
-  LOGGER_INFO    =  2, /**< informational message */
-  LOGGER_NOTICE  =  3, /**< normal, but significant, condition */
-  LOGGER_WARNING =  4, /**< warning conditions */
-  LOGGER_ERR     =  5, /**< error conditions */
-  LOGGER_CRIT    =  6, /**< critical conditions */
-  LOGGER_ALERT   =  7, /**< action must be taken immediately */
-  LOGGER_EMERG   =  8, /**< system is unusable */
-  LOGGER_MAX     =  9  /**< last entry, always! */
+  LOGGER_UNKNOWN = 0,  /**< unknown level */
+  LOGGER_DEBUG   = 1,  /**< debug-level message */
+  LOGGER_INFO    = 2,  /**< informational message */
+  LOGGER_NOTICE  = 3,  /**< normal, but significant, condition */
+  LOGGER_WARNING = 4,  /**< warning conditions */
+  LOGGER_ERR     = 5,  /**< error conditions */
+  LOGGER_CRIT    = 6,  /**< critical conditions */
+  LOGGER_ALERT   = 7,  /**< action must be taken immediately */
+  LOGGER_EMERG   = 8,  /**< system is unusable */
+  LOGGER_MAX     = 9   /**< last entry, always! */
 } logger_level_t;
 
 
@@ -140,7 +140,7 @@ logger_return_t __logger(logger_id_t    id,
 #define logger_text_attr_set(attr)                     ((void)(0))
 #define logger_text_reset()                            ((void)(0))
 #define logger(id, level, format, ...)                 ((void)(0))
-#define logger_verbose(id, level, format, args...)     ((void)(0))
+#define logger_verbose(id, level, format, args ...)    ((void)(0))
 #endif /* LOGGER_ENABLE */
 
-#endif /* end of include guard: __LOGGERGER_H__ */
+#endif /* end of include guard: LOGGER_H */

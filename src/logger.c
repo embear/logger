@@ -12,8 +12,8 @@
 
 #ifdef LOGGER_ENABLE
 
-#define LOGGER_OUTPUTS_MAX    16 /**< number of possible simultaneous outputs */
-#define LOGGER_IDS_MAX        16 /**< number of possible ids */
+#define LOGGER_OUTPUTS_MAX    16                           /**< number of possible simultaneous outputs */
+#define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
 static FILE           *logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
 static logger_bool_t  logger_ids[LOGGER_IDS_MAX];          /**< storage for possible ids */
