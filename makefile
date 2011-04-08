@@ -48,7 +48,7 @@ CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wuninitialized
 CFLAGS += -fdiagnostics-show-option
 CFLAGS += -fmessage-length=0
-LINTFLAGS := -nullstate -varuse 
+LINTFLAGS := -nullstate -varuse -preproc
 INCLUDE := -I$(INCDIR)
 LDFLAGS := 
 
