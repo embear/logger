@@ -34,6 +34,15 @@
  * logger_output_deregister(stdout);
  * logger_id_release(id);
  * \endcode
+ *
+ * The format of the output could be changed by setting on of the following defines on compile time:
+ *
+ *   - LOGGER_FORMAT_SIMPLE (default)
+ *   - LOGGER_FORMAT_FULL
+ *   - LOGGER_FORMAT_FILE
+ *   - LOGGER_FORMAT_FUNCTION
+ *
+ *
  */
 #ifndef LOGGER_H
 #define LOGGER_H
@@ -131,8 +140,17 @@ typedef enum logger_text_fg_e {
 #define logger_text_attr_set(attr)                     ((void)(0))
 #define logger_text_reset()                            ((void)(0))
 #endif /* LOGGER_COLORS */
+
+#if defined(LOGGER_FORMAT_FULL)
+#define logger(id, level, format, args ...)            __logger(id, level, "%10s:%14s:%20s:%20s():%5s: " format, LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__), ## args)
+#elif defined(LOGGER_FORMAT_FILE)
+#define logger(id, level, format, args ...)            __logger(id, level, "%10s:%14s:%20s:%5s: " format, LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, LOGGER_STRINGIFY(__LINE__), ## args)
+#elif defined(LOGGER_FORMAT_FUNCTION)
+#define logger(id, level, format, args ...)            __logger(id, level, "%10s:%14s:%20s():%5s: " format, LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__), ## args)
+#else
 #define logger(id, level, format, args ...)            __logger(id, level, format, ## args)
-#define logger_verbose(id, level, format, args ...)    __logger(id, level, LOGGER_STRINGIFY(id) ":" LOGGER_STRINGIFY(level) ":" __FILE__ ":" LOGGER_STRINGIFY(__LINE__) ": " format, ## args)
+#endif
+
 
 logger_return_t __logger_init(void);
 logger_return_t __logger_output_register(FILE *stream);
@@ -168,8 +186,7 @@ logger_return_t __logger(logger_id_t    id,
 #define logger_text_color_set(fg, bg)                  ((void)(0))
 #define logger_text_attr_set(attr)                     ((void)(0))
 #define logger_text_reset()                            ((void)(0))
-#define logger(id, level, format, ...)                 ((void)(0))
-#define logger_verbose(id, level, format, args ...)    ((void)(0))
+#define logger(id, level, format, args ...)            ((void)(0))
 #endif /* LOGGER_ENABLE */
 
 #endif /* end of include guard: LOGGER_H */
