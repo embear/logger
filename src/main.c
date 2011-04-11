@@ -203,35 +203,6 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
-  printf("Starting test %d -- verbose logging ....\n", test);
-
-  puts("Log messages have a verbose prefix");
-
-  logger_output_register(stdout);
-  id = logger_id_request();
-  logger_id_enable(id);
-  logger_id_level_set(id, LOGGER_DEBUG);
-
-  logger_verbose(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
-  logger_verbose(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
-
-  logger_output_deregister(stdout);
-  logger_id_release(id);
-
-  printf("Ending test %d ....\n", test);
-
-  test++;
-  puts("");
-  puts("****************************************************************************");
-  puts("* TEST *********************************************************************");
-  puts("****************************************************************************");
-  puts("");
   printf("Starting test %d -- using control functions ....\n", test);
 
   puts("Changing and restoring logging level");
