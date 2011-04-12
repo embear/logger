@@ -17,15 +17,23 @@
 #define LOGGER_OUTPUTS_MAX    16                           /**< number of possible simultaneous outputs */
 #define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
+typedef struct logger_control_s {
+  logger_bool_t used; /**< this id is used */
+  logger_bool_t enabled; /**< this id is enabled */
+  logger_level_t level; /**< level for this id */
+  logger_bool_t color; /**< changed colors for this id */
+  logger_text_fg_t fg; /**< foreground color of this id */
+  logger_text_bg_t bg; /**< background color of this id */
+  logger_text_attr_t attr; /**< attributes of this id */
+} logger_control_t;
+
 typedef struct logger_output_s {
   int  count;   /**< number of registrations for this stream */
   FILE *stream; /**< file pointer given during registration */
 } logger_output_t;
 
+static logger_control_t   logger_control[LOGGER_IDS_MAX];         /**< control storage for possible ids */
 static logger_output_t logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
-static logger_bool_t   logger_ids[LOGGER_IDS_MAX];         /**< storage for possible ids */
-static logger_bool_t   logger_ids_enabled[LOGGER_IDS_MAX]; /**< which ids are enabled */
-static logger_level_t  logger_ids_level[LOGGER_IDS_MAX];   /**< which level for which id */
 
 /** ************************************************************************//**
  * \brief  initialize logger
@@ -36,9 +44,7 @@ logger_return_t __logger_init(void)
 {
   logger_return_t ret = LOGGER_OK;
 
-  memset(logger_ids, 0, sizeof(logger_ids));
-  memset(logger_ids_enabled, 0, sizeof(logger_ids_enabled));
-  memset(logger_ids_level, LOGGER_DEBUG, sizeof(logger_ids_level));
+  memset(logger_control, 0, sizeof(logger_control));
   memset(logger_outputs, 0, sizeof(logger_outputs));
 
   return(ret);
@@ -164,7 +170,7 @@ logger_id_t __logger_id_request(void)
   /* search for an available id */
   found = logger_false;
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    if (logger_ids[index] == logger_false) {
+    if (logger_control[index].used == logger_false) {
       found = logger_true;
       break;
     }
@@ -172,7 +178,7 @@ logger_id_t __logger_id_request(void)
 
   /* found an empty slot */
   if (found == logger_true) {
-    logger_ids[index] = logger_true;
+    logger_control[index].used = logger_true;
     ret = index;
   }
   else {
@@ -197,11 +203,11 @@ logger_return_t __logger_id_release(logger_id_t id)
   /* check for valid id */
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
-    if (logger_ids[id] == logger_true) {
+    if (logger_control[id].used == logger_true) {
       /* reset all id dependend values to defaults */
-      logger_ids[id]         = logger_false;
-      logger_ids_enabled[id] = logger_false;
-      logger_ids_level[id]   = LOGGER_DEBUG;
+      logger_control[id].used         = logger_false;
+      logger_control[id].enabled = logger_false;
+      logger_control[id].level   = LOGGER_DEBUG;
     }
     else {
       ret = LOGGER_ERR_ID_NOT_FOUND;
@@ -227,7 +233,7 @@ logger_return_t __logger_id_enable(logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     /* enable given id */
-    logger_ids_enabled[id] = logger_true;
+    logger_control[id].enabled = logger_true;
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -252,7 +258,7 @@ logger_return_t __logger_id_disable(logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     /* disable given id */
-    logger_ids_enabled[id] = logger_false;
+    logger_control[id].enabled = logger_false;
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -277,7 +283,7 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     /* id enable state */
-    ret = logger_ids_enabled[id];
+    ret = logger_control[id].enabled;
   }
 
   return(ret);
@@ -304,7 +310,7 @@ logger_return_t __logger_id_level_set(logger_id_t    id,
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
       /* set id level */
-      logger_ids_level[id] = level;
+      logger_control[id].level = level;
     }
     else {
       ret = LOGGER_ERR_LEVEL_UNKNOWN;
@@ -333,62 +339,35 @@ logger_level_t __logger_id_level_get(logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     /* get id level */
-    ret = logger_ids_level[id];
+    ret = logger_control[id].level;
   }
 
   return(ret);
 }
 
 
+#ifdef LOGGER_COLORS
 /** ************************************************************************//**
- * \brief  change terminal text color and reset attributes
+ * \brief  change terminal text color and attributes
  *
+ * \param[in]     id      id for setting level
  * \param[in]     fg      text foreground
  * \param[in]     bg      text background
- *
- * \return     LOGGER_OK if no error occurred, error code otherwise
- ******************************************************************************/
-logger_return_t __logger_text_color_set(logger_text_fg_t fg,
-                                        logger_text_bg_t bg)
-{
-  logger_level_t ret = LOGGER_OK;
-  int            index;
-
-  /* loop over all possibe outputs */
-  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index].stream == stdout) ||
-        (logger_outputs[index].stream == stderr)) {
-      (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, LOGGER_ATTR_RESET, fg, bg);
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  change terminal text attributes
- *
- * must be called after setting colors
- *
  * \param[in]     attr    text attribute
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_text_attr_set(logger_text_attr_t attr)
+logger_return_t __logger_color_set(logger_id_t id,
+                                        logger_text_fg_t fg,
+                                        logger_text_bg_t bg,
+                                        logger_text_attr_t attr)
 {
   logger_level_t ret = LOGGER_OK;
-  int            index;
 
-  /* loop over all possibe outputs */
-  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index].stream == stdout) ||
-        (logger_outputs[index].stream == stderr)) {
-      (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, attr);
-    }
-  }
+  logger_control[id].color = logger_true;
+  logger_control[id].fg = fg;
+  logger_control[id].bg = bg;
+  logger_control[id].attr = attr;
 
   return(ret);
 }
@@ -397,24 +376,19 @@ logger_return_t __logger_text_attr_set(logger_text_attr_t attr)
 /** ************************************************************************//**
  * \brief  reset terminal text color and attributes
  *
+ * \param[in]     id      id for setting level
+ *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_text_reset(void)
+logger_return_t __logger_color_reset(logger_id_t id)
 {
   logger_level_t ret = LOGGER_OK;
-  int            index;
 
-  /* loop over all possibe outputs */
-  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    /* use colors only on stdout and stderr, files will just be cluttered */
-    if ((logger_outputs[index].stream == stdout) ||
-        (logger_outputs[index].stream == stderr)) {
-      (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
-    }
-  }
+  logger_control[id].color = logger_false;
 
   return(ret);
 }
+#endif /* LOGGER_COLORS */
 
 
 /** ************************************************************************//**
@@ -443,16 +417,38 @@ logger_return_t __logger(logger_id_t    id,
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
       /* check if id is enabled and level is high enough */
-      if ((logger_ids_enabled[id] == logger_true) &&
-          (logger_ids_level[id] <= level)) {
+      if ((logger_control[id].enabled == logger_true) &&
+          (logger_control[id].level <= level)) {
+        /* initialize variable arguments */
         va_start(argp, format);
 
         /* loop over all possibe outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
           if (logger_outputs[index].count > 0) {
+            /* set color */
+#ifdef LOGGER_COLORS
+            if ((logger_control[id].color == logger_true) &&
+                ((logger_outputs[index].stream == stdout) ||
+                 (logger_outputs[index].stream == stderr))) {
+              (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
+            }
+#endif /* LOGGER_COLORS */
+
+            /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
+
+            /* reset color */
+#ifdef LOGGER_COLORS
+            if ((logger_control[id].color == logger_true) &&
+                ((logger_outputs[index].stream == stdout) ||
+                 (logger_outputs[index].stream == stderr))) {
+              (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+            }
+#endif /* LOGGER_COLORS */
           }
         }
+
+        /* deinitialize variable arguments */
         va_end(argp);
       }
     }
