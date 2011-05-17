@@ -1,21 +1,30 @@
+#SILENT ?= @
+
 CC = gcc
 LD = gcc
 RM = rm
 SED = sed
 ECHO = echo
 MKDIR = mkdir
-LINT = splint
 
 SRCDIR := src
 INCDIR := include
 DEPDIR := dep
 OBJDIR := obj
+LIBDIR := lib
+
+INCDIRS := 
+INCDIRS += h
 
 APP := logger
-SRCS := $(wildcard $(SRCDIR)/*.c)
-OBJS := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:%.c=%.o)))
-DEPS := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:%.c=%.d)))
+LIB := logger
 
+APPSRCS := $(SRCDIR)/main.c
+LIBSRCS := $(SRCDIR)/logger.c
+APPOBJS := $(addprefix $(OBJDIR)/, $(notdir $(APPSRCS:%.c=%.o)))
+LIBOBJS := $(addprefix $(OBJDIR)/, $(notdir $(LIBSRCS:%.c=%.o)))
+LIBNAME := $(LIBDIR)/lib$(LIB).a
+DEPS := $(addprefix $(DEPDIR)/, $(notdir $(LIBSRCS:%.c=%.d)) $(notdir $(LIBSRCS:%.c=%.d)))
 
 CFLAGS :=
 CFLAGS += -g
@@ -52,38 +61,50 @@ CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wuninitialized
 CFLAGS += -fdiagnostics-show-option
 CFLAGS += -fmessage-length=0
-LINTFLAGS := -nullstate -varuse -preproc
 INCLUDE := -I$(INCDIR)
-LDFLAGS := 
 
-.PHONY: all print clean lint
+LDFLAGS := 
+LDFLAGS += -L$(LIBDIR) -l$(LIB)
+
+.PHONY: all print clean distclean
 
 all: $(APP)
 
 print: 
-	@$(ECHO) "APP:  $(APP)"
-	@$(ECHO) "SRCS: $(SRCS)"
-	@$(ECHO) "OBJS: $(OBJS)"
-	@$(ECHO) "DEPS: $(DEPS)"
+	$(SILENT)$(ECHO) "APP:     $(APP)"
+	$(SILENT)$(ECHO) "LIB:     $(LIB)"
+	$(SILENT)$(ECHO) "APPSRCS: $(APPSRCS)"
+	$(SILENT)$(ECHO) "LIBSRCS: $(LIBSRCS)"
+	$(SILENT)$(ECHO) "APPOBJS: $(APPOBJS)"
+	$(SILENT)$(ECHO) "LIBOBJS: $(LIBOBJS)"
+	$(SILENT)$(ECHO) "INCLUDE:  $(INCLUDE)"
+	$(SILENT)$(ECHO) "DEPS:    $(DEPS)"
 
 clean:
-	@$(ECHO) "Cleaning"
-	@$(RM) -rf $(APP) $(OBJS) $(DEPS)
+	$(SILENT)$(ECHO) "Cleaning"
+	$(SILENT)$(RM) -rf $(APP) $(LIBNAME) $(APPOBJS) $(LIBOBJS) $(DEPS)
 
-lint:
-	$(LINT) $(LINTFLAGS) $(INCLUDE) $(SRCS)
+distclean:
+	$(SILENT)$(ECHO) "Dist Cleaning"
+	$(SILENT)$(RM) -rf $(APP) $(LIBDIR) $(OBJDIR) $(DEPDIR)
 
-$(APP): $(OBJS)
-	@$(ECHO) "Linking $@"
-	@$(LD) $(LDFLAGS) -o $@ $(OBJS)
+$(APP): $(APPOBJS) $(LIBNAME)
+	$(SILENT)$(ECHO) "Linking $@"
+	$(SILENT)$(LD) -o $@ $(APPOBJS) $(LDFLAGS)
+
+$(LIBNAME): $(LIBOBJS)
+	$(SILENT)[ -d $(LIBDIR) ] || $(MKDIR) $(LIBDIR)
+	$(SILENT)$(ECHO) "Archiving $@"
+	$(SILENT)ar r $@ $(LIBOBJS) >/dev/null 2>&1
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@$(ECHO) "Compiling $@"
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	$(SILENT)[ -d $(OBJDIR) ] || $(MKDIR) $(OBJDIR)
+	$(SILENT)$(ECHO) "Compiling $@"
+	$(SILENT)$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 $(DEPDIR)/%.d: $(SRCDIR)/%.c
-	@[ -d $(DEPDIR) ] || $(MKDIR) $(DEPDIR)
-	@$(ECHO) "Updating dependencies for $<"
-	@$(CC) -MM $(CFLAGS) $(INCLUDE) $< > $@.$$$$; $(SED) 's,\($*\)\.o[ :]*,$(OBJDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; $(RM) -f $@.$$$$
+	$(SILENT)[ -d $(DEPDIR) ] || $(MKDIR) $(DEPDIR)
+	$(SILENT)$(ECHO) "Updating dependencies for $<"
+	$(SILENT)$(CC) -MM $(CFLAGS) $(INCLUDE) $< > $@.$$$$; $(SED) 's,\($*\)\.o[ :]*,$(OBJDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; $(RM) -f $@.$$$$
 
 -include $(DEPS)
