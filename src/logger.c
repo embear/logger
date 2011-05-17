@@ -17,13 +17,13 @@
 #define LOGGER_IDS_MAX        16                           /**< number of possible ids */
 
 typedef struct logger_control_s {
-  logger_bool_t used; /**< this id is used */
-  logger_bool_t enabled; /**< this id is enabled */
-  logger_level_t level; /**< level for this id */
-  logger_bool_t color; /**< changed colors for this id */
-  logger_text_fg_t fg; /**< foreground color of this id */
-  logger_text_bg_t bg; /**< background color of this id */
-  logger_text_attr_t attr; /**< attributes of this id */
+  logger_bool_t      used;    /**< this id is used */
+  logger_bool_t      enabled; /**< this id is enabled */
+  logger_level_t     level;   /**< level for this id */
+  logger_bool_t      color;   /**< changed colors for this id */
+  logger_text_fg_t   fg;      /**< foreground color of this id */
+  logger_text_bg_t   bg;      /**< background color of this id */
+  logger_text_attr_t attr;    /**< attributes of this id */
 } logger_control_t;
 
 typedef struct logger_output_s {
@@ -31,8 +31,8 @@ typedef struct logger_output_s {
   FILE *stream; /**< file pointer given during registration */
 } logger_output_t;
 
-static logger_control_t   logger_control[LOGGER_IDS_MAX];         /**< control storage for possible ids */
-static logger_output_t logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
+static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< control storage for possible ids */
+static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
 
 /** ************************************************************************//**
  * \brief  initialize logger
@@ -100,7 +100,6 @@ logger_return_t __logger_output_register(FILE *stream)
 
         /* make a nonblocking stream */
         fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);
-
       }
       else {
         ret = LOGGER_ERR_OUTPUTS_FULL;
@@ -204,7 +203,7 @@ logger_return_t __logger_id_release(logger_id_t id)
       (id < LOGGER_IDS_MAX)) {
     if (logger_control[id].used == logger_true) {
       /* reset all id dependend values to defaults */
-      logger_control[id].used         = logger_false;
+      logger_control[id].used    = logger_false;
       logger_control[id].enabled = logger_false;
       logger_control[id].level   = LOGGER_DEBUG;
     }
@@ -346,6 +345,7 @@ logger_level_t __logger_id_level_get(logger_id_t id)
 
 
 #ifdef LOGGER_COLORS
+
 /** ************************************************************************//**
  * \brief  change terminal text color and attributes
  *
@@ -356,17 +356,17 @@ logger_level_t __logger_id_level_get(logger_id_t id)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_color_set(logger_id_t id,
-                                        logger_text_fg_t fg,
-                                        logger_text_bg_t bg,
-                                        logger_text_attr_t attr)
+logger_return_t __logger_color_set(logger_id_t        id,
+                                   logger_text_fg_t   fg,
+                                   logger_text_bg_t   bg,
+                                   logger_text_attr_t attr)
 {
   logger_level_t ret = LOGGER_OK;
 
   logger_control[id].color = logger_true;
-  logger_control[id].fg = fg;
-  logger_control[id].bg = bg;
-  logger_control[id].attr = attr;
+  logger_control[id].fg    = fg;
+  logger_control[id].bg    = bg;
+  logger_control[id].attr  = attr;
 
   return(ret);
 }
@@ -387,6 +387,8 @@ logger_return_t __logger_color_reset(logger_id_t id)
 
   return(ret);
 }
+
+
 #endif /* LOGGER_COLORS */
 
 
@@ -431,7 +433,7 @@ logger_return_t __logger(logger_id_t    id,
                  (logger_outputs[index].stream == stderr))) {
               (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
             }
-#endif /* LOGGER_COLORS */
+#endif      /* LOGGER_COLORS */
 
             /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
@@ -443,7 +445,7 @@ logger_return_t __logger(logger_id_t    id,
                  (logger_outputs[index].stream == stderr))) {
               (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
             }
-#endif /* LOGGER_COLORS */
+#endif      /* LOGGER_COLORS */
           }
         }
 
