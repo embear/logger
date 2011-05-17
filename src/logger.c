@@ -1,10 +1,9 @@
 /***************************************************************************//**
- * \file   $Id$
+ * \file   logger.c
  *
  * \brief  logging facility for C
  * \author Markus Braun
  * \date   2010-10-13
- * \note   TODO: additional notes
  ******************************************************************************/
 #include <string.h>
 #include <stdarg.h>

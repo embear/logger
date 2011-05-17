@@ -1,5 +1,5 @@
 /***************************************************************************//**
- * \file   $Id$
+ * \file   logger.h
  *
  * \brief  logging facility for C
  * \author Markus Braun
@@ -41,7 +41,6 @@
  *   - LOGGER_FORMAT_FULL
  *   - LOGGER_FORMAT_FILE
  *   - LOGGER_FORMAT_FUNCTION
- *
  *
  */
 #ifndef LOGGER_H
