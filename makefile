@@ -1,4 +1,4 @@
-#SILENT ?= @
+SILENT ?= @
 
 CC = gcc
 LD = gcc
@@ -86,7 +86,7 @@ clean:
 
 distclean:
 	$(SILENT)$(ECHO) "Dist Cleaning"
-	$(SILENT)$(RM) -rf $(APP) $(LIBDIR) $(OBJDIR) $(DEPDIR)
+	$(SILENT)$(RM) -rf $(APP) $(LIBDIR) $(OBJDIR) $(DEPDIR) logfile
 
 $(APP): $(APPOBJS) $(LIBNAME)
 	$(SILENT)$(ECHO) "Linking $@"
