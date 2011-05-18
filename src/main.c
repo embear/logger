@@ -260,6 +260,35 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- continued messages ....\n", test);
+
+  puts("Messages will be all in one line");
+
+  logger_output_register(stdout);
+  id = logger_id_request();
+  logger_id_enable(id);
+  logger_id_level_set(id, LOGGER_DEBUG);
+
+  logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__);
+  logger(id, LOGGER_DEBUG,   " - continued 1");
+  logger(id, LOGGER_DEBUG,   " - continued 2");
+  logger(id, LOGGER_DEBUG,   " - continued 3\n");
+  logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__);
+  logger(id, LOGGER_DEBUG,   " - continued 1");
+  logger(id, LOGGER_DEBUG,   " - continued 2");
+  logger(id, LOGGER_DEBUG,   " - continued 3\n");
+
+  logger_output_deregister(stdout);
+  logger_id_release(id);
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- colors in text output ....\n", test);
 
   puts("Print log messages in different colors");
