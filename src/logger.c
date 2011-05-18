@@ -24,6 +24,7 @@ typedef struct logger_control_s {
   logger_text_fg_t   fg;      /**< foreground color of this id */
   logger_text_bg_t   bg;      /**< background color of this id */
   logger_text_attr_t attr;    /**< attributes of this id */
+  logger_bool_t      cont;    /**< previous message didn't contain a newline, thus omit prefix for next message */
 } logger_control_t;
 
 typedef struct logger_output_s {
@@ -393,7 +394,7 @@ logger_return_t __logger_color_reset(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  output log message
+ * \brief  output log message prefix
  *
  * \param[in]     id      id outputting this message
  * \param[in]     level   level of this message
@@ -402,7 +403,7 @@ logger_return_t __logger_color_reset(logger_id_t id)
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger(logger_id_t    id,
+logger_return_t __logger_prefix(logger_id_t    id,
                          logger_level_t level,
                          const char     *format,
                          ...)
@@ -419,7 +420,95 @@ logger_return_t __logger(logger_id_t    id,
         (level <= LOGGER_MAX)) {
       /* check if id is enabled and level is high enough */
       if ((logger_control[id].enabled == logger_true) &&
+          (logger_control[id].level <= level) &&
+          (logger_control[id].cont == logger_false)) {
+        /* initialize variable arguments */
+        va_start(argp, format);
+
+        /* loop over all possibe outputs */
+        for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+          if (logger_outputs[index].count > 0) {
+            /* set color */
+#ifdef LOGGER_COLORS
+            if ((logger_control[id].color == logger_true) &&
+                ((logger_outputs[index].stream == stdout) ||
+                 (logger_outputs[index].stream == stderr))) {
+              (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
+            }
+#endif      /* LOGGER_COLORS */
+
+            /* print message */
+            (void)vfprintf(logger_outputs[index].stream, format, argp);
+
+            /* reset color */
+#ifdef LOGGER_COLORS
+            if ((logger_control[id].color == logger_true) &&
+                ((logger_outputs[index].stream == stdout) ||
+                 (logger_outputs[index].stream == stderr))) {
+              (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+            }
+#endif      /* LOGGER_COLORS */
+          }
+        }
+
+        /* deinitialize variable arguments */
+        va_end(argp);
+      }
+    }
+    else {
+      ret = LOGGER_ERR_LEVEL_UNKNOWN;
+    }
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  output log message
+ *
+ * \param[in]     id      id outputting this message
+ * \param[in]     level   level of this message
+ * \param[in]     format  printf like format string
+ * \param[in]     va_args argument list
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_msg(logger_id_t    id,
+                         logger_level_t level,
+                         const char     *format,
+                         ...)
+{
+  logger_return_t ret = LOGGER_OK;
+  va_list         argp;
+  int             index;
+  logger_bool_t   cont;
+
+
+  /* check for valid id */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX)) {
+    /* check for valid level */
+    if ((level >= LOGGER_DEBUG) &&
+        (level <= LOGGER_MAX)) {
+
+      /* check for multiline message */
+      cont = logger_true;
+      for (index = 0; format[index] != '\0'; index++) {
+        if (format[index] == '\n') {
+          cont = logger_false;
+          break;
+        }
+      }
+
+      /* check if id is enabled and level is high enough */
+      if ((logger_control[id].enabled == logger_true) &&
           (logger_control[id].level <= level)) {
+        logger_control[id].cont = cont;
+
         /* initialize variable arguments */
         va_start(argp, format);
 
