@@ -404,9 +404,9 @@ logger_return_t __logger_color_reset(logger_id_t id)
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
 logger_return_t __logger_prefix(logger_id_t    id,
-                         logger_level_t level,
-                         const char     *format,
-                         ...)
+                                logger_level_t level,
+                                const char     *format,
+                                ...)
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
@@ -478,15 +478,14 @@ logger_return_t __logger_prefix(logger_id_t    id,
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
 logger_return_t __logger_msg(logger_id_t    id,
-                         logger_level_t level,
-                         const char     *format,
-                         ...)
+                             logger_level_t level,
+                             const char     *format,
+                             ...)
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
   int             index;
   logger_bool_t   cont;
-
 
   /* check for valid id */
   if ((id >= 0) &&
@@ -494,10 +493,9 @@ logger_return_t __logger_msg(logger_id_t    id,
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
-
       /* check for multiline message */
       cont = logger_true;
-      for (index = 0; format[index] != '\0'; index++) {
+      for (index = 0 ; format[index] != '\0' ; index++) {
         if (format[index] == '\n') {
           cont = logger_false;
           break;
