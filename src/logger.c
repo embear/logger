@@ -439,15 +439,6 @@ logger_return_t __logger_prefix(logger_id_t    id,
 
             /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
-
-            /* reset color */
-#ifdef LOGGER_COLORS
-            if ((logger_control[id].color == logger_true) &&
-                ((logger_outputs[index].stream == stdout) ||
-                 (logger_outputs[index].stream == stderr))) {
-              (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
-            }
-#endif      /* LOGGER_COLORS */
           }
         }
 
@@ -513,21 +504,13 @@ logger_return_t __logger_msg(logger_id_t    id,
         /* loop over all possibe outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
           if (logger_outputs[index].count > 0) {
-            /* set color */
-#ifdef LOGGER_COLORS
-            if ((logger_control[id].color == logger_true) &&
-                ((logger_outputs[index].stream == stdout) ||
-                 (logger_outputs[index].stream == stderr))) {
-              (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
-            }
-#endif      /* LOGGER_COLORS */
-
             /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
 
             /* reset color */
 #ifdef LOGGER_COLORS
             if ((logger_control[id].color == logger_true) &&
+                (logger_control[id].cont == logger_false) &&
                 ((logger_outputs[index].stream == stdout) ||
                  (logger_outputs[index].stream == stderr))) {
               (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
