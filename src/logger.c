@@ -99,7 +99,7 @@ logger_return_t __logger_output_register(FILE *stream)
         logger_outputs[index].stream = stream;
 
         /* make a nonblocking stream */
-        fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);
+        //fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);
       }
       else {
         ret = LOGGER_ERR_OUTPUTS_FULL;
