@@ -24,6 +24,8 @@
  * \code
  * logger_id_t    id  = logger_id_unknown;
  *
+ * logger_init();
+ *
  * logger_output_register(stdout);
  * id = logger_id_request();
  * logger_id_enable(id);
