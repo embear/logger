@@ -32,6 +32,7 @@ typedef struct logger_output_s {
   FILE *stream; /**< file pointer given during registration */
 } logger_output_t;
 
+static logger_bool_t logger_enabled; /**< logger is enabled */
 static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< control storage for possible ids */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
 
@@ -44,8 +45,39 @@ logger_return_t __logger_init(void)
 {
   logger_return_t ret = LOGGER_OK;
 
+  logger_enabled = logger_true;
   memset(logger_control, 0, sizeof(logger_control));
   memset(logger_outputs, 0, sizeof(logger_outputs));
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  enable logger
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_enable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_enabled = logger_true;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  enable logger
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_disable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_enabled = logger_false;
 
   return(ret);
 }
@@ -414,7 +446,8 @@ logger_return_t __logger_prefix(logger_id_t    id,
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_enabled == logger_true)) {
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
@@ -480,7 +513,8 @@ logger_return_t __logger_msg(logger_id_t    id,
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_enabled == logger_true)) {
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {

@@ -121,6 +121,8 @@ typedef enum logger_text_fg_e {
 #define LOGGER_STRINGIFY_(x)                  # x
 #define LOGGER_STRINGIFY(x)                   LOGGER_STRINGIFY_(x)
 #define logger_init()                         __logger_init()
+#define logger_enable()                       __logger_enable()
+#define logger_disable()                      __logger_disable()
 #define logger_output_register(stream)        __logger_output_register(stream)
 #define logger_output_deregister(stream)      __logger_output_deregister(stream)
 #define logger_id_request()                   __logger_id_request()
@@ -166,6 +168,8 @@ typedef enum logger_text_fg_e {
 
 
 logger_return_t __logger_init(void);
+logger_return_t __logger_enable(void);
+logger_return_t __logger_disable(void);
 logger_return_t __logger_output_register(FILE *stream);
 logger_return_t __logger_output_deregister(FILE *stream);
 logger_id_t __logger_id_request(void);
@@ -192,6 +196,8 @@ logger_return_t __logger_msg(logger_id_t    id,
 
 #else  /* LOGGER_ENABLE */
 #define logger_init()                          ((void)(0))
+#define logger_enable()                        ((void)(0))
+#define logger_disable()                       ((void)(0))
 #define logger_output_register(stream)         ((void)(0))
 #define logger_output_deregister(stream)       ((void)(0))
 #define logger_id_request()                    LOGGER_ERR_ID_UNKNOWN
