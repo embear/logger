@@ -32,7 +32,7 @@ typedef struct logger_output_s {
   FILE *stream; /**< file pointer given during registration */
 } logger_output_t;
 
-static logger_bool_t logger_enabled; /**< logger is enabled */
+static logger_bool_t    logger_enabled;                     /**< logger is enabled */
 static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< control storage for possible ids */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
 
@@ -69,7 +69,7 @@ logger_return_t __logger_enable(void)
 
 
 /** ************************************************************************//**
- * \brief  enable logger
+ * \brief  disable logger
  *
  * \return     LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
