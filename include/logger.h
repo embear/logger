@@ -141,25 +141,25 @@ typedef enum logger_text_fg_e {
 #if defined(LOGGER_FORMAT_FULL)
 #define logger(id, level, format, args ...)                                                                                                                       \
   {                                                                                                                                                               \
-    __logger_prefix(id, level, "%10s:%14s:%20s:%20s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_prefix(id, level, "%15s:%15s:%30s:%30s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
     __logger_msg(id, level, format, ## args);                                                                                                                     \
   }
 #elif defined(LOGGER_FORMAT_FILE)
 #define logger(id, level, format, args ...)                                                                                                  \
   {                                                                                                                                          \
-    __logger_prefix(id, level, "%10s:%14s:%20s:%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_prefix(id, level, "%15s:%15s:%30s:%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FILE__, LOGGER_STRINGIFY(__LINE__)); \
     __logger_msg(id, level, format, ## args);                                                                                                \
   }
 #elif defined(LOGGER_FORMAT_FUNCTION)
 #define logger(id, level, format, args ...)                                                                                                                 \
   {                                                                                                                                                         \
-    __logger_prefix(id, level, "%10s:%14s:%20s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__), ## args); \
+    __logger_prefix(id, level, "%15s:%15s:%30s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__), ## args); \
     __logger_msg(id, level, format, ## args);                                                                                                               \
   }
 #else
 #define logger(id, level, format, args ...)                                                   \
   {                                                                                           \
-    __logger_prefix(id, level, "%10s:%14s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level)); \
+    __logger_prefix(id, level, "%15s:%15s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level)); \
     __logger_msg(id, level, format, ## args);                                                 \
   }
 #endif
