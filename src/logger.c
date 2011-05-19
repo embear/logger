@@ -84,6 +84,17 @@ logger_return_t __logger_disable(void)
 
 
 /** ************************************************************************//**
+ * \brief  check if logger is enabled
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_bool_t __logger_is_enabled()
+{
+  return(logger_enabled);
+}
+
+
+/** ************************************************************************//**
  * \brief  register an output stream to logger
  *
  * the given file stream may be on of stdout, stderr or a file stream opened by
@@ -300,7 +311,7 @@ logger_return_t __logger_id_disable(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  disable a logger id for output
+ * \brief  check if logging of given id is enabled
  *
  * \param[in]     id id to check enable state
  *
