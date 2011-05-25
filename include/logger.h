@@ -156,10 +156,10 @@ typedef enum logger_text_fg_e {
     __logger_msg(id, level, format, ## args);                                                                                                \
   }
 #elif defined(LOGGER_FORMAT_FUNCTION)
-#define logger(id, level, format, args ...)                                                                                                                 \
-  {                                                                                                                                                         \
-    __logger_prefix(id, level, "%15s:%15s:%30s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__), ## args); \
-    __logger_msg(id, level, format, ## args);                                                                                                               \
+#define logger(id, level, format, args ...)                                                                                                        \
+  {                                                                                                                                                \
+    __logger_prefix(id, level, "%15s:%15s:%30s():%5s: ", LOGGER_STRINGIFY(id), LOGGER_STRINGIFY(level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_msg(id, level, format, ## args);                                                                                                      \
   }
 #else
 #define logger(id, level, format, args ...)                                                   \
