@@ -13,8 +13,8 @@
 
 #ifdef LOGGER_ENABLE
 
-#define LOGGER_OUTPUTS_MAX    16                           /**< number of possible simultaneous outputs */
-#define LOGGER_IDS_MAX        16                           /**< number of possible ids */
+#define LOGGER_OUTPUTS_MAX    256                          /**< number of possible simultaneous outputs */
+#define LOGGER_IDS_MAX        256                          /**< number of possible ids */
 
 typedef struct logger_control_s {
   logger_bool_t      used;    /**< this id is used */
