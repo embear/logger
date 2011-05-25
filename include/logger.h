@@ -19,37 +19,56 @@
  * Logger needs to be enabled using the global define LOGGER_ENABLE.
  * Otherwise all functions will be excluded from compilation.
  *
+ * To get color support LOGGER_COLORS needs to be defined.
+ *
  * Basic usage of logger:
  *
  * \code
- * FILE        *stream;
- * logger_id_t id = logger_id_unknown;
- *
- * logger_init();
- *
- * stream = fopen("logfile", "w");
- * logger_output_register(stream);
- * logger_output_level_set(stream, LOGGER_DEBUG);
- *
- * logger_output_register(stdout);
- * logger_output_level_set(stdout, LOGGER_ERROR);
- *
- * id = logger_id_request();
- * logger_id_enable(id);
- * logger_id_level_set(id, LOGGER_DEBUG);
- *
- * logger(id, LOGGER_DEBUG,    "id %d - LOGGER_DEBUG   in line %d\n", id, __LINE__);
- * logger(id, LOGGER_INFO,     "id %d - LOGGER_INFO    in line %d\n", id, __LINE__);
- * logger(id, LOGGER_NOTICE,   "id %d - LOGGER_NOTICE  in line %d\n", id, __LINE__);
- * logger(id, LOGGER_WARNING,  "id %d - LOGGER_WARNING in line %d\n", id, __LINE__);
- * logger(id, LOGGER_ERR,      "id %d - LOGGER_ERR     in line %d\n", id, __LINE__);
- * logger(id, LOGGER_CRIT,     "id %d - LOGGER_CRIT    in line %d\n", id, __LINE__);
- * logger(id, LOGGER_ALERT,    "id %d - LOGGER_ALERT   in line %d\n", id, __LINE__);
- * logger(id, LOGGER_EMERG,    "id %d - LOGGER_EMERG   in line %d\n", id, __LINE__);
- *
- * logger_output_deregister(stream);
- * logger_output_deregister(stdout);
- * logger_id_release(id);
+ * #include "logger.h"
+ * 
+ * int main(void)
+ * {
+ *   FILE        *stream;
+ *   logger_id_t id = logger_id_unknown;
+ *  
+ *   // initialize logger
+ *   logger_init();
+ *  
+ *   // open a file as output for all messages
+ *   stream = fopen("logfile", "w");
+ *   logger_output_register(stream);
+ *   logger_output_level_set(stream, LOGGER_DEBUG);
+ *  
+ *   // open stdout as output for messages above LOGGER_ERR
+ *   logger_output_register(stdout);
+ *   logger_output_level_set(stdout, LOGGER_ERR);
+ *  
+ *   // get a logging id, enable it and set log level
+ *   id = logger_id_request();
+ *   logger_id_enable(id);
+ *   logger_id_level_set(id, LOGGER_DEBUG);
+ *  
+ *   // do the logging
+ *   logger(id, LOGGER_DEBUG,    "id %d - LOGGER_DEBUG   in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_INFO,     "id %d - LOGGER_INFO    in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_NOTICE,   "id %d - LOGGER_NOTICE  in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_WARNING,  "id %d - LOGGER_WARNING in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_ERR,      "id %d - LOGGER_ERR     in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_CRIT,     "id %d - LOGGER_CRIT    in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_ALERT,    "id %d - LOGGER_ALERT   in line %d\n", id, __LINE__);
+ *   logger(id, LOGGER_EMERG,    "id %d - LOGGER_EMERG   in line %d\n", id, __LINE__);
+ *  
+ *   // release id
+ *   logger_id_release(id);
+ * 
+ *   // deregister stdout output
+ *   logger_output_deregister(stdout);
+ * 
+ *   // deregister file output
+ *   logger_output_deregister(stream);
+ * 
+ *   return(0);
+ * }
  * \endcode
  *
  * The format of the output could be changed by setting on of the following defines on compile time:
