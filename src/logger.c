@@ -1,7 +1,14 @@
 /***************************************************************************//**
+ *     __
+ *    / /___  ____ _____ ____  _____
+ *   / / __ \/ __ `/ __ `/ _ \/ ___/
+ *  / / /_/ / /_/ / /_/ /  __/ /
+ * /_/\____/\__, /\__, /\___/_/
+ *         /____//____/
+ *
  * \file   logger.c
  *
- * \brief  logging facility for C
+ * \brief  Logging facility for C.
  * \author Markus Braun
  * \date   2010-10-13
  ******************************************************************************/
@@ -13,34 +20,37 @@
 
 #ifdef LOGGER_ENABLE
 
-#define LOGGER_OUTPUTS_MAX    256                          /**< number of possible simultaneous outputs */
-#define LOGGER_IDS_MAX        256                          /**< number of possible ids */
+#define LOGGER_OUTPUTS_MAX    256                          /**< Number of possible simultaneous outputs. */
+#define LOGGER_IDS_MAX        256                          /**< Number of possible ids. */
 
 typedef struct logger_control_s {
-  logger_bool_t      used;    /**< this id is used */
-  logger_bool_t      enabled; /**< this id is enabled */
-  logger_level_t     level;   /**< level for this id */
-  logger_bool_t      color;   /**< changed colors for this id */
-  logger_text_fg_t   fg;      /**< foreground color of this id */
-  logger_text_bg_t   bg;      /**< background color of this id */
-  logger_text_attr_t attr;    /**< attributes of this id */
-  logger_bool_t      cont;    /**< previous message didn't contain a newline, thus omit prefix for next message */
+  logger_bool_t      used;    /**< This id is used. */
+  logger_bool_t      enabled; /**< This id is enabled. */
+  logger_level_t     level;   /**< Level for this id. */
+  logger_bool_t      color;   /**< Changed colors for this id. */
+  logger_text_fg_t   fg;      /**< Foreground color of this id. */
+  logger_text_bg_t   bg;      /**< Background color of this id. */
+  logger_text_attr_t attr;    /**< Attributes of this id. */
+  logger_bool_t      cont;    /**< Previous message didn't contain a newline, thus omit prefix for next message. */
 } logger_control_t;
 
 typedef struct logger_output_s {
-  int            count;   /**< number of registrations for this stream */
-  logger_level_t level;   /**< level for this stream */
-  FILE           *stream; /**< file pointer given during registration */
+  int            count;   /**< Number of registrations for this stream. */
+  logger_level_t level;   /**< Level for this stream. */
+  FILE           *stream; /**< File pointer given during registration. */
 } logger_output_t;
 
-static logger_bool_t    logger_enabled;                     /**< logger is enabled */
-static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< control storage for possible ids */
-static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< storage for possible output streams */
+static logger_bool_t    logger_enabled;                     /**< Logger is enabled. */
+static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage for possible ids. */
+static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
 
 /** ************************************************************************//**
- * \brief  initialize logger
+ * \brief  Initialize logger.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * Initialize logger internal structures. Needs to be called once before any
+ * other logger function is called.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_init(void)
 {
@@ -55,9 +65,11 @@ logger_return_t __logger_init(void)
 
 
 /** ************************************************************************//**
- * \brief  enable logger
+ * \brief  Enable logger.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * Enable logger globally for all ids and all outputs.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_enable(void)
 {
@@ -70,9 +82,11 @@ logger_return_t __logger_enable(void)
 
 
 /** ************************************************************************//**
- * \brief  disable logger
+ * \brief  Disable logger.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * Disable logger globally for all ids and all outputs.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_disable(void)
 {
@@ -85,9 +99,11 @@ logger_return_t __logger_disable(void)
 
 
 /** ************************************************************************//**
- * \brief  check if logger is enabled
+ * \brief  Query the current enable state of logger.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * Query the current global enable state of logger.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_bool_t __logger_is_enabled()
 {
@@ -96,15 +112,15 @@ logger_bool_t __logger_is_enabled()
 
 
 /** ************************************************************************//**
- * \brief  register an output stream to logger
+ * \brief  Register an output stream.
  *
- * the given file stream may be on of stdout, stderr or a file stream opened by
- * the user. the default logging level is set to LOGGER_DEBUG thus all messages
- * will appear on this stream.
+ * The given file stream may be on of \c stdout, \c stderr or a file stream
+ * opened by the user. The default logging level is set to \c LOGGER_DEBUG thus
+ * all messages will appear on this stream.
  *
- * \param[in]     stream opened file stream
+ * \param[in]     stream  Opened file stream.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_output_register(FILE *stream)
 {
@@ -162,11 +178,13 @@ logger_return_t __logger_output_register(FILE *stream)
 
 
 /** ************************************************************************//**
- * \brief  deregister an output stream to logger
+ * \brief  Deregister an output stream.
  *
- * \param[in]     stream previous registered file stream
+ * Remove given file stream from list of outputs.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     stream  Previous registered file stream.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_output_deregister(FILE *stream)
 {
@@ -203,12 +221,15 @@ logger_return_t __logger_output_deregister(FILE *stream)
 
 
 /** ************************************************************************//**
- * \brief  set required minimum level for logging on this output
+ * \brief  Set logging level for output stream.
  *
- * \param[in]     stream previous registered file stream
- * \param[in]     level level to set
+ * Set the minimum logging level for given output stream. Only log messages
+ * equal or above the given level will be printed to the given stream.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     stream  Previous registered file stream.
+ * \param[in]     level   Level to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_output_level_set(FILE           *stream,
                                           logger_level_t level)
@@ -247,11 +268,13 @@ logger_return_t __logger_output_level_set(FILE           *stream,
 
 
 /** ************************************************************************//**
- * \brief  get currently set minimum level for logging on this
+ * \brief  Query logging level for output stream.
  *
- * \param[in]     stream previous registered file stream
+ * Query the currently set minimum level for the given logging output stream.
  *
- * \return     currently set level
+ * \param[in]     stream  Previous registered file stream.
+ *
+ * \return        Currently set logging level.
  ******************************************************************************/
 logger_level_t __logger_output_level_get(FILE *stream)
 {
@@ -282,9 +305,12 @@ logger_level_t __logger_output_level_get(FILE *stream)
 
 
 /** ************************************************************************//**
- * \brief  request a id from logger
+ * \brief  Request a logging id.
  *
- * \return     id number if id is available, error code otherwise
+ * Request a id for later use with calls to \c logger(). Each logging id is
+ * disabled by default.
+ *
+ * \return        Id number if id is available, error code otherwise.
  ******************************************************************************/
 logger_id_t __logger_id_request(void)
 {
@@ -315,11 +341,13 @@ logger_id_t __logger_id_request(void)
 
 
 /** ************************************************************************//**
- * \brief  release a logger id
+ * \brief  Release a logging id.
  *
- * \param[in]     id id to enable
+ * Release a id. After this call logging to this id is not possible anymore.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id to enable.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_id_release(logger_id_t id)
 {
@@ -344,11 +372,13 @@ logger_return_t __logger_id_release(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  enable a logger id for output
+ * \brief  Enable a logging id for output.
  *
- * \param[in]     id id to enable
+ * Enable given logging id for all outputs.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id to enable.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_id_enable(logger_id_t id)
 {
@@ -369,11 +399,13 @@ logger_return_t __logger_id_enable(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  disable a logger id for output
+ * \brief  Disable a logger id for output.
  *
- * \param[in]     id id to disable
+ * Disable given logging id for all outputs.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id to disable.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
 logger_return_t __logger_id_disable(logger_id_t id)
 {
@@ -394,11 +426,13 @@ logger_return_t __logger_id_disable(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  check if logging of given id is enabled
+ * \brief  Query the current enable state of id.
  *
- * \param[in]     id id to check enable state
+ * Query the current enable state of given logging id.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id to check enable state.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_bool_t __logger_id_is_enabled(logger_id_t id)
 {
@@ -416,12 +450,15 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  set required minimum level for log output
+ * \brief  Set logging level for id.
  *
- * \param[in]     id    id for setting level
- * \param[in]     level level to set
+ * Set the minimum logging level for given id. Only log messages equal or above
+ * the given level will be printed to outpus streams.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id for setting level.
+ * \param[in]     level   Level to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_id_level_set(logger_id_t    id,
                                       logger_level_t level)
@@ -450,11 +487,13 @@ logger_return_t __logger_id_level_set(logger_id_t    id,
 
 
 /** ************************************************************************//**
- * \brief  get currently set minimum level for log output
+ * \brief  Query logging level for id.
  *
- * \param[in]     id id for setting level
+ * Query the currently set minimum level for the given logging id.
  *
- * \return     currently set level
+ * \param[in]     id      Id for setting level
+ *
+ * \return        Currently set level
  ******************************************************************************/
 logger_level_t __logger_id_level_get(logger_id_t id)
 {
@@ -473,15 +512,21 @@ logger_level_t __logger_id_level_get(logger_id_t id)
 
 #ifdef LOGGER_COLORS
 
+
 /** ************************************************************************//**
- * \brief  change terminal text color and attributes
+ * \brief  Change terminal text color and attributes.
  *
- * \param[in]     id      id for setting level
- * \param[in]     fg      text foreground
- * \param[in]     bg      text background
- * \param[in]     attr    text attribute
+ * Change text color and attributes for all messages of given id when they are
+ * printed to \c stdout or \c stdin. Outputs to other streams including files
+ * will have no
+ * color.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_color_set(logger_id_t        id,
                                    logger_text_fg_t   fg,
@@ -500,11 +545,13 @@ logger_return_t __logger_color_set(logger_id_t        id,
 
 
 /** ************************************************************************//**
- * \brief  reset terminal text color and attributes
+ * \brief  Reset terminal text color and attributes.
  *
- * \param[in]     id      id for setting level
+ * Reset text color and attributes of given id back to defaults.
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ * \param[in]     id      Id for setting level.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_color_reset(logger_id_t id)
 {
@@ -520,14 +567,22 @@ logger_return_t __logger_color_reset(logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  output log message prefix
+ * \brief  Print log message prefix.
  *
- * \param[in]     id      id outputting this message
- * \param[in]     level   level of this message
- * \param[in]     format  printf like format string
- * \param[in]     va_args argument list
+ * Print the log message prefix to all output streams registered. Only print
+ * the prefix if
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ *   - previous logging call ended with a '\n' i.e. is complete.
+ *   - logging is globally enabled.
+ *   - logging id is enabled.
+ *   - logging level is high enough.
+ *
+ * \param[in]     id      Id outputting this message.
+ * \param[in]     level   Level of this message.
+ * \param[in]     format  \c printf() like format string.
+ * \param[in]     va_args Argument list.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_prefix(logger_id_t    id,
                                 logger_level_t level,
@@ -587,14 +642,23 @@ logger_return_t __logger_prefix(logger_id_t    id,
 
 
 /** ************************************************************************//**
- * \brief  output log message
+ * \brief  Print log message.
  *
- * \param[in]     id      id outputting this message
- * \param[in]     level   level of this message
- * \param[in]     format  printf like format string
- * \param[in]     va_args argument list
+ * Print the log message to all output streams registered. It is possible to do
+ * repeated prints to the same line by ommiting '\n' in the log message format
+ * sting. In this case a subsequent call will be appended without prefix. Only
+ * print the message if
  *
- * \return     LOGGER_OK if no error occurred, error code otherwise
+ *   - logging is globally enabled.
+ *   - logging id is enabled.
+ *   - logging level is high enough.
+ *
+ * \param[in]     id      Id outputting this message.
+ * \param[in]     level   Level of this message.
+ * \param[in]     format  \c printf() like format string.
+ * \param[in]     va_args Argument list.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t __logger_msg(logger_id_t    id,
                              logger_level_t level,

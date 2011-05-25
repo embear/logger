@@ -1,5 +1,29 @@
-SILENT ?= @
+#     __
+#    / /___  ____ _____ ____  _____
+#   / / __ \/ __ `/ __ `/ _ \/ ___/
+#  / / /_/ / /_/ / /_/ /  __/ /
+# /_/\____/\__, /\__, /\___/_/
+#         /____//____/
+#
+# \file   makefile
+#
+# \brief  Logging facility for C.
+# \author Markus Braun
+# \date   2010-10-13
 
+# run 'make VERBOSE=1' for verbose build
+VERBOSE ?= 0
+ifeq ($(VERBOSE) , 0)
+  SILENT = @
+endif
+
+# application
+APP := logger
+
+# library
+LIB := logger
+
+# programs
 CC = gcc
 LD = gcc
 RM = rm
@@ -7,25 +31,31 @@ SED = sed
 ECHO = echo
 MKDIR = mkdir
 
+# directories
 SRCDIR := src
 INCDIR := include
 DEPDIR := dep
 OBJDIR := obj
 LIBDIR := lib
 
-INCDIRS := 
-INCDIRS += h
+INCDIRS :=
+INCDIRS += include
 
-APP := logger
-LIB := logger
+# sources for application
+APPSRCS := 
+APPSRCS += src/main.c
 
-APPSRCS := $(SRCDIR)/main.c
-LIBSRCS := $(SRCDIR)/logger.c
+# sources for library
+LIBSRCS :=
+LIBSRCS += $(SRCDIR)/logger.c
+
+# generate variables from above
 APPOBJS := $(addprefix $(OBJDIR)/, $(notdir $(APPSRCS:%.c=%.o)))
 LIBOBJS := $(addprefix $(OBJDIR)/, $(notdir $(LIBSRCS:%.c=%.o)))
 LIBNAME := $(LIBDIR)/lib$(LIB).a
 DEPS := $(addprefix $(DEPDIR)/, $(notdir $(APPSRCS:%.c=%.d)) $(notdir $(LIBSRCS:%.c=%.d)))
 
+# compiler flags
 CFLAGS :=
 CFLAGS += -g
 CFLAGS += -DLOGGER_ENABLE
@@ -61,16 +91,21 @@ CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wuninitialized
 CFLAGS += -fdiagnostics-show-option
 CFLAGS += -fmessage-length=0
-INCLUDE := -I$(INCDIR)
 
-LDFLAGS := 
+# linker flags
+LDFLAGS :=
 LDFLAGS += -L$(LIBDIR) -l$(LIB)
 
+# include flags
+INCLUDE := $(addprefix -I, $(INCDIRS))
+
+# non file targets
 .PHONY: all print clean distclean
 
+# rules
 all: $(APP)
 
-print: 
+print:
 	$(SILENT)$(ECHO) "APP:     $(APP)"
 	$(SILENT)$(ECHO) "LIB:     $(LIB)"
 	$(SILENT)$(ECHO) "APPSRCS: $(APPSRCS)"

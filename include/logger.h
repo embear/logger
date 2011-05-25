@@ -1,7 +1,14 @@
 /***************************************************************************//**
+ *     __
+ *    / /___  ____ _____ ____  _____
+ *   / / __ \/ __ `/ __ `/ _ \/ ___/
+ *  / / /_/ / /_/ / /_/ /  __/ /
+ * /_/\____/\__, /\__, /\___/_/
+ *         /____//____/
+ *
  * \file   logger.h
  *
- * \brief  logging facility for C
+ * \brief  Logging facility for C.
  * \author Markus Braun
  * \date   2010-10-13
  ******************************************************************************/
@@ -12,42 +19,43 @@
  * \section sec_intro Introduction
  *
  * Logger is a simple logging facility for the C language.
- * It is possible to output logging information to different output stream and to use different logging severities.
+ * It is possible to output logging information to different output stream and
+ * to use different logging severities.
  *
  * \section sec_usage Usage
  *
- * Logger needs to be enabled using the global define LOGGER_ENABLE.
+ * Logger needs to be enabled using the global define \c LOGGER_ENABLE.
  * Otherwise all functions will be excluded from compilation.
  *
- * To get color support LOGGER_COLORS needs to be defined.
+ * To get color support \c LOGGER_COLORS needs to be defined.
  *
  * Basic usage of logger:
  *
  * \code
  * #include "logger.h"
- * 
+ *
  * int main(void)
  * {
  *   FILE        *stream;
  *   logger_id_t id = logger_id_unknown;
- *  
+ *
  *   // initialize logger
  *   logger_init();
- *  
+ *
  *   // open a file as output for all messages
  *   stream = fopen("logfile", "w");
  *   logger_output_register(stream);
  *   logger_output_level_set(stream, LOGGER_DEBUG);
- *  
+ *
  *   // open stdout as output for messages above LOGGER_ERR
  *   logger_output_register(stdout);
  *   logger_output_level_set(stdout, LOGGER_ERR);
- *  
+ *
  *   // get a logging id, enable it and set log level
  *   id = logger_id_request();
  *   logger_id_enable(id);
  *   logger_id_level_set(id, LOGGER_DEBUG);
- *  
+ *
  *   // do the logging
  *   logger(id, LOGGER_DEBUG,    "id %d - LOGGER_DEBUG   in line %d\n", id, __LINE__);
  *   logger(id, LOGGER_INFO,     "id %d - LOGGER_INFO    in line %d\n", id, __LINE__);
@@ -57,26 +65,26 @@
  *   logger(id, LOGGER_CRIT,     "id %d - LOGGER_CRIT    in line %d\n", id, __LINE__);
  *   logger(id, LOGGER_ALERT,    "id %d - LOGGER_ALERT   in line %d\n", id, __LINE__);
  *   logger(id, LOGGER_EMERG,    "id %d - LOGGER_EMERG   in line %d\n", id, __LINE__);
- *  
+ *
  *   // release id
  *   logger_id_release(id);
- * 
+ *
  *   // deregister stdout output
  *   logger_output_deregister(stdout);
- * 
+ *
  *   // deregister file output
  *   logger_output_deregister(stream);
- * 
+ *
  *   return(0);
  * }
  * \endcode
  *
  * The format of the output could be changed by setting on of the following defines on compile time:
  *
- *   - LOGGER_FORMAT_SIMPLE (default)
- *   - LOGGER_FORMAT_FULL
- *   - LOGGER_FORMAT_FILE
- *   - LOGGER_FORMAT_FUNCTION
+ *   - \c LOGGER_FORMAT_SIMPLE (default)
+ *   - \c LOGGER_FORMAT_FULL
+ *   - \c LOGGER_FORMAT_FILE
+ *   - \c LOGGER_FORMAT_FUNCTION
  *
  */
 #ifndef LOGGER_H
@@ -84,72 +92,72 @@
 
 #include <stdio.h>
 
-typedef unsigned char  logger_bool_t;                       /**< logger boolean type */
-static const logger_bool_t logger_true  = (logger_bool_t)1; /**< logger boolean true */
-static const logger_bool_t logger_false = (logger_bool_t)0; /**< logger boolean false */
+typedef unsigned char  logger_bool_t;                       /**< Logger boolean type. */
+static const logger_bool_t logger_true  = (logger_bool_t)1; /**< Logger boolean true. */
+static const logger_bool_t logger_false = (logger_bool_t)0; /**< Logger boolean false. */
 
 
 typedef enum logger_level_e {
-  LOGGER_UNKNOWN = 0,  /**< unknown level */
-  LOGGER_DEBUG   = 1,  /**< debug-level message */
-  LOGGER_INFO    = 2,  /**< informational message */
-  LOGGER_NOTICE  = 3,  /**< normal, but significant, condition */
-  LOGGER_WARNING = 4,  /**< warning conditions */
-  LOGGER_ERR     = 5,  /**< error conditions */
-  LOGGER_CRIT    = 6,  /**< critical conditions */
-  LOGGER_ALERT   = 7,  /**< action must be taken immediately */
-  LOGGER_EMERG   = 8,  /**< system is unusable */
-  LOGGER_MAX     = 9   /**< last entry, always! */
+  LOGGER_UNKNOWN = 0,  /**< Unknown level. */
+  LOGGER_DEBUG   = 1,  /**< Debug-level message. */
+  LOGGER_INFO    = 2,  /**< Informational message. */
+  LOGGER_NOTICE  = 3,  /**< Normal, but significant, condition. */
+  LOGGER_WARNING = 4,  /**< Warning conditions. */
+  LOGGER_ERR     = 5,  /**< Error conditions. */
+  LOGGER_CRIT    = 6,  /**< Critical conditions. */
+  LOGGER_ALERT   = 7,  /**< Action must be taken immediately. */
+  LOGGER_EMERG   = 8,  /**< System is unusable. */
+  LOGGER_MAX     = 9   /**< Last entry, always! */
 } logger_level_t;
 
 
-typedef int  logger_id_t;                                     /**< logger id type */
-static const logger_id_t logger_id_unknown = (logger_id_t)-1; /**< unknown logger id */
+typedef int  logger_id_t;                                     /**< Logger id type. */
+static const logger_id_t logger_id_unknown = (logger_id_t)-1; /**< Unknown logger id. */
 
 
 typedef enum logger_return_e {
-  LOGGER_OK                    = 0,  /**< ok */
-  LOGGER_ERR_OUTPUT_INVALID    = -1, /**< given output stream is invalid */
-  LOGGER_ERR_OUTPUTS_FULL      = -2, /**< all available outputs are used */
-  LOGGER_ERR_OUTPUT_REGISTERED = -3, /**< output already registered */
-  LOGGER_ERR_OUTPUT_NOT_FOUND  = -4, /**< output not registered */
-  LOGGER_ERR_IDS_FULL          = -5, /**< all available ids are used */
-  LOGGER_ERR_ID_NOT_FOUND      = -6, /**< id not registered */
-  LOGGER_ERR_ID_UNKNOWN        = -7, /**< id is unknown */
-  LOGGER_ERR_LEVEL_UNKNOWN     = -8, /**< level is unknown */
+  LOGGER_OK                    = 0,  /**< Ok. */
+  LOGGER_ERR_OUTPUT_INVALID    = -1, /**< Given output stream is invalid. */
+  LOGGER_ERR_OUTPUTS_FULL      = -2, /**< All available outputs are used. */
+  LOGGER_ERR_OUTPUT_REGISTERED = -3, /**< Output already registered. */
+  LOGGER_ERR_OUTPUT_NOT_FOUND  = -4, /**< Output not registered. */
+  LOGGER_ERR_IDS_FULL          = -5, /**< All available ids are used. */
+  LOGGER_ERR_ID_NOT_FOUND      = -6, /**< Id not registered. */
+  LOGGER_ERR_ID_UNKNOWN        = -7, /**< Id is unknown. */
+  LOGGER_ERR_LEVEL_UNKNOWN     = -8, /**< Level is unknown. */
 } logger_return_t;
 
-/* macros for color text output */
+/* macros for color text output. */
 typedef enum logger_text_attr_e {
-  LOGGER_ATTR_RESET     = 0, /**< reset attributes */
-  LOGGER_ATTR_BRIGHT    = 1, /**< bright attribute */
-  LOGGER_ATTR_DIM       = 2, /**< dim attribute */
-  LOGGER_ATTR_UNDERLINE = 3, /**< underline attribute */
-  LOGGER_ATTR_BLINK     = 5, /**< blink attribute */
-  LOGGER_ATTR_REVERSE   = 7, /**< reverse attribute */
-  LOGGER_ATTR_HIDDEN    = 8  /**< hidden attribute */
+  LOGGER_ATTR_RESET     = 0, /**< Reset attributes. */
+  LOGGER_ATTR_BRIGHT    = 1, /**< Bright attribute. */
+  LOGGER_ATTR_DIM       = 2, /**< Dim attribute. */
+  LOGGER_ATTR_UNDERLINE = 3, /**< Underline attribute. */
+  LOGGER_ATTR_BLINK     = 5, /**< Blink attribute. */
+  LOGGER_ATTR_REVERSE   = 7, /**< Reverse attribute. */
+  LOGGER_ATTR_HIDDEN    = 8  /**< Hidden attribute. */
 } logger_text_attr_t;
 
 typedef enum logger_text_bg_e {
-  LOGGER_BG_BLACK   = 40, /**< black background color */
-  LOGGER_BG_RED     = 41, /**< red background color */
-  LOGGER_BG_GREEN   = 42, /**< green background color */
-  LOGGER_BG_YELLOW  = 43, /**< yellow background color */
-  LOGGER_BG_BLUE    = 44, /**< blue background color */
-  LOGGER_BG_MAGENTA = 45, /**< magenta background color */
-  LOGGER_BG_CYAN    = 46, /**< cyan background color */
-  LOGGER_BG_WHITE   = 47  /**< white background color */
+  LOGGER_BG_BLACK   = 40, /**< Black background color. */
+  LOGGER_BG_RED     = 41, /**< Red background color. */
+  LOGGER_BG_GREEN   = 42, /**< Green background color. */
+  LOGGER_BG_YELLOW  = 43, /**< Yellow background color. */
+  LOGGER_BG_BLUE    = 44, /**< Blue background color. */
+  LOGGER_BG_MAGENTA = 45, /**< Magenta background color. */
+  LOGGER_BG_CYAN    = 46, /**< Cyan background color. */
+  LOGGER_BG_WHITE   = 47  /**< White background color. */
 } logger_text_bg_t;
 
 typedef enum logger_text_fg_e {
-  LOGGER_FG_BLACK   = 30, /**< black background color */
-  LOGGER_FG_RED     = 31, /**< red background color */
-  LOGGER_FG_GREEN   = 32, /**< green background color */
-  LOGGER_FG_YELLOW  = 33, /**< yellow background color */
-  LOGGER_FG_BLUE    = 34, /**< blue background color */
-  LOGGER_FG_MAGENTA = 35, /**< magenta background color */
-  LOGGER_FG_CYAN    = 36, /**< cyan background color */
-  LOGGER_FG_WHITE   = 37  /**< white background color */
+  LOGGER_FG_BLACK   = 30, /**< Black background color. */
+  LOGGER_FG_RED     = 31, /**< Red background color. */
+  LOGGER_FG_GREEN   = 32, /**< Green background color. */
+  LOGGER_FG_YELLOW  = 33, /**< Yellow background color. */
+  LOGGER_FG_BLUE    = 34, /**< Blue background color. */
+  LOGGER_FG_MAGENTA = 35, /**< Magenta background color. */
+  LOGGER_FG_CYAN    = 36, /**< Cyan background color. */
+  LOGGER_FG_WHITE   = 37  /**< White background color. */
 } logger_text_fg_t;
 
 
