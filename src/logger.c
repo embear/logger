@@ -28,8 +28,9 @@ typedef struct logger_control_s {
 } logger_control_t;
 
 typedef struct logger_output_s {
-  int  count;   /**< number of registrations for this stream */
-  FILE *stream; /**< file pointer given during registration */
+  int            count;   /**< number of registrations for this stream */
+  logger_level_t level;   /**< level for this stream */
+  FILE           *stream; /**< file pointer given during registration */
 } logger_output_t;
 
 static logger_bool_t    logger_enabled;                     /**< logger is enabled */
@@ -98,7 +99,8 @@ logger_bool_t __logger_is_enabled()
  * \brief  register an output stream to logger
  *
  * the given file stream may be on of stdout, stderr or a file stream opened by
- * the user.
+ * the user. the default logging level is set to LOGGER_DEBUG thus all messages
+ * will appear on this stream.
  *
  * \param[in]     stream opened file stream
  *
@@ -140,6 +142,7 @@ logger_return_t __logger_output_register(FILE *stream)
       /* found an empty slot */
       if (found == logger_true) {
         logger_outputs[index].count++;
+        logger_outputs[index].level  = LOGGER_DEBUG;
         logger_outputs[index].stream = stream;
 
         /* make a nonblocking stream */
@@ -187,8 +190,88 @@ logger_return_t __logger_output_deregister(FILE *stream)
     /* remove this stream if this was the last reference */
     if (logger_outputs[index].count <= 0) {
       logger_outputs[index].count  = 0;
+      logger_outputs[index].level  = LOGGER_UNKNOWN;
       logger_outputs[index].stream = (FILE *)NULL;
     }
+  }
+  else {
+    ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  set required minimum level for logging on this output
+ *
+ * \param[in]     stream previous registered file stream
+ * \param[in]     level level to set
+ *
+ * \return     LOGGER_OK if no error occurred, error code otherwise
+ ******************************************************************************/
+logger_return_t __logger_output_level_set(FILE           *stream,
+                                          logger_level_t level)
+{
+  logger_return_t ret = LOGGER_OK;
+  int             index;
+  logger_bool_t   found;
+
+  /* check for valid level */
+  if ((level >= LOGGER_DEBUG) &&
+      (level <= LOGGER_MAX)) {
+    /* check if this output is already registered */
+    found = logger_false;
+    for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+      if (logger_outputs[index].stream == stream) {
+        found = logger_true;
+        break;
+      }
+    }
+
+    /* found given stream in a slot */
+    if (found == logger_true) {
+      /* set log level */
+      logger_outputs[index].level = level;
+    }
+    else {
+      ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+    }
+  }
+  else {
+    ret = LOGGER_ERR_LEVEL_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  get currently set minimum level for logging on this
+ *
+ * \param[in]     stream previous registered file stream
+ *
+ * \return     currently set level
+ ******************************************************************************/
+logger_level_t __logger_output_level_get(FILE *stream)
+{
+  logger_level_t ret = LOGGER_UNKNOWN;
+  int            index;
+  logger_bool_t  found;
+
+  /* check if this output is already registered */
+  found = logger_false;
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    if (logger_outputs[index].stream == stream) {
+      found = logger_true;
+      break;
+    }
+  }
+
+  /* found given stream in a slot */
+  if (found == logger_true) {
+    /* set log level */
+    ret = logger_outputs[index].level;
   }
   else {
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
@@ -471,7 +554,8 @@ logger_return_t __logger_prefix(logger_id_t    id,
 
         /* loop over all possibe outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-          if (logger_outputs[index].count > 0) {
+          if ((logger_outputs[index].count > 0) &&
+              (logger_outputs[index].level <= level)) {
             /* set color */
 #ifdef LOGGER_COLORS
             if ((logger_control[id].color == logger_true) &&
@@ -548,7 +632,8 @@ logger_return_t __logger_msg(logger_id_t    id,
 
         /* loop over all possibe outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-          if (logger_outputs[index].count > 0) {
+          if ((logger_outputs[index].count > 0) &&
+              (logger_outputs[index].level <= level)) {
             /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
 
