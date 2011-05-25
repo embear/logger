@@ -335,23 +335,23 @@ int main(int  argc,
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 
-  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_YELLOW, LOGGER_ATTR_RESET);
+  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
-  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_YELLOW, LOGGER_ATTR_BRIGHT);
+  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
-  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_YELLOW, LOGGER_ATTR_BLINK);
+  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BLINK);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
-  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_YELLOW, LOGGER_ATTR_REVERSE);
+  logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_REVERSE);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
-  logger_color_set(id, LOGGER_FG_BLUE, LOGGER_BG_GREEN, LOGGER_ATTR_RESET);
+  logger_color_set(id, LOGGER_FG_BLUE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
@@ -359,7 +359,7 @@ int main(int  argc,
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
-  logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_WHITE, LOGGER_ATTR_RESET);
+  logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
   logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   puts("Other message");
   puts("Other message");
