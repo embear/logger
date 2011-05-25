@@ -24,7 +24,7 @@ LIBSRCS := $(SRCDIR)/logger.c
 APPOBJS := $(addprefix $(OBJDIR)/, $(notdir $(APPSRCS:%.c=%.o)))
 LIBOBJS := $(addprefix $(OBJDIR)/, $(notdir $(LIBSRCS:%.c=%.o)))
 LIBNAME := $(LIBDIR)/lib$(LIB).a
-DEPS := $(addprefix $(DEPDIR)/, $(notdir $(LIBSRCS:%.c=%.d)) $(notdir $(LIBSRCS:%.c=%.d)))
+DEPS := $(addprefix $(DEPDIR)/, $(notdir $(APPSRCS:%.c=%.d)) $(notdir $(LIBSRCS:%.c=%.d)))
 
 CFLAGS :=
 CFLAGS += -g
@@ -105,6 +105,6 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 $(DEPDIR)/%.d: $(SRCDIR)/%.c
 	$(SILENT)[ -d $(DEPDIR) ] || $(MKDIR) $(DEPDIR)
 	$(SILENT)$(ECHO) "Updating dependencies for $<"
-	$(SILENT)$(CC) -MM $(CFLAGS) $(INCLUDE) $< > $@.$$$$; $(SED) 's,\($*\)\.o[ :]*,$(OBJDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; $(RM) -f $@.$$$$
+	$(SILENT)$(CC) -MM $(CFLAGS) $(INCLUDE) $< > $@.$$$$; $(SED) 's,\($*\)\.o[ :]*,$(OBJDIR)/\1.o $@ : makefile ,g' < $@.$$$$ > $@; $(RM) -f $@.$$$$
 
 -include $(DEPS)
