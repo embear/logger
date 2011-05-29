@@ -178,7 +178,7 @@ logger_return_t __logger_output_register(FILE *stream)
 
 
 /** ************************************************************************//**
- * \brief  Deregister an output stream.
+ * \brief  Unregister an output stream.
  *
  * Remove given file stream from list of outputs.
  *
@@ -357,7 +357,7 @@ logger_return_t __logger_id_release(logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     if (logger_control[id].used == logger_true) {
-      /* reset all id dependend values to defaults */
+      /* reset all id dependent values to defaults */
       logger_control[id].used    = logger_false;
       logger_control[id].enabled = logger_false;
       logger_control[id].level   = LOGGER_DEBUG;
@@ -453,7 +453,7 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id)
  * \brief  Set logging level for id.
  *
  * Set the minimum logging level for given id. Only log messages equal or above
- * the given level will be printed to outpus streams.
+ * the given level will be printed to output streams.
  *
  * \param[in]     id      Id for setting level.
  * \param[in]     level   Level to set.
@@ -607,7 +607,7 @@ logger_return_t __logger_prefix(logger_id_t    id,
         /* initialize variable arguments */
         va_start(argp, format);
 
-        /* loop over all possibe outputs */
+        /* loop over all possible outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
           if ((logger_outputs[index].count > 0) &&
               (logger_outputs[index].level <= level)) {
@@ -625,7 +625,7 @@ logger_return_t __logger_prefix(logger_id_t    id,
           }
         }
 
-        /* deinitialize variable arguments */
+        /* end variable arguments */
         va_end(argp);
       }
     }
@@ -645,7 +645,7 @@ logger_return_t __logger_prefix(logger_id_t    id,
  * \brief  Print log message.
  *
  * Print the log message to all output streams registered. It is possible to do
- * repeated prints to the same line by ommiting '\n' in the log message format
+ * repeated prints to the same line by omitting '\n' in the log message format
  * sting. In this case a subsequent call will be appended without prefix. Only
  * print the message if
  *
@@ -677,7 +677,7 @@ logger_return_t __logger_msg(logger_id_t    id,
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
-      /* check for multiline message */
+      /* check for multi line message */
       cont = logger_true;
       for (index = 0 ; format[index] != '\0' ; index++) {
         if (format[index] == '\n') {
@@ -694,7 +694,7 @@ logger_return_t __logger_msg(logger_id_t    id,
         /* initialize variable arguments */
         va_start(argp, format);
 
-        /* loop over all possibe outputs */
+        /* loop over all possible outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
           if ((logger_outputs[index].count > 0) &&
               (logger_outputs[index].level <= level)) {
@@ -713,7 +713,7 @@ logger_return_t __logger_msg(logger_id_t    id,
           }
         }
 
-        /* deinitialize variable arguments */
+        /* end variable arguments */
         va_end(argp);
       }
     }
