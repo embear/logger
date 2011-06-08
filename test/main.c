@@ -13,6 +13,7 @@
  * \date   2010-10-13
  ******************************************************************************/
 #include <stdio.h>
+#include <assert.h>
 #include "logger.h"
 
 int main(int  argc,
@@ -25,6 +26,15 @@ int main(int  argc,
   logger_id_t    id2 = logger_id_unknown;
 
   logger_init();
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- check logger version number ....\n", test);
+  assert(LOGGER_VERSION == logger_version());
 
   test++;
   puts("");
