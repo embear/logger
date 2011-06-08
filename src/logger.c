@@ -45,6 +45,20 @@ static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
 
 /** ************************************************************************//**
+ * \brief  Version of logger.
+ *
+ * Get the version of logger for which it was compiled. Needed to check for
+ * correct version of logger when linking against a precompiled library.
+ *
+ * \return        Version of logger
+ ******************************************************************************/
+logger_version_t __logger_version(void)
+{
+  return(LOGGER_VERSION);
+}
+
+
+/** ************************************************************************//**
  * \brief  Initialize logger.
  *
  * Initialize logger internal structures. Needs to be called once before any
