@@ -39,6 +39,11 @@
  *   FILE        *stream;
  *   logger_id_t id = logger_id_unknown;
  *
+ *   // check logger version
+ *   if(LOGGER_VERSION != logger_version()) {
+ *     return(1);
+ *   }
+ *
  *   // initialize logger
  *   logger_init();
  *
@@ -91,6 +96,14 @@
 #define LOGGER_H
 
 #include <stdio.h>
+
+#define LOGGER_VERSION_MAJOR              (1)
+#define LOGGER_VERSION_MINOR              (0)
+#define LOGGER_VERSION_PATCH              (1)
+#define LOGGER_VERSION                    (((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF))
+
+typedef unsigned int logger_version_t; /**< Logger version type. */
+
 
 typedef unsigned char  logger_bool_t;                       /**< Logger boolean type. */
 static const logger_bool_t logger_true  = (logger_bool_t)1; /**< Logger boolean true. */
@@ -164,6 +177,7 @@ typedef enum logger_text_fg_e {
 #ifdef LOGGER_ENABLE
 #define LOGGER_STRINGIFY_(x)                          # x
 #define LOGGER_STRINGIFY(x)                           LOGGER_STRINGIFY_(x)
+#define logger_version()                              __logger_version()
 #define logger_init()                                 __logger_init()
 #define logger_enable()                               __logger_enable()
 #define logger_disable()                              __logger_disable()
@@ -214,6 +228,7 @@ typedef enum logger_text_fg_e {
 #endif
 
 
+logger_version_t __logger_version(void);
 logger_return_t __logger_init(void);
 logger_return_t __logger_enable(void);
 logger_return_t __logger_disable(void);
@@ -246,6 +261,7 @@ logger_return_t __logger_msg(logger_id_t    id,
                              ...);
 
 #else  /* LOGGER_ENABLE */
+#define logger_version()                               (LOGGER_VERSION)
 #define logger_init()                                  ((void)(0))
 #define logger_enable()                                ((void)(0))
 #define logger_disable()                               ((void)(0))
