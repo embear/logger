@@ -97,6 +97,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 #define LOGGER_VERSION_MAJOR              (1)
 #define LOGGER_VERSION_MINOR              (0)
 #define LOGGER_VERSION_PATCH              (1)
@@ -281,5 +285,9 @@ logger_return_t __logger_msg(logger_id_t    id,
 #define logger_color_reset(__id)                       ((void)(0))
 #define logger(__id, __level, __format, __args ...)    ((void)(0))
 #endif /* LOGGER_ENABLE */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* end of include guard: LOGGER_H */
