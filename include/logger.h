@@ -80,6 +80,9 @@
  *   // deregister file output
  *   logger_output_deregister(stream);
  *
+ *   // close file
+ *   fclose(stream);
+ *
  *   return(0);
  * }
  * \endcode
