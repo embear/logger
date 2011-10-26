@@ -68,11 +68,15 @@ logger_version_t __logger_version(void)
  ******************************************************************************/
 logger_return_t __logger_init(void)
 {
+  static logger_bool_t logger_initialized = 0;
   logger_return_t ret = LOGGER_OK;
 
-  logger_enabled = logger_true;
-  memset(logger_control, 0, sizeof(logger_control));
-  memset(logger_outputs, 0, sizeof(logger_outputs));
+  if (logger_initialized == logger_false) {
+    logger_enabled = logger_true;
+    memset(logger_control, 0, sizeof(logger_control));
+    memset(logger_outputs, 0, sizeof(logger_outputs));
+    logger_initialized = logger_true;
+  }
 
   return(ret);
 }
