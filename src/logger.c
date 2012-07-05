@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <stddef.h>
 #include <fcntl.h>
 #include "logger.h"
 
@@ -35,7 +36,7 @@ typedef struct logger_control_s {
 } logger_control_t;
 
 typedef struct logger_output_s {
-  int            count;   /**< Number of registrations for this stream. */
+  int16_t        count;   /**< Number of registrations for this stream. */
   logger_level_t level;   /**< Level for this stream. */
   FILE           *stream; /**< File pointer given during registration. */
 } logger_output_t;
@@ -143,7 +144,7 @@ logger_bool_t __logger_is_enabled()
 logger_return_t __logger_output_register(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
-  int             index;
+  int16_t         index;
   logger_bool_t   found;
 
   /* check if stream is not NULL */
@@ -207,7 +208,7 @@ logger_return_t __logger_output_register(FILE *stream)
 logger_return_t __logger_output_deregister(FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
-  int             index;
+  int16_t         index;
   logger_bool_t   found;
 
   /* check if this output is already registered */
@@ -253,7 +254,7 @@ logger_return_t __logger_output_level_set(FILE           *stream,
                                           logger_level_t level)
 {
   logger_return_t ret = LOGGER_OK;
-  int             index;
+  int16_t         index;
   logger_bool_t   found;
 
   /* check for valid level */
@@ -297,7 +298,7 @@ logger_return_t __logger_output_level_set(FILE           *stream,
 logger_level_t __logger_output_level_get(FILE *stream)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
-  int            index;
+  int16_t        index;
   logger_bool_t  found;
 
   /* check if this output is already registered */
@@ -333,7 +334,7 @@ logger_level_t __logger_output_level_get(FILE *stream)
 logger_id_t __logger_id_request(void)
 {
   logger_return_t ret = LOGGER_OK;
-  int             index;
+  int16_t         index;
   logger_bool_t   found;
 
   /* search for an available id */
@@ -609,7 +610,7 @@ logger_return_t __logger_prefix(logger_id_t    id,
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
-  int             index;
+  int16_t         index;
 
   /* check for valid id */
   if ((id >= 0) &&
@@ -685,7 +686,7 @@ logger_return_t __logger_msg(logger_id_t    id,
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
-  int             index;
+  int16_t         index;
   logger_bool_t   cont;
 
   /* check for valid id */

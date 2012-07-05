@@ -98,6 +98,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <stdint.h>
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -109,10 +110,10 @@ extern "C" {
 #define LOGGER_VERSION_PATCH              (1)
 #define LOGGER_VERSION                    (((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF))
 
-typedef unsigned int logger_version_t; /**< Logger version type. */
+typedef uint32_t logger_version_t; /**< Logger version type. */
 
 
-typedef unsigned char  logger_bool_t;                       /**< Logger boolean type. */
+typedef uint8_t  logger_bool_t;                             /**< Logger boolean type. */
 static const logger_bool_t logger_true  = (logger_bool_t)1; /**< Logger boolean true. */
 static const logger_bool_t logger_false = (logger_bool_t)0; /**< Logger boolean false. */
 
@@ -131,7 +132,7 @@ typedef enum logger_level_e {
 } logger_level_t;
 
 
-typedef int  logger_id_t;                                     /**< Logger id type. */
+typedef int16_t  logger_id_t;                                 /**< Logger id type. */
 static const logger_id_t logger_id_unknown = (logger_id_t)-1; /**< Unknown logger id. */
 
 
