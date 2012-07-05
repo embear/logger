@@ -244,30 +244,30 @@ logger_return_t __logger_enable(void);
 logger_return_t __logger_disable(void);
 logger_bool_t __logger_is_enabled(void);
 logger_return_t __logger_output_register(FILE *stream);
-logger_return_t __logger_output_deregister(FILE *stream);
-logger_return_t __logger_output_level_set(FILE           *stream,
-                                          logger_level_t level);
-logger_level_t __logger_output_level_get(FILE *stream);
-logger_id_t __logger_id_request(char *name);
-logger_return_t __logger_id_release(logger_id_t id);
-logger_return_t __logger_id_enable(logger_id_t id);
-logger_return_t __logger_id_disable(logger_id_t id);
-logger_bool_t __logger_id_is_enabled(logger_id_t id);
-logger_return_t __logger_id_level_set(logger_id_t    id,
-                                      logger_level_t level);
-logger_level_t __logger_id_level_get(logger_id_t id);
-char * __logger_id_name_get(logger_id_t id);
-logger_return_t __logger_color_set(logger_id_t        id,
-                                   logger_text_fg_t   fg,
-                                   logger_text_bg_t   bg,
-                                   logger_text_attr_t attr);
-logger_return_t __logger_color_reset(logger_id_t id);
-logger_return_t __logger_prefix(logger_id_t    id,
-                                logger_level_t level,
-                                const char     *format,
+logger_return_t __logger_output_deregister(const FILE *stream);
+logger_return_t __logger_output_level_set(const FILE           *stream,
+                                          const logger_level_t level);
+logger_level_t __logger_output_level_get(const FILE *stream);
+logger_id_t __logger_id_request(const char *name);
+logger_return_t __logger_id_release(const logger_id_t id);
+logger_return_t __logger_id_enable(const logger_id_t id);
+logger_return_t __logger_id_disable(const logger_id_t id);
+logger_bool_t __logger_id_is_enabled(const logger_id_t id);
+logger_return_t __logger_id_level_set(const logger_id_t    id,
+                                      const logger_level_t level);
+logger_level_t __logger_id_level_get(const logger_id_t id);
+const char * __logger_id_name_get(const logger_id_t id);
+logger_return_t __logger_color_set(const logger_id_t        id,
+                                   const logger_text_fg_t   fg,
+                                   const logger_text_bg_t   bg,
+                                   const logger_text_attr_t attr);
+logger_return_t __logger_color_reset(const logger_id_t id);
+logger_return_t __logger_prefix(const logger_id_t    id,
+                                const logger_level_t level,
+                                const char           *format,
                                 ...);
-logger_return_t __logger_msg(logger_id_t    id,
-                             logger_level_t level,
+logger_return_t __logger_msg(const logger_id_t    id,
+                             const logger_level_t level,
                              const char     *format,
                              ...);
 
@@ -294,7 +294,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 #define logger_id_is_enabled(__id)                     __logger_ignore_false()
 #define logger_id_level_set(__id, __level)             __logger_ignore_ok()
 #define logger_id_level_get(__id)                      __logger_ignore_err()
-#define logger_id_name_get(__id)                       '\0'
+#define logger_id_name_get(__id)                       ""
 #define logger_color_set(__id, __fg, __bg, __attr)     __logger_ignore_ok()
 #define logger_color_reset(__id)                       __logger_ignore_ok()
 #define logger(__id, __level, ...)                     __logger_ignore_ok()

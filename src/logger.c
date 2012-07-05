@@ -207,7 +207,7 @@ logger_return_t __logger_output_register(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_deregister(FILE *stream)
+logger_return_t __logger_output_deregister(const FILE *stream)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -252,8 +252,8 @@ logger_return_t __logger_output_deregister(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_level_set(FILE           *stream,
-                                          logger_level_t level)
+logger_return_t __logger_output_level_set(const FILE           *stream,
+                                          const logger_level_t level)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -297,7 +297,7 @@ logger_return_t __logger_output_level_set(FILE           *stream,
  *
  * \return        Currently set logging level.
  ******************************************************************************/
-logger_level_t __logger_output_level_get(FILE *stream)
+logger_level_t __logger_output_level_get(const FILE *stream)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
   int16_t        index;
@@ -333,7 +333,7 @@ logger_level_t __logger_output_level_get(FILE *stream)
  *
  * \return        Id number if id is available, error code otherwise.
  ******************************************************************************/
-logger_id_t __logger_id_request(char* name)
+logger_id_t __logger_id_request(const char* name)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -393,7 +393,7 @@ logger_id_t __logger_id_request(char* name)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_release(logger_id_t id)
+logger_return_t __logger_id_release(const logger_id_t id)
 {
   logger_return_t ret = LOGGER_OK;
 
@@ -424,7 +424,7 @@ logger_return_t __logger_id_release(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_enable(logger_id_t id)
+logger_return_t __logger_id_enable(const logger_id_t id)
 {
   logger_return_t ret = LOGGER_OK;
 
@@ -451,7 +451,7 @@ logger_return_t __logger_id_enable(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_id_disable(logger_id_t id)
+logger_return_t __logger_id_disable(const logger_id_t id)
 {
   logger_return_t ret = LOGGER_OK;
 
@@ -478,7 +478,7 @@ logger_return_t __logger_id_disable(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_bool_t __logger_id_is_enabled(logger_id_t id)
+logger_bool_t __logger_id_is_enabled(const logger_id_t id)
 {
   logger_bool_t ret = logger_false;
 
@@ -504,8 +504,8 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_level_set(logger_id_t    id,
-                                      logger_level_t level)
+logger_return_t __logger_id_level_set(const logger_id_t    id,
+                                      const logger_level_t level)
 {
   logger_return_t ret = LOGGER_OK;
 
@@ -539,7 +539,7 @@ logger_return_t __logger_id_level_set(logger_id_t    id,
  *
  * \return        Currently set level
  ******************************************************************************/
-logger_level_t __logger_id_level_get(logger_id_t id)
+logger_level_t __logger_id_level_get(const logger_id_t id)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
 
@@ -563,7 +563,7 @@ logger_level_t __logger_id_level_get(logger_id_t id)
  *
  * \return        Symbolic name of the id
  ******************************************************************************/
-char *__logger_id_name_get(logger_id_t id)
+const char *__logger_id_name_get(const logger_id_t id)
 {
   char *name = NULL;
 
@@ -596,10 +596,10 @@ char *__logger_id_name_get(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_set(logger_id_t        id,
-                                   logger_text_fg_t   fg,
-                                   logger_text_bg_t   bg,
-                                   logger_text_attr_t attr)
+logger_return_t __logger_color_set(const logger_id_t        id,
+                                   const logger_text_fg_t   fg,
+                                   const logger_text_bg_t   bg,
+                                   const logger_text_attr_t attr)
 {
   logger_level_t ret = LOGGER_OK;
 
@@ -621,7 +621,7 @@ logger_return_t __logger_color_set(logger_id_t        id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_reset(logger_id_t id)
+logger_return_t __logger_color_reset(const logger_id_t id)
 {
   logger_level_t ret = LOGGER_OK;
 
@@ -652,9 +652,9 @@ logger_return_t __logger_color_reset(logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_prefix(logger_id_t    id,
-                                logger_level_t level,
-                                const char     *format,
+logger_return_t __logger_prefix(const logger_id_t    id,
+                                const logger_level_t level,
+                                const char           *format,
                                 ...)
 {
   logger_return_t ret = LOGGER_OK;
