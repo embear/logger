@@ -183,7 +183,7 @@ logger_return_t __logger_output_register(FILE *stream)
         logger_outputs[index].stream = stream;
 
         /* make a nonblocking stream */
-        //fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);
+        /*fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);*/
       }
       else {
         ret = LOGGER_ERR_OUTPUTS_FULL;
@@ -565,7 +565,7 @@ logger_level_t __logger_id_level_get(logger_id_t id)
  ******************************************************************************/
 char *__logger_id_name_get(logger_id_t id)
 {
-  char *name;
+  char *name = NULL;
 
   /* check for valid id */
   if ((id >= 0) &&

@@ -108,7 +108,7 @@ extern "C" {
 #define LOGGER_VERSION_MAJOR              (1)
 #define LOGGER_VERSION_MINOR              (0)
 #define LOGGER_VERSION_PATCH              (1)
-#define LOGGER_VERSION                    (((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF))
+#define LOGGER_VERSION                    ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
 
 typedef uint32_t logger_version_t; /**< Logger version type. */
 
@@ -145,7 +145,7 @@ typedef enum logger_return_e {
   LOGGER_ERR_IDS_FULL          = -5, /**< All available ids are used. */
   LOGGER_ERR_ID_NOT_FOUND      = -6, /**< Id not registered. */
   LOGGER_ERR_ID_UNKNOWN        = -7, /**< Id is unknown. */
-  LOGGER_ERR_LEVEL_UNKNOWN     = -8, /**< Level is unknown. */
+  LOGGER_ERR_LEVEL_UNKNOWN     = -8  /**< Level is unknown. */
 } logger_return_t;
 
 /* macros for color text output. */
@@ -211,28 +211,28 @@ typedef enum logger_text_fg_e {
 #endif /* LOGGER_COLORS */
 
 #if defined(LOGGER_FORMAT_FULL)
-#define logger(__id, __level, __format, __args ...)                                                                                                                       \
-  {                                                                                                                                                                       \
+#define logger(__id, __level, ...)                                                                                                                                          \
+  {                                                                                                                                                                         \
     __logger_prefix(__id, __level, "%15s:%15s:%30s:%30s():%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
-    __logger_msg(__id, __level, __format, ## __args);                                                                                                                     \
+    __logger_msg(__id, __level, ## __VA_ARGS__);                                                                                                                            \
   }
 #elif defined(LOGGER_FORMAT_FILE)
-#define logger(__id, __level, __format, __args ...)                                                                                                  \
-  {                                                                                                                                                  \
+#define logger(__id, __level, ...)                                                                                                                     \
+  {                                                                                                                                                    \
     __logger_prefix(__id, __level, "%15s:%15s:%30s:%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FILE__, LOGGER_STRINGIFY(__LINE__)); \
-    __logger_msg(__id, __level, __format, ## __args);                                                                                                \
+    __logger_msg(__id, __level, ## __VA_ARGS__);                                                                                                       \
   }
 #elif defined(LOGGER_FORMAT_FUNCTION)
-#define logger(__id, __level, __format, __args ...)                                                                                                        \
-  {                                                                                                                                                        \
+#define logger(__id, __level, ...)                                                                                                                           \
+  {                                                                                                                                                          \
     __logger_prefix(__id, __level, "%15s:%15s:%30s():%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
-    __logger_msg(__id, __level, __format, ## __args);                                                                                                      \
+    __logger_msg(__id, __level, ## __VA_ARGS__);                                                                                                             \
   }
 #else
-#define logger(__id, __level, __format, __args ...)                                                   \
-  {                                                                                                   \
+#define logger(__id, __level, ...)                                                                      \
+  {                                                                                                     \
     __logger_prefix(__id, __level, "%15s:%15s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level)); \
-    __logger_msg(__id, __level, __format, ## __args);                                                 \
+    __logger_msg(__id, __level, ## __VA_ARGS__);                                                        \
   }
 #endif
 
@@ -290,7 +290,7 @@ logger_return_t __logger_msg(logger_id_t    id,
 #define logger_id_name_get(__id)                       '\0'
 #define logger_color_set(__id, __fg, __bg, __attr)     ((void)(0))
 #define logger_color_reset(__id)                       ((void)(0))
-#define logger(__id, __level, __format, __args ...)    ((void)(0))
+#define logger(__id, __level, ...)                     ((void)(0))
 #endif /* LOGGER_ENABLE */
 
 #ifdef __cplusplus
