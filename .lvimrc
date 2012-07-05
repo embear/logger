@@ -1,0 +1,9 @@
+" get root directory
+let s:root_path=expand("<sfile>:h")
+
+" set makeprg to change directory in advance
+if (isdirectory(s:root_path."/build"))
+  let &l:makeprg="cd ".s:root_path."/build && make"
+else
+  let &l:makeprg="cd ".s:root_path." && make"
+endif
