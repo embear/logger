@@ -113,9 +113,9 @@ extern "C" {
 typedef uint32_t logger_version_t; /**< Logger version type. */
 
 
-typedef uint8_t  logger_bool_t;                             /**< Logger boolean type. */
-static const logger_bool_t logger_true  = (logger_bool_t)1; /**< Logger boolean true. */
-static const logger_bool_t logger_false = (logger_bool_t)0; /**< Logger boolean false. */
+typedef uint8_t  logger_bool_t;            /**< Logger boolean type. */
+#define logger_true     ((logger_bool_t)1) /**< Logger boolean true. */
+#define logger_false    ((logger_bool_t)0) /**< Logger boolean false. */
 
 
 typedef enum logger_level_e {
@@ -132,8 +132,8 @@ typedef enum logger_level_e {
 } logger_level_t;
 
 
-typedef int16_t  logger_id_t;                                 /**< Logger id type. */
-static const logger_id_t logger_id_unknown = (logger_id_t)-1; /**< Unknown logger id. */
+typedef int16_t  logger_id_t;                  /**< Logger id type. */
+#define logger_id_unknown    ((logger_id_t)-1) /**< Unknown logger id. */
 
 
 typedef enum logger_return_e {
