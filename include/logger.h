@@ -57,7 +57,7 @@
  *   logger_output_level_set(stdout, LOGGER_ERR);
  *
  *   // get a logging id, enable it and set log level
- *   id = logger_id_request();
+ *   id = logger_id_request("logger_test_id");
  *   logger_id_enable(id);
  *   logger_id_level_set(id, LOGGER_DEBUG);
  *
@@ -194,13 +194,14 @@ typedef enum logger_text_fg_e {
 #define logger_output_deregister(__stream)            __logger_output_deregister(__stream)
 #define logger_output_level_set(__stream, __level)    __logger_output_level_set(__stream, __level)
 #define logger_output_level_get(__stream)             __logger_output_level_get(__stream)
-#define logger_id_request()                           __logger_id_request()
+#define logger_id_request(__name)                     __logger_id_request(__name)
 #define logger_id_release(__id)                       __logger_id_release(__id)
 #define logger_id_enable(__id)                        __logger_id_enable(__id)
 #define logger_id_disable(__id)                       __logger_id_disable(__id)
 #define logger_id_is_enabled(__id)                    __logger_id_is_enabled(__id)
 #define logger_id_level_set(__id, __level)            __logger_id_level_set(__id, __level)
 #define logger_id_level_get(__id)                     __logger_id_level_get(__id)
+#define logger_id_name_get(__id)                      __logger_id_name_get(__id)
 #ifdef LOGGER_COLORS
 #define logger_color_set(__id, __fg, __bg, __attr)    __logger_color_set(__id, __fg, __bg, __attr)
 #define logger_color_reset(__id)                      __logger_color_reset(__id)
@@ -212,25 +213,25 @@ typedef enum logger_text_fg_e {
 #if defined(LOGGER_FORMAT_FULL)
 #define logger(__id, __level, __format, __args ...)                                                                                                                       \
   {                                                                                                                                                                       \
-    __logger_prefix(__id, __level, "%15s:%15s:%30s:%30s():%5s: ", LOGGER_STRINGIFY(__id), LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_prefix(__id, __level, "%15s:%15s:%30s:%30s():%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
     __logger_msg(__id, __level, __format, ## __args);                                                                                                                     \
   }
 #elif defined(LOGGER_FORMAT_FILE)
 #define logger(__id, __level, __format, __args ...)                                                                                                  \
   {                                                                                                                                                  \
-    __logger_prefix(__id, __level, "%15s:%15s:%30s:%5s: ", LOGGER_STRINGIFY(__id), LOGGER_STRINGIFY(__level), __FILE__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_prefix(__id, __level, "%15s:%15s:%30s:%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FILE__, LOGGER_STRINGIFY(__LINE__)); \
     __logger_msg(__id, __level, __format, ## __args);                                                                                                \
   }
 #elif defined(LOGGER_FORMAT_FUNCTION)
 #define logger(__id, __level, __format, __args ...)                                                                                                        \
   {                                                                                                                                                        \
-    __logger_prefix(__id, __level, "%15s:%15s:%30s():%5s: ", LOGGER_STRINGIFY(__id), LOGGER_STRINGIFY(__level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
+    __logger_prefix(__id, __level, "%15s:%15s:%30s():%5s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level), __FUNCTION__, LOGGER_STRINGIFY(__LINE__)); \
     __logger_msg(__id, __level, __format, ## __args);                                                                                                      \
   }
 #else
 #define logger(__id, __level, __format, __args ...)                                                   \
   {                                                                                                   \
-    __logger_prefix(__id, __level, "%15s:%15s: ", LOGGER_STRINGIFY(__id), LOGGER_STRINGIFY(__level)); \
+    __logger_prefix(__id, __level, "%15s:%15s: ", logger_id_name_get(__id), LOGGER_STRINGIFY(__level)); \
     __logger_msg(__id, __level, __format, ## __args);                                                 \
   }
 #endif
@@ -246,7 +247,7 @@ logger_return_t __logger_output_deregister(FILE *stream);
 logger_return_t __logger_output_level_set(FILE           *stream,
                                           logger_level_t level);
 logger_level_t __logger_output_level_get(FILE *stream);
-logger_id_t __logger_id_request(void);
+logger_id_t __logger_id_request(char *name);
 logger_return_t __logger_id_release(logger_id_t id);
 logger_return_t __logger_id_enable(logger_id_t id);
 logger_return_t __logger_id_disable(logger_id_t id);
@@ -254,6 +255,7 @@ logger_bool_t __logger_id_is_enabled(logger_id_t id);
 logger_return_t __logger_id_level_set(logger_id_t    id,
                                       logger_level_t level);
 logger_level_t __logger_id_level_get(logger_id_t id);
+char * __logger_id_name_get(logger_id_t id);
 logger_return_t __logger_color_set(logger_id_t        id,
                                    logger_text_fg_t   fg,
                                    logger_text_bg_t   bg,
@@ -278,13 +280,14 @@ logger_return_t __logger_msg(logger_id_t    id,
 #define logger_output_deregister(__stream)             ((void)(0))
 #define logger_output_level_set(__stream, __level)     ((void)(0))
 #define logger_output_level_get(__stream)              LOGGER_ERR_LEVEL_UNKNOWN
-#define logger_id_request()                            LOGGER_ERR_ID_UNKNOWN
+#define logger_id_request(__name)                      LOGGER_ERR_ID_UNKNOWN
 #define logger_id_release(__id)                        ((void)(0))
 #define logger_id_enable(__id)                         ((void)(0))
 #define logger_id_disable(__id)                        ((void)(0))
 #define logger_id_is_enabled(__id)                     logger_false
 #define logger_id_level_set(__id, __level)             ((void)(0))
 #define logger_id_level_get(__id)                      LOGGER_ERR_LEVEL_UNKNOWN
+#define logger_id_name_get(__id)                       '\0'
 #define logger_color_set(__id, __fg, __bg, __attr)     ((void)(0))
 #define logger_color_reset(__id)                       ((void)(0))
 #define logger(__id, __level, __format, __args ...)    ((void)(0))

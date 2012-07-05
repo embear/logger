@@ -72,7 +72,7 @@ int main(int  argc,
   puts("No log message will be shown because id is not enabled");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
 
   logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
@@ -99,7 +99,7 @@ int main(int  argc,
   puts("All log messages will be shown because id level is not set ( -> level is DEBUG by default)");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
 
   logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
@@ -127,7 +127,7 @@ int main(int  argc,
   puts("Log messages are shown only if globally enabled");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 
@@ -155,7 +155,7 @@ int main(int  argc,
   puts("Only log messages with level above or equal to WARNING will be shown");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_WARNING);
 
@@ -179,12 +179,37 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- id and id2 are the same ....\n", test);
+
+  puts("log messages of id and id2 will be shown");
+
+  logger_output_register(stdout);
+  id = logger_id_request("logger_test_id");
+  id2 = logger_id_request("logger_test_id");
+  assert(id == id2);
+  logger_id_enable(id);
+
+  logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
+  logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
+
+  logger_output_deregister(stdout);
+  logger_id_release(id);
+  logger_id_release(id2);
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- id enabled, id2 not ....\n", test);
 
   puts("Only log messages of id will be shown");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
 
   logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
@@ -207,7 +232,7 @@ int main(int  argc,
 
   logger_output_register(stdout);
   logger_output_register(stderr);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_ERR);
 
@@ -238,7 +263,7 @@ int main(int  argc,
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_ERR);
 
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 
@@ -269,7 +294,7 @@ int main(int  argc,
   puts("Changing and restoring logging level");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_WARNING);
 
@@ -326,7 +351,7 @@ int main(int  argc,
   puts("Messages will be all in one line");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 
@@ -355,7 +380,7 @@ int main(int  argc,
   puts("Print log messages in different colors");
 
   logger_output_register(stdout);
-  id = logger_id_request();
+  id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_DEBUG);
 

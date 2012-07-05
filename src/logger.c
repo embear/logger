@@ -23,16 +23,18 @@
 
 #define LOGGER_OUTPUTS_MAX    256                          /**< Number of possible simultaneous outputs. */
 #define LOGGER_IDS_MAX        256                          /**< Number of possible ids. */
+#define LOGGER_NAME_MAX       256                          /**< Length of logger id name including '\0' */
 
 typedef struct logger_control_s {
-  logger_bool_t      used;    /**< This id is used. */
-  logger_bool_t      enabled; /**< This id is enabled. */
-  logger_level_t     level;   /**< Level for this id. */
-  logger_bool_t      color;   /**< Changed colors for this id. */
-  logger_text_fg_t   fg;      /**< Foreground color of this id. */
-  logger_text_bg_t   bg;      /**< Background color of this id. */
-  logger_text_attr_t attr;    /**< Attributes of this id. */
-  logger_bool_t      cont;    /**< Previous message didn't contain a newline, thus omit prefix for next message. */
+  logger_bool_t      used;                  /**< This id is used. */
+  logger_bool_t      enabled;               /**< This id is enabled. */
+  logger_level_t     level;                 /**< Level for this id. */
+  logger_bool_t      color;                 /**< Changed colors for this id. */
+  logger_text_fg_t   fg;                    /**< Foreground color of this id. */
+  logger_text_bg_t   bg;                    /**< Background color of this id. */
+  logger_text_attr_t attr;                  /**< Attributes of this id. */
+  logger_bool_t      cont;                  /**< Previous message didn't contain a newline, thus omit prefix for next message. */
+  char               name[LOGGER_NAME_MAX]; /**< Name of this logger ID */
 } logger_control_t;
 
 typedef struct logger_output_s {
@@ -331,24 +333,47 @@ logger_level_t __logger_output_level_get(FILE *stream)
  *
  * \return        Id number if id is available, error code otherwise.
  ******************************************************************************/
-logger_id_t __logger_id_request(void)
+logger_id_t __logger_id_request(char* name)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
   logger_bool_t   found;
 
-  /* search for an available id */
+  /* start search */
   found = logger_false;
+
+  /* search for an already existing id with the same name */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    if (logger_control[index].used == logger_false) {
-      found = logger_true;
-      break;
+    if (logger_control[index].used == logger_true) {
+      if (strncmp(logger_control[index].name, name, LOGGER_NAME_MAX) == 0) {
+        found = logger_true;
+        break;
+      }
+    }
+  }
+
+  /* search for an available id */
+  if (found == logger_false) {
+    for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+      if (logger_control[index].used == logger_false) {
+        found = logger_true;
+        /* reset the id */
+        memset(&logger_control[index], 0, sizeof(logger_control[index]));
+
+        /* mark this id as used */
+        logger_control[index].used = logger_true;
+
+        /* copy the name */
+        strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
+        logger_control[index].name[LOGGER_NAME_MAX] = '\0';
+
+        break;
+      }
     }
   }
 
   /* found an empty slot */
   if (found == logger_true) {
-    logger_control[index].used = logger_true;
     ret = index;
   }
   else {
@@ -526,6 +551,30 @@ logger_level_t __logger_id_level_get(logger_id_t id)
   }
 
   return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query name for id.
+ *
+ * Query the name for the given logging id.
+ *
+ * \param[in]     id      Id for setting level
+ *
+ * \return        Symbolic name of the id
+ ******************************************************************************/
+char *__logger_id_name_get(logger_id_t id)
+{
+  char *name;
+
+  /* check for valid id */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX)) {
+    /* get id level */
+    name = logger_control[id].name;
+  }
+
+  return(name);
 }
 
 
