@@ -408,9 +408,11 @@ logger_return_t __logger_id_release(const logger_id_t id)
       logger_control[id].used    = logger_false;
       logger_control[id].enabled = logger_false;
       logger_control[id].level   = LOGGER_DEBUG;
+      logger_control[id].color   = logger_false;
+      logger_control[id].name[0] = '\0';
     }
     else {
-      ret = LOGGER_ERR_ID_NOT_FOUND;
+      ret = LOGGER_ERR_ID_UNKNOWN;
     }
   }
 
@@ -433,7 +435,8 @@ logger_return_t __logger_id_enable(const logger_id_t id)
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
     /* enable given id */
     logger_control[id].enabled = logger_true;
   }
@@ -460,7 +463,8 @@ logger_return_t __logger_id_disable(const logger_id_t id)
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
     /* disable given id */
     logger_control[id].enabled = logger_false;
   }
@@ -514,7 +518,8 @@ logger_return_t __logger_id_level_set(const logger_id_t    id,
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
@@ -548,7 +553,8 @@ logger_level_t __logger_id_level_get(const logger_id_t id)
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
     /* get id level */
     ret = logger_control[id].level;
   }
@@ -572,7 +578,8 @@ const char *__logger_id_name_get(const logger_id_t id)
 
   /* check for valid id */
   if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX)) {
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
     /* get id level */
     name = logger_control[id].name;
   }
@@ -606,10 +613,17 @@ logger_return_t __logger_color_set(const logger_id_t        id,
 {
   logger_level_t ret = LOGGER_OK;
 
-  logger_control[id].color = logger_true;
-  logger_control[id].fg    = fg;
-  logger_control[id].bg    = bg;
-  logger_control[id].attr  = attr;
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    logger_control[id].color = logger_true;
+    logger_control[id].fg    = fg;
+    logger_control[id].bg    = bg;
+    logger_control[id].attr  = attr;
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
@@ -628,7 +642,14 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 {
   logger_level_t ret = LOGGER_OK;
 
-  logger_control[id].color = logger_false;
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    logger_control[id].color = logger_false;
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
