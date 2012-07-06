@@ -27,6 +27,7 @@
 
 typedef struct logger_control_s {
   logger_bool_t      used;                  /**< This id is used. */
+  int16_t            count;                 /**< Number of registrations for this id. */
   logger_bool_t      enabled;               /**< This id is enabled. */
   logger_level_t     level;                 /**< Level for this id. */
   logger_bool_t      color;                 /**< Changed colors for this id. */
@@ -349,6 +350,7 @@ logger_id_t __logger_id_request(const char* name)
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     if (logger_control[index].used == logger_true) {
       if (strncmp(logger_control[index].name, name, LOGGER_NAME_MAX) == 0) {
+        logger_control[index].count++;
         found = logger_true;
         break;
       }
@@ -363,8 +365,12 @@ logger_id_t __logger_id_request(const char* name)
         /* reset the id */
         memset(&logger_control[index], 0, sizeof(logger_control[index]));
 
-        /* mark this id as used */
-        logger_control[index].used = logger_true;
+        /* initialize thethe  id */
+        logger_control[index].used    = logger_true;
+        logger_control[index].count   = 1;
+        logger_control[index].enabled = logger_false;
+        logger_control[index].level   = LOGGER_DEBUG;
+        logger_control[index].color   = logger_false;
 
         /* copy the name */
         strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
@@ -404,12 +410,19 @@ logger_return_t __logger_id_release(const logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX)) {
     if (logger_control[id].used == logger_true) {
-      /* reset all id dependent values to defaults */
-      logger_control[id].used    = logger_false;
-      logger_control[id].enabled = logger_false;
-      logger_control[id].level   = LOGGER_DEBUG;
-      logger_control[id].color   = logger_false;
-      logger_control[id].name[0] = '\0';
+      logger_control[id].count--;
+      if (logger_control[id].count <= 0) {
+        /* reset the id */
+        memset(&logger_control[id], 0, sizeof(logger_control[id]));
+
+        /* reset all id dependent values to defaults */
+        logger_control[id].used    = logger_false;
+        logger_control[id].count = 0;
+        logger_control[id].enabled = logger_false;
+        logger_control[id].level   = LOGGER_DEBUG;
+        logger_control[id].color   = logger_false;
+        logger_control[id].name[0] = '\0';
+      }
     }
     else {
       ret = LOGGER_ERR_ID_UNKNOWN;
