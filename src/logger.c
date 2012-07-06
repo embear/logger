@@ -229,6 +229,10 @@ logger_return_t __logger_output_deregister(const FILE *stream)
 
     /* remove this stream if this was the last reference */
     if (logger_outputs[index].count <= 0) {
+      /* flush everything in this stream */
+      fflush(logger_outputs[index].stream);
+
+      /* reset output to default values */
       logger_outputs[index].count  = 0;
       logger_outputs[index].level  = LOGGER_UNKNOWN;
       logger_outputs[index].stream = (FILE *)NULL;
@@ -327,6 +331,29 @@ logger_level_t __logger_output_level_get(const FILE *stream)
 
 
 /** ************************************************************************//**
+ * \brief  Flush all output streams.
+ *
+ * Force a flush of all output streams.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_output_flush(void)
+{
+  logger_return_t ret = LOGGER_OK;
+  int16_t         index;
+
+  /* search for an empty slot */
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    if (logger_outputs[index].count > 0) {
+      fflush(logger_outputs[index].stream);
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Request a logging id.
  *
  * Request a id for later use with calls to \c logger(). If an id with the same
@@ -411,7 +438,11 @@ logger_return_t __logger_id_release(const logger_id_t id)
       (id < LOGGER_IDS_MAX)) {
     if (logger_control[id].used == logger_true) {
       logger_control[id].count--;
+      /* if this was the last id */
       if (logger_control[id].count <= 0) {
+        /* flush all streams */
+        __logger_output_flush();
+
         /* reset the id */
         memset(&logger_control[id], 0, sizeof(logger_control[id]));
 
