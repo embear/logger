@@ -194,6 +194,7 @@ typedef enum logger_text_fg_e {
 #define logger_output_deregister(__stream)            __logger_output_deregister(__stream)
 #define logger_output_level_set(__stream, __level)    __logger_output_level_set(__stream, __level)
 #define logger_output_level_get(__stream)             __logger_output_level_get(__stream)
+#define logger_output_flush()                         __logger_output_flush()
 #define logger_id_request(__name)                     __logger_id_request(__name)
 #define logger_id_release(__id)                       __logger_id_release(__id)
 #define logger_id_enable(__id)                        __logger_id_enable(__id)
@@ -247,6 +248,7 @@ logger_return_t __logger_output_deregister(const FILE *stream);
 logger_return_t __logger_output_level_set(const FILE           *stream,
                                           const logger_level_t level);
 logger_level_t __logger_output_level_get(const FILE *stream);
+logger_return_t __logger_output_flush(void);
 logger_id_t __logger_id_request(const char *name);
 logger_return_t __logger_id_release(const logger_id_t id);
 logger_return_t __logger_id_enable(const logger_id_t id);
@@ -286,6 +288,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 #define logger_output_deregister(__stream)             __logger_ignore_ok()
 #define logger_output_level_set(__stream, __level)     __logger_ignore_ok()
 #define logger_output_level_get(__stream)              __logger_ignore_err()
+#define logger_output_flush()                          __logger_ignore_ok()
 #define logger_id_request(__name)                      __logger_ignore_id()
 #define logger_id_release(__id)                        __logger_ignore_ok()
 #define logger_id_enable(__id)                         __logger_ignore_ok()
