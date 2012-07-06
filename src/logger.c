@@ -328,8 +328,11 @@ logger_level_t __logger_output_level_get(const FILE *stream)
 /** ************************************************************************//**
  * \brief  Request a logging id.
  *
- * Request a id for later use with calls to \c logger(). Each logging id is
- * disabled by default.
+ * Request a id for later use with calls to \c logger(). If an id with the same
+ * symbolic name has already been requested that id is returned otherwise a new
+ * id is allocated. Each logging id is disabled by default.
+ *
+ * \param[in]     name    Symbolic name for the id.
  *
  * \return        Id number if id is available, error code otherwise.
  ******************************************************************************/
