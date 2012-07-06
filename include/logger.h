@@ -144,9 +144,8 @@ typedef enum logger_return_e {
   LOGGER_ERR_OUTPUT_REGISTERED = -4, /**< Output already registered. */
   LOGGER_ERR_OUTPUT_NOT_FOUND  = -5, /**< Output not registered. */
   LOGGER_ERR_IDS_FULL          = -6, /**< All available ids are used. */
-  LOGGER_ERR_ID_NOT_FOUND      = -7, /**< Id not registered. */
-  LOGGER_ERR_ID_UNKNOWN        = -8, /**< Id is unknown. */
-  LOGGER_ERR_LEVEL_UNKNOWN     = -9  /**< Level is unknown. */
+  LOGGER_ERR_ID_UNKNOWN        = -7, /**< Id is unknown. */
+  LOGGER_ERR_LEVEL_UNKNOWN     = -8  /**< Level is unknown. */
 } logger_return_t;
 
 /* macros for color text output. */
