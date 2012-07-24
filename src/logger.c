@@ -401,7 +401,7 @@ logger_id_t __logger_id_request(const char* name)
 
         /* copy the name */
         strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
-        logger_control[index].name[LOGGER_NAME_MAX] = '\0';
+        logger_control[index].name[LOGGER_NAME_MAX - 1] = '\0';
 
         break;
       }
