@@ -655,7 +655,7 @@ logger_return_t __logger_color_set(const logger_id_t        id,
                                    const logger_text_bg_t   bg,
                                    const logger_text_attr_t attr)
 {
-  logger_level_t ret = LOGGER_OK;
+  logger_return_t ret = LOGGER_OK;
 
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
@@ -684,7 +684,7 @@ logger_return_t __logger_color_set(const logger_id_t        id,
  ******************************************************************************/
 logger_return_t __logger_color_reset(const logger_id_t id)
 {
-  logger_level_t ret = LOGGER_OK;
+  logger_return_t ret = LOGGER_OK;
 
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
