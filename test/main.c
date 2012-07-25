@@ -33,7 +33,7 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
-  printf("Starting test %d -- check logger version number ....\n", test);
+  printf("Starting test %d -- check logger version number %s ....\n", test, LOGGER_VERSION_STRING);
   assert(LOGGER_VERSION == logger_version());
 
   test++;

@@ -105,10 +105,15 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define LOGGER_VERSION_MAJOR              (255)
-#define LOGGER_VERSION_MINOR              (255)
-#define LOGGER_VERSION_PATCH              (255)
-#define LOGGER_VERSION                    ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
+#define LOGGER_STRINGIFY_(x)     # x
+#define LOGGER_STRINGIFY(x)      LOGGER_STRINGIFY_(x)
+
+#define LOGGER_VERSION_MAJOR     255
+#define LOGGER_VERSION_MINOR     255
+#define LOGGER_VERSION_PATCH     255
+#define LOGGER_VERSION           ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
+#define LOGGER_VERSION_STRING    LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "."LOGGER_STRINGIFY (LOGGER_VERSION_MINOR)"."LOGGER_STRINGIFY (LOGGER_VERSION_PATCH)
+
 
 typedef uint32_t logger_version_t; /**< Logger version type. */
 
@@ -183,8 +188,6 @@ typedef enum logger_text_fg_e {
 
 
 #ifdef LOGGER_ENABLE
-#define LOGGER_STRINGIFY_(x)                          # x
-#define LOGGER_STRINGIFY(x)                           LOGGER_STRINGIFY_(x)
 #define logger_version()                              __logger_version()
 #define logger_init()                                 __logger_init()
 #define logger_enable()                               __logger_enable()
