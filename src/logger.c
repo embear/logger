@@ -20,9 +20,9 @@
 
 #ifdef LOGGER_ENABLE
 
-#define LOGGER_OUTPUTS_MAX    256                          /**< Number of possible simultaneous outputs. */
-#define LOGGER_IDS_MAX        256                          /**< Number of possible ids. */
-#define LOGGER_NAME_MAX       256                          /**< Length of logger id name including '\0' */
+#define LOGGER_OUTPUTS_MAX    256 /**< Number of possible simultaneous outputs. */
+#define LOGGER_IDS_MAX        256 /**< Number of possible ids. */
+#define LOGGER_NAME_MAX       256 /**< Length of logger id name including '\0' */
 
 typedef struct logger_control_s {
   logger_bool_t      used;                  /**< This id is used. */

@@ -21,22 +21,24 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define LOGGER_STRINGIFY_(x)     # x
-#define LOGGER_STRINGIFY(x)      LOGGER_STRINGIFY_(x)
+#define LOGGER_STRINGIFY_(x)    # x
+#define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
 
-#define LOGGER_VERSION_MAJOR     255
-#define LOGGER_VERSION_MINOR     255
-#define LOGGER_VERSION_PATCH     255
-#define LOGGER_VERSION           ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
-#define LOGGER_VERSION_STRING    LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "."LOGGER_STRINGIFY (LOGGER_VERSION_MINOR)"."LOGGER_STRINGIFY (LOGGER_VERSION_PATCH)
-
+#define LOGGER_VERSION_MAJOR    (255)
+#define LOGGER_VERSION_MINOR    (255)
+#define LOGGER_VERSION_PATCH    (255)
+#define LOGGER_VERSION          ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
+#define LOGGER_VERSION_STRING   LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "."LOGGER_STRINGIFY (LOGGER_VERSION_MINOR)"."LOGGER_STRINGIFY (LOGGER_VERSION_PATCH)
 
 typedef uint32_t logger_version_t; /**< Logger version type. */
 
-
 typedef uint8_t  logger_bool_t;            /**< Logger boolean type. */
-#define logger_true     ((logger_bool_t)1) /**< Logger boolean true. */
-#define logger_false    ((logger_bool_t)0) /**< Logger boolean false. */
+
+/** Logger boolean true. */
+#define logger_true     ((logger_bool_t)1)
+
+/** Logger boolean false. */
+#define logger_false    ((logger_bool_t)0)
 
 
 typedef enum logger_level_e {
@@ -69,7 +71,8 @@ typedef enum logger_return_e {
   LOGGER_ERR_LEVEL_UNKNOWN     = -8  /**< Level is unknown. */
 } logger_return_t;
 
-/* macros for color text output. */
+
+/** enum for text style output. */
 typedef enum logger_text_attr_e {
   LOGGER_ATTR_RESET     = 0, /**< Reset attributes. */
   LOGGER_ATTR_BRIGHT    = 1, /**< Bright attribute. */
@@ -80,6 +83,8 @@ typedef enum logger_text_attr_e {
   LOGGER_ATTR_HIDDEN    = 8  /**< Hidden attribute. */
 } logger_text_attr_t;
 
+
+/** enum for text background color output. */
 typedef enum logger_text_bg_e {
   LOGGER_BG_BLACK   = 40, /**< Black background color. */
   LOGGER_BG_RED     = 41, /**< Red background color. */
@@ -91,6 +96,8 @@ typedef enum logger_text_bg_e {
   LOGGER_BG_WHITE   = 47  /**< White background color. */
 } logger_text_bg_t;
 
+
+/** enum for text foreground color output. */
 typedef enum logger_text_fg_e {
   LOGGER_FG_BLACK   = 30, /**< Black background color. */
   LOGGER_FG_RED     = 31, /**< Red background color. */
