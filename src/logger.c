@@ -10,7 +10,6 @@
  *
  * \brief  Logging facility for C.
  * \author Markus Braun
- * \date   2010-10-13
  ******************************************************************************/
 #include <string.h>
 #include <stdarg.h>
