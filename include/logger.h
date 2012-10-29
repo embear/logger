@@ -55,8 +55,8 @@ typedef enum logger_level_e {
 } logger_level_t;
 
 
-typedef int16_t  logger_id_t;                  /**< Logger id type. */
-#define logger_id_unknown    ((logger_id_t)-1) /**< Unknown logger id. */
+typedef int16_t  logger_id_t;                  /**< Logger ID type. */
+#define logger_id_unknown    ((logger_id_t)-1) /**< Unknown logger ID. */
 
 
 typedef enum logger_return_e {
