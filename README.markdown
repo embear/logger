@@ -1,10 +1,12 @@
-# logger
+logger
+======
 
 Logger is a simple logging facility for the C language. It is possible to
 output logging information to different output stream and to use different
 logging severities.
 
-## Introduction
+Introduction
+------------
 
 Logger needs to be enabled using the global define `LOGGER_ENABLE` when
 compiling the sources. Otherwise all functions will be excluded from
@@ -25,6 +27,21 @@ logging only for parts of a program. The function `logger_id_level_get()`
 can be used to get the current value, store it, increase the level for some
 part of thew program and restore it afterwards.
 
+Each ID has its own prefix assigned. By default each ID prints the prefix
+`LOGGER_PREFIX_FULL`. The prefix is changed by `logger_id_prefix_set()` and it
+is possible to get the current value for later restore with
+`logger_id_prefix_get()`. All available prefixes are:
+
+  Prefix enum              Generated prefix
+  ------------------------ ---------------------------------------------------
+  `LOGGER_PREFIX_EMPTY`    `""`
+  `LOGGER_PREFIX_NAME`     `"LOGGER_ID_NAME:"`
+  `LOGGER_PREFIX_SHORT`    `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
+  `LOGGER_PREFIX_FUNCTION` `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
+  `LOGGER_PREFIX_FILE`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
+  `LOGGER_PREFIX_FULL`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"`
+  ------------------------ ---------------------------------------------------
+
 It is possible to give each logger ID different foreground and background color
 as well as text attributes with `logger_id_color_set()` and reset them with
 `logger_id_color_reset()`. Colors are changed by escape sequences and only
@@ -43,15 +60,8 @@ Keep in mind that a message is only printed if the severity of the
 `logger()` call is higher than the level of the according ID *AND* the
 severity is higher than the level of the output.
 
-The format of output could be changed by setting on of the following defines on
-compile time:
-
-  - `LOGGER_FORMAT_SIMPLE` (default)
-  - `LOGGER_FORMAT_FULL`
-  - `LOGGER_FORMAT_FILE`
-  - `LOGGER_FORMAT_FUNCTION`
-
-## Example
+Example
+-------
 
 Below is a basic example for using logger. Store it as `main.c` and compile
 with:

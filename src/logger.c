@@ -35,6 +35,7 @@ typedef struct logger_control_s {
   int16_t            count;                 /**< Number of registrations for this ID. */
   logger_bool_t      enabled;               /**< This ID is enabled. */
   logger_level_t     level;                 /**< Level for this ID. */
+  logger_prefix_t    prefix;                /**< Prefix for this ID. */
   logger_bool_t      color;                 /**< Changed colors for this ID. */
   logger_text_fg_t   fg;                    /**< Foreground color of this ID. */
   logger_text_bg_t   bg;                    /**< Background color of this ID. */
@@ -401,6 +402,7 @@ logger_id_t __logger_id_request(const char* name)
         logger_control[index].count   = 1;
         logger_control[index].enabled = logger_false;
         logger_control[index].level   = LOGGER_DEBUG;
+        logger_control[index].prefix  = LOGGER_PREFIX_FULL;
         logger_control[index].color   = logger_false;
 
         /* copy the name */
@@ -591,7 +593,7 @@ logger_return_t __logger_id_level_set(const logger_id_t    id,
  *
  * Query the currently set minimum level for the given logging ID.
  *
- * \param[in]     id      ID for setting level
+ * \param[in]     id      ID for querying level
  *
  * \return        Currently set level
  ******************************************************************************/
@@ -612,11 +614,74 @@ logger_level_t __logger_id_level_get(const logger_id_t id)
 
 
 /** ************************************************************************//**
+ * \brief  Set logging prefix for ID.
+ *
+ * Set the prefix for given ID. All messages for this ID will get this prefix
+ * from now on.
+ *
+ * \param[in]     id      ID for setting prefix.
+ * \param[in]     prefix  Prefix to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_id_prefix_set(const logger_id_t    id,
+                                       const logger_prefix_t prefix)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* check for valid ID */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* check for valid level */
+    if ((prefix > LOGGER_PREFIX_UNKNOWN) &&
+        (prefix < LOGGER_PREFIX_MAX)) {
+      /* set ID prefix */
+      logger_control[id].prefix = prefix;
+    }
+    else {
+      ret = LOGGER_ERR_PREFIX_UNKNOWN;
+    }
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging prefix for ID.
+ *
+ * Query the currently set prefix for the given logging ID.
+ *
+ * \param[in]     id      ID for querying prefix
+ *
+ * \return        Currently set level
+ ******************************************************************************/
+logger_prefix_t __logger_id_prefix_get(const logger_id_t id)
+{
+  logger_prefix_t ret = LOGGER_PREFIX_UNKNOWN;
+
+  /* check for valid ID */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* get ID level */
+    ret = logger_control[id].prefix;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Query name for id.
  *
  * Query the name for the given logging ID.
  *
- * \param[in]     id      ID for setting level
+ * \param[in]     id      ID for querying name
  *
  * \return        Symbolic name of the ID
  ******************************************************************************/
@@ -707,43 +772,55 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 
 
 /** ************************************************************************//**
- * \brief  Print log message prefix.
+ * \brief  Print log message.
  *
- * Print the log message prefix to all output streams registered. Only print
- * the prefix if
+ * Print the log message to all output streams registered. It is possible to do
+ * repeated prints to the same line by omitting '\n' in the log message format
+ * sting. In this case a subsequent call will be appended without prefix. Only
+ * print the message if
  *
- *   - previous logging call ended with a '\n' i.e. is complete.
  *   - logging is globally enabled.
  *   - logging ID is enabled.
  *   - logging level is high enough.
  *
- * \param[in]     id      ID outputting this message.
- * \param[in]     level   Level of this message.
- * \param[in]     format  \c printf() like format string.
- * \param[in]     va_args Argument list.
+ * \param[in]     id        ID outputting this message.
+ * \param[in]     level     Level of this message.
+ * \param[in]     level_str Level of this message as string.
+ * \param[in]     file      Name of file where this call happend.
+ * \param[in]     function  Name of function where this call happend.
+ * \param[in]     line      Line where this call happend.
+ * \param[in]     format    \c printf() like format string.
+ * \param[in]     va_args i Argument list.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_prefix(const logger_id_t    id,
-                                const logger_level_t level,
-                                const char           *format,
-                                ...)
+logger_return_t __logger(logger_id_t    id,
+                         logger_level_t level,
+                         const char     *level_str,
+                         const char     *file,
+                         const char     *function,
+                         uint32_t       line,
+                         const char     *format,
+                         ...)
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
   int16_t         index;
+  logger_bool_t   cont;
 
   /* check for valid ID */
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
       (logger_enabled == logger_true)) {
+
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
+
       /* check if ID is enabled and level is high enough */
       if ((logger_control[id].enabled == logger_true) &&
-          (logger_control[id].level <= level) &&
-          (logger_control[id].cont == logger_false)) {
+          (logger_control[id].level <= level)) {
+
         /* initialize variable arguments */
         va_start(argp, format);
 
@@ -760,84 +837,43 @@ logger_return_t __logger_prefix(const logger_id_t    id,
             }
 #endif      /* LOGGER_COLORS */
 
-            /* print message */
-            (void)vfprintf(logger_outputs[index].stream, format, argp);
-          }
-        }
+            /* print prefix */
+            if (logger_control[id].cont == logger_false) {
+              switch(logger_control[id].prefix) {
+                case LOGGER_PREFIX_UNKNOWN:
+                  /* nothing */
+                  break;
 
-        /* end variable arguments */
-        va_end(argp);
-      }
-    }
-    else {
-      ret = LOGGER_ERR_LEVEL_UNKNOWN;
-    }
-  }
-  else {
-    ret = LOGGER_ERR_ID_UNKNOWN;
-  }
+                case LOGGER_PREFIX_EMPTY:
+                  /* nothing */
+                  break;
 
-  return(ret);
-}
+                case LOGGER_PREFIX_NAME:
+                  (void)fprintf(logger_outputs[index].stream, "%15s: ", logger_id_name_get(id));
+                  break;
 
+                case LOGGER_PREFIX_SHORT:
+                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s: ", logger_id_name_get(id), level_str);
+                  break;
 
-/** ************************************************************************//**
- * \brief  Print log message.
- *
- * Print the log message to all output streams registered. It is possible to do
- * repeated prints to the same line by omitting '\n' in the log message format
- * sting. In this case a subsequent call will be appended without prefix. Only
- * print the message if
- *
- *   - logging is globally enabled.
- *   - logging ID is enabled.
- *   - logging level is high enough.
- *
- * \param[in]     id      ID outputting this message.
- * \param[in]     level   Level of this message.
- * \param[in]     format  \c printf() like format string.
- * \param[in]     va_args Argument list.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t __logger_msg(logger_id_t    id,
-                             logger_level_t level,
-                             const char     *format,
-                             ...)
-{
-  logger_return_t ret = LOGGER_OK;
-  va_list         argp;
-  int16_t         index;
-  logger_bool_t   cont;
+                case LOGGER_PREFIX_FUNCTION:
+                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
+                  break;
 
-  /* check for valid ID */
-  if ((id >= 0) &&
-      (id < LOGGER_IDS_MAX) &&
-      (logger_enabled == logger_true)) {
-    /* check for valid level */
-    if ((level >= LOGGER_DEBUG) &&
-        (level <= LOGGER_MAX)) {
-      /* check for multi line message */
-      cont = logger_true;
-      for (index = 0 ; format[index] != '\0' ; index++) {
-        if (format[index] == '\n') {
-          cont = logger_false;
-          break;
-        }
-      }
+                case LOGGER_PREFIX_FILE:
+                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
+                  break;
 
-      /* check if ID is enabled and level is high enough */
-      if ((logger_control[id].enabled == logger_true) &&
-          (logger_control[id].level <= level)) {
-        logger_control[id].cont = cont;
+                case LOGGER_PREFIX_FULL:
+                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
+                  break;
 
-        /* initialize variable arguments */
-        va_start(argp, format);
+                case LOGGER_PREFIX_MAX:
+                  /* nothing */
+                  break;
+              }
+            }
 
-        /* loop over all possible outputs */
-        for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-          if ((logger_outputs[index].count > 0) &&
-              (logger_outputs[index].level <= level)) {
             /* print message */
             (void)vfprintf(logger_outputs[index].stream, format, argp);
 
@@ -855,6 +891,18 @@ logger_return_t __logger_msg(logger_id_t    id,
 
         /* end variable arguments */
         va_end(argp);
+
+        /* check for multi line message */
+        cont = logger_true;
+        for (index = 0 ; format[index] != '\0' ; index++) {
+          if (format[index] == '\n') {
+            cont = logger_false;
+            break;
+          }
+        }
+
+        logger_control[id].cont = cont;
+
       }
     }
     else {

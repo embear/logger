@@ -19,11 +19,12 @@
 int main(int  argc,
          char *argv[])
 {
-  int            test = 0;
-  FILE           *logger_stream;
-  logger_level_t level;
-  logger_id_t    id  = logger_id_unknown;
-  logger_id_t    id2 = logger_id_unknown;
+  int             test = 0;
+  FILE            *logger_stream;
+  logger_level_t  level;
+  logger_prefix_t prefix;
+  logger_id_t     id  = logger_id_unknown;
+  logger_id_t     id2 = logger_id_unknown;
 
   assert(LOGGER_OK == logger_init());
 
@@ -192,6 +193,95 @@ int main(int  argc,
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
   assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- all possible prefixes ....\n", test);
+
+  puts("All possible prefixes will be shown");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+
+
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_EMPTY));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_SHORT));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FULL));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- different prefixes for id and id2 ....\n", test);
+
+  puts("Different prefixes for id and id2 will be shown");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  id2 = logger_id_request("logger_test_id2");
+  assert(LOGGER_OK == logger_id_enable(id2));
+  assert(LOGGER_OK == logger_id_prefix_set(id2, LOGGER_PREFIX_SHORT));
+
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+  assert(LOGGER_OK == logger_id_release(id2));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- modify prefixe for id ....\n", test);
+
+  puts("Change prefix for id and restore previous value");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  prefix = logger_id_prefix_get(id);
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_SHORT));
+
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_id_prefix_set(id, prefix));
+
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
