@@ -12,6 +12,7 @@
  * \author Markus Braun
  ******************************************************************************/
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -814,7 +815,6 @@ logger_return_t __logger(logger_id_t    id,
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
   int16_t         index;
-  logger_bool_t   cont;
   char            *prefix = NULL;
   char            *message = NULL;
 
@@ -937,16 +937,14 @@ logger_return_t __logger(logger_id_t    id,
         }
 
         /* check for multi line message */
-        cont = logger_true;
-        for (index = 0 ; format[index] != '\0' ; index++) {
-          if (format[index] == '\n') {
-            cont = logger_false;
-            break;
-          }
+        if (rindex(format, '\n') != NULL) {
+          /* '\n' -> will not be continued */
+          logger_control[id].cont = logger_false;
         }
-
-        logger_control[id].cont = cont;
-
+        else {
+          /* no '\n' -> will be continued */
+          logger_control[id].cont = logger_true;
+        }
       }
     }
     else {
