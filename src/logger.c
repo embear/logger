@@ -12,6 +12,8 @@
  * \author Markus Braun
  ******************************************************************************/
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <stddef.h>
@@ -21,13 +23,19 @@
 #ifdef LOGGER_ENABLE
 
 /** Number of possible simultaneous outputs. */
-#define LOGGER_OUTPUTS_MAX    (256)
+#define LOGGER_OUTPUTS_MAX           (256)
 
 /** Number of possible ids. */
-#define LOGGER_IDS_MAX        (256)
+#define LOGGER_IDS_MAX               (256)
 
 /** Length of logger ID name including '\0' */
-#define LOGGER_NAME_MAX       (256)
+#define LOGGER_NAME_MAX              (256)
+
+/** Length of logger prefix string including '\0' */
+#define LOGGER_PREFIX_STRING_MAX     (128)
+
+/** Length of logger message string including '\0' */
+#define LOGGER_MESSAGE_STRING_MAX    (512)
 
 typedef struct logger_control_s {
   logger_bool_t      cont;                  /**< Previous message didn't contain a newline, thus omit prefix for next message. */
@@ -807,6 +815,8 @@ logger_return_t __logger(logger_id_t    id,
   va_list         argp;
   int16_t         index;
   logger_bool_t   cont;
+  char            *prefix = NULL;
+  char            *message = NULL;
 
   /* check for valid ID */
   if ((id >= 0) &&
@@ -821,8 +831,67 @@ logger_return_t __logger(logger_id_t    id,
       if ((logger_control[id].enabled == logger_true) &&
           (logger_control[id].level <= level)) {
 
+        /* do prefix stuff only if needed */
+        if (logger_control[id].cont == logger_false) {
+          /* allocate storage for prefix */
+          prefix = (char *)malloc(LOGGER_PREFIX_STRING_MAX * sizeof(char));
+
+          /* print prefix to string */
+          if (prefix != NULL) {
+            switch (logger_control[id].prefix) {
+              case LOGGER_PREFIX_UNKNOWN:
+                /* empty */
+                prefix[0] = '\0';
+                break;
+
+              case LOGGER_PREFIX_EMPTY:
+                /* empty */
+                prefix[0] = '\0';
+                break;
+
+              case LOGGER_PREFIX_NAME:
+                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s: ", logger_id_name_get(id));
+                break;
+
+              case LOGGER_PREFIX_SHORT:
+                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s: ", logger_id_name_get(id), level_str);
+                break;
+
+              case LOGGER_PREFIX_FUNCTION:
+                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
+                break;
+
+              case LOGGER_PREFIX_FILE:
+                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
+                break;
+
+              case LOGGER_PREFIX_FULL:
+                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
+                break;
+
+              case LOGGER_PREFIX_MAX:
+                /* empty */
+                prefix[0] = '\0';
+                break;
+            }
+            prefix[LOGGER_PREFIX_STRING_MAX - 1] = '\0';
+          }
+        }
+
+        /* allocate storage for message */
+        message = (char *)malloc(LOGGER_MESSAGE_STRING_MAX * sizeof(char));
+
         /* initialize variable arguments */
         va_start(argp, format);
+
+        /* print message to string */
+        if (message != NULL) {
+          (void)vsnprintf(message, LOGGER_MESSAGE_STRING_MAX - 1, format, argp);
+          message[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
+        }
+
+        /* end variable arguments */
+        va_end(argp);
 
         /* loop over all possible outputs */
         for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
@@ -837,45 +906,15 @@ logger_return_t __logger(logger_id_t    id,
             }
 #endif      /* LOGGER_COLORS */
 
-            /* print prefix */
-            if (logger_control[id].cont == logger_false) {
-              switch(logger_control[id].prefix) {
-                case LOGGER_PREFIX_UNKNOWN:
-                  /* nothing */
-                  break;
-
-                case LOGGER_PREFIX_EMPTY:
-                  /* nothing */
-                  break;
-
-                case LOGGER_PREFIX_NAME:
-                  (void)fprintf(logger_outputs[index].stream, "%15s: ", logger_id_name_get(id));
-                  break;
-
-                case LOGGER_PREFIX_SHORT:
-                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s: ", logger_id_name_get(id), level_str);
-                  break;
-
-                case LOGGER_PREFIX_FUNCTION:
-                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
-                  break;
-
-                case LOGGER_PREFIX_FILE:
-                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
-                  break;
-
-                case LOGGER_PREFIX_FULL:
-                  (void)fprintf(logger_outputs[index].stream, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
-                  break;
-
-                case LOGGER_PREFIX_MAX:
-                  /* nothing */
-                  break;
-              }
+            /* actually output prefix */
+            if (prefix != NULL) {
+              fputs(prefix, logger_outputs[index].stream);
             }
 
-            /* print message */
-            (void)vfprintf(logger_outputs[index].stream, format, argp);
+            /* actually output message */
+            if (message != NULL) {
+              fputs(message, logger_outputs[index].stream);
+            }
 
             /* reset color */
 #ifdef LOGGER_COLORS
@@ -889,8 +928,13 @@ logger_return_t __logger(logger_id_t    id,
           }
         }
 
-        /* end variable arguments */
-        va_end(argp);
+        /* release memory of prefix and message */
+        if (prefix != NULL) {
+          free(prefix);
+        }
+        if (message != NULL) {
+          free(message);
+        }
 
         /* check for multi line message */
         cont = logger_true;
