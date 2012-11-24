@@ -1026,6 +1026,8 @@ logger_return_t __logger(logger_id_t    id,
   va_list         argp;
   char            *prefix  = NULL;
   char            *message = NULL;
+  char            *message_part;
+  char            *message_end;
 
   /* check for valid ID */
   if ((id >= 0) &&
@@ -1047,8 +1049,27 @@ logger_return_t __logger(logger_id_t    id,
         __logger_format_message(id, &message, format, argp);
         va_end(argp);
 
-        /* output messages */
-        __logger_output(id, level, prefix, message);
+        /* initialize message pointer */
+        message_part = message;
+
+        /* loop over all message parts */
+        do {
+          /* search for the next linefeed */
+          message_end = index(message_part, '\n');
+          if (message_end != NULL) {
+            /* replace linefeed with string end */
+            *message_end = '\0';
+
+            /* make message_end point to the next message part */
+            message_end++;
+          }
+
+          /* output message */
+          __logger_output(id, level, prefix, message_part);
+
+          /* update message part for next loop */
+          message_part = message_end;
+        } while (message_part != NULL);
 
         /* release memory of prefix and message */
         if (prefix != NULL) {
