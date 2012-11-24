@@ -920,6 +920,77 @@ logger_return_t __logger_format_message(logger_id_t id,
 
 
 /** ************************************************************************//**
+ * \brief  Output log messages to streams
+ *
+ * Print the log message to all output streams registered. It is possible to do
+ * repeated prints to the same line by omitting '\n' in the log message format
+ * sting. In this case a subsequent call will be appended without prefix. Only
+ * print the message if
+ *
+ *   - logging is globally enabled.
+ *   - logging ID is enabled.
+ *   - logging level is high enough.
+ *
+ * \param[in]     id        ID outputting this message.
+ * \param[in]     level     Level of this message.
+ * \param[in]     prefix    Formatted message prefix.
+ * \param[in]     message   Formatted message.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_output(logger_id_t    id,
+                                logger_level_t level,
+                                const char     *prefix,
+                                const char     *message)
+{
+  logger_return_t ret = LOGGER_OK;
+  int16_t         index;
+
+  /* loop over all possible outputs */
+  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    if ((logger_outputs[index].count > 0) &&
+        (logger_outputs[index].level <= level)) {
+      /* set color */
+#ifdef LOGGER_COLORS
+      if ((logger_control[id].color == logger_true) &&
+          ((logger_outputs[index].stream == stdout) ||
+           (logger_outputs[index].stream == stderr))) {
+        (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
+      }
+#endif      /* LOGGER_COLORS */
+
+      /* actually output prefix */
+      if (prefix != NULL) {
+        fputs(prefix, logger_outputs[index].stream);
+      }
+
+      /* actually output message */
+      if (message != NULL) {
+        fputs(message, logger_outputs[index].stream);
+      }
+
+      /* reset color */
+#ifdef LOGGER_COLORS
+      if ((logger_control[id].color == logger_true) &&
+          (logger_control[id].cont == logger_false) &&
+          ((logger_outputs[index].stream == stdout) ||
+           (logger_outputs[index].stream == stderr))) {
+        (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+      }
+#endif      /* LOGGER_COLORS */
+
+      /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
+      if (logger_control[id].cont == logger_false) {
+        fputc('\n', logger_outputs[index].stream);
+      }
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all output streams registered. It is possible to do
@@ -952,7 +1023,6 @@ logger_return_t __logger(logger_id_t    id,
                          ...)
 {
   logger_return_t ret = LOGGER_OK;
-  int16_t         index;
   va_list         argp;
   char            *prefix  = NULL;
   char            *message = NULL;
@@ -977,45 +1047,8 @@ logger_return_t __logger(logger_id_t    id,
         __logger_format_message(id, &message, format, argp);
         va_end(argp);
 
-        /* loop over all possible outputs */
-        for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-          if ((logger_outputs[index].count > 0) &&
-              (logger_outputs[index].level <= level)) {
-            /* set color */
-#ifdef LOGGER_COLORS
-            if ((logger_control[id].color == logger_true) &&
-                ((logger_outputs[index].stream == stdout) ||
-                 (logger_outputs[index].stream == stderr))) {
-              (void)fprintf(logger_outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
-            }
-#endif      /* LOGGER_COLORS */
-
-            /* actually output prefix */
-            if (prefix != NULL) {
-              fputs(prefix, logger_outputs[index].stream);
-            }
-
-            /* actually output message */
-            if (message != NULL) {
-              fputs(message, logger_outputs[index].stream);
-            }
-
-            /* reset color */
-#ifdef LOGGER_COLORS
-            if ((logger_control[id].color == logger_true) &&
-                (logger_control[id].cont == logger_false) &&
-                ((logger_outputs[index].stream == stdout) ||
-                 (logger_outputs[index].stream == stderr))) {
-              (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
-            }
-#endif      /* LOGGER_COLORS */
-
-            /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
-            if (logger_control[id].cont == logger_false) {
-              fputc('\n', logger_outputs[index].stream);
-            }
-          }
-        }
+        /* output messages */
+        __logger_output(id, level, prefix, message);
 
         /* release memory of prefix and message */
         if (prefix != NULL) {
