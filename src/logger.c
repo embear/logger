@@ -815,7 +815,8 @@ logger_return_t __logger(logger_id_t    id,
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
   int16_t         index;
-  char            *prefix = NULL;
+  char            *ptr_linefeed;
+  char            *prefix  = NULL;
   char            *message = NULL;
 
   /* check for valid ID */
@@ -888,6 +889,20 @@ logger_return_t __logger(logger_id_t    id,
         if (message != NULL) {
           (void)vsnprintf(message, LOGGER_MESSAGE_STRING_MAX - 1, format, argp);
           message[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
+
+          /* check for multi line message */
+          ptr_linefeed = rindex(message, '\n');
+          if (ptr_linefeed != NULL) {
+            /* '\n' -> will not be continued */
+            logger_control[id].cont = logger_false;
+
+            /* remove '\n', needed for correct color display (see below) */
+            *ptr_linefeed = '\0';
+          }
+          else {
+            /* no '\n' -> will be continued */
+            logger_control[id].cont = logger_true;
+          }
         }
 
         /* end variable arguments */
@@ -925,6 +940,11 @@ logger_return_t __logger(logger_id_t    id,
               (void)fprintf(logger_outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
             }
 #endif      /* LOGGER_COLORS */
+
+            /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
+            if (logger_control[id].cont == logger_false) {
+              fputc('\n', logger_outputs[index].stream);
+            }
           }
         }
 
@@ -934,16 +954,6 @@ logger_return_t __logger(logger_id_t    id,
         }
         if (message != NULL) {
           free(message);
-        }
-
-        /* check for multi line message */
-        if (rindex(format, '\n') != NULL) {
-          /* '\n' -> will not be continued */
-          logger_control[id].cont = logger_false;
-        }
-        else {
-          /* no '\n' -> will be continued */
-          logger_control[id].cont = logger_true;
         }
       }
     }
