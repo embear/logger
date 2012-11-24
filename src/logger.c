@@ -797,13 +797,13 @@ logger_return_t __logger_color_reset(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_format_prefix(logger_id_t    id,
-                                       char           **prefix,
-                                       logger_level_t level,
-                                       const char     *level_str,
-                                       const char     *file,
-                                       const char     *function,
-                                       uint32_t       line)
+static inline logger_return_t __logger_format_prefix(logger_id_t    id,
+                                                     char           **prefix,
+                                                     logger_level_t level,
+                                                     const char     *level_str,
+                                                     const char     *file,
+                                                     const char     *function,
+                                                     uint32_t       line)
 {
   logger_return_t ret = LOGGER_OK;
 
@@ -876,10 +876,10 @@ logger_return_t __logger_format_prefix(logger_id_t    id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_format_message(logger_id_t id,
-                                        char        **message,
-                                        const char  *format,
-                                        va_list     argp)
+static inline logger_return_t __logger_format_message(logger_id_t id,
+                                                      char        **message,
+                                                      const char  *format,
+                                                      va_list     argp)
 {
   logger_return_t ret = LOGGER_OK;
   char            *ptr_linefeed;
@@ -938,10 +938,10 @@ logger_return_t __logger_format_message(logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output(logger_id_t    id,
-                                logger_level_t level,
-                                const char     *prefix,
-                                const char     *message)
+static inline logger_return_t __logger_output(logger_id_t    id,
+                                              logger_level_t level,
+                                              const char     *prefix,
+                                              const char     *message)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
