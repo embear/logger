@@ -781,6 +781,145 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 
 
 /** ************************************************************************//**
+ * \brief  Format message prefix
+ *
+ * Allocate memory for prefix and print prefix to allocated memory.
+ *
+ * Memory needs to be deallocated using free() when the sting is not needed anymore.
+ *
+ * \param[in]     id        ID outputting this message.
+ * \param[out]    prefix    Formatted message prefix.
+ * \param[in]     level     Level of this message.
+ * \param[in]     level_str Level of this message as string.
+ * \param[in]     file      Name of file where this call happend.
+ * \param[in]     function  Name of function where this call happend.
+ * \param[in]     line      Line where this call happend.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_format_prefix(logger_id_t    id,
+                                       char           **prefix,
+                                       logger_level_t level,
+                                       const char     *level_str,
+                                       const char     *file,
+                                       const char     *function,
+                                       uint32_t       line)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* do prefix stuff only if needed */
+  if (logger_control[id].cont == logger_false) {
+    /* allocate storage for prefix */
+    *prefix = (char *)malloc(LOGGER_PREFIX_STRING_MAX * sizeof(char));
+
+    /* print prefix to string */
+    if (*prefix != NULL) {
+      switch (logger_control[id].prefix) {
+        case LOGGER_PREFIX_UNKNOWN:
+          /* empty */
+          *prefix[0] = '\0';
+          break;
+
+        case LOGGER_PREFIX_EMPTY:
+          /* empty */
+          *prefix[0] = '\0';
+          break;
+
+        case LOGGER_PREFIX_NAME:
+          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s: ", logger_id_name_get(id));
+          break;
+
+        case LOGGER_PREFIX_SHORT:
+          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s: ", logger_id_name_get(id), level_str);
+          break;
+
+        case LOGGER_PREFIX_FUNCTION:
+          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
+          break;
+
+        case LOGGER_PREFIX_FILE:
+          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
+          break;
+
+        case LOGGER_PREFIX_FULL:
+          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
+          break;
+
+        case LOGGER_PREFIX_MAX:
+          /* empty */
+          *prefix[0] = '\0';
+          break;
+      }
+      (*prefix)[LOGGER_PREFIX_STRING_MAX - 1] = '\0';
+    }
+    else {
+      ret = LOGGER_ERR_OUT_OF_MEMORY;
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Format log message.
+ *
+ * Allocate memory for message and print message to allocated memory.
+ *
+ * Memory needs to be deallocated using free() when the sting is not needed
+ * anymore.
+ *
+ * \param[in]     id        ID outputting this message.
+ * \param[out]    message   Formatted message.
+ * \param[in]     format    \c printf() like format string.
+ * \param[in]     va_args   Argument list.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_format_message(logger_id_t id,
+                                        char        **message,
+                                        const char  *format,
+                                        va_list     argp)
+{
+  logger_return_t ret = LOGGER_OK;
+  char            *ptr_linefeed;
+
+  /* allocate storage for message */
+  *message = (char *)malloc(LOGGER_MESSAGE_STRING_MAX * sizeof(char));
+
+  /* print message to string */
+  if (*message != NULL) {
+
+    /* format message */
+    (void)vsnprintf(*message, LOGGER_MESSAGE_STRING_MAX - 1, format, argp);
+
+    /* make sure message is '\0' terminated */
+    (*message)[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
+
+    /* check for multi line message */
+    ptr_linefeed = rindex(*message, '\n');
+    if (ptr_linefeed != NULL) {
+      /* '\n' -> will not be continued */
+      logger_control[id].cont = logger_false;
+
+      /* remove '\n', needed for correct color display (see below) */
+      *ptr_linefeed = '\0';
+    }
+    else {
+      /* no '\n' -> will be continued */
+      logger_control[id].cont = logger_true;
+    }
+  }
+
+  else {
+    ret = LOGGER_ERR_OUT_OF_MEMORY;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all output streams registered. It is possible to do
@@ -799,7 +938,7 @@ logger_return_t __logger_color_reset(const logger_id_t id)
  * \param[in]     function  Name of function where this call happend.
  * \param[in]     line      Line where this call happend.
  * \param[in]     format    \c printf() like format string.
- * \param[in]     va_args i Argument list.
+ * \param[in]     va_args   Argument list.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -813,9 +952,8 @@ logger_return_t __logger(logger_id_t    id,
                          ...)
 {
   logger_return_t ret = LOGGER_OK;
-  va_list         argp;
   int16_t         index;
-  char            *ptr_linefeed;
+  va_list         argp;
   char            *prefix  = NULL;
   char            *message = NULL;
 
@@ -831,81 +969,12 @@ logger_return_t __logger(logger_id_t    id,
       /* check if ID is enabled and level is high enough */
       if ((logger_control[id].enabled == logger_true) &&
           (logger_control[id].level <= level)) {
+        /* format prefix */
+        __logger_format_prefix(id, &prefix, level, level_str, file, function, line);
 
-        /* do prefix stuff only if needed */
-        if (logger_control[id].cont == logger_false) {
-          /* allocate storage for prefix */
-          prefix = (char *)malloc(LOGGER_PREFIX_STRING_MAX * sizeof(char));
-
-          /* print prefix to string */
-          if (prefix != NULL) {
-            switch (logger_control[id].prefix) {
-              case LOGGER_PREFIX_UNKNOWN:
-                /* empty */
-                prefix[0] = '\0';
-                break;
-
-              case LOGGER_PREFIX_EMPTY:
-                /* empty */
-                prefix[0] = '\0';
-                break;
-
-              case LOGGER_PREFIX_NAME:
-                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s: ", logger_id_name_get(id));
-                break;
-
-              case LOGGER_PREFIX_SHORT:
-                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s: ", logger_id_name_get(id), level_str);
-                break;
-
-              case LOGGER_PREFIX_FUNCTION:
-                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
-                break;
-
-              case LOGGER_PREFIX_FILE:
-                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
-                break;
-
-              case LOGGER_PREFIX_FULL:
-                (void)snprintf(prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
-                break;
-
-              case LOGGER_PREFIX_MAX:
-                /* empty */
-                prefix[0] = '\0';
-                break;
-            }
-            prefix[LOGGER_PREFIX_STRING_MAX - 1] = '\0';
-          }
-        }
-
-        /* allocate storage for message */
-        message = (char *)malloc(LOGGER_MESSAGE_STRING_MAX * sizeof(char));
-
-        /* initialize variable arguments */
+        /* format message */
         va_start(argp, format);
-
-        /* print message to string */
-        if (message != NULL) {
-          (void)vsnprintf(message, LOGGER_MESSAGE_STRING_MAX - 1, format, argp);
-          message[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
-
-          /* check for multi line message */
-          ptr_linefeed = rindex(message, '\n');
-          if (ptr_linefeed != NULL) {
-            /* '\n' -> will not be continued */
-            logger_control[id].cont = logger_false;
-
-            /* remove '\n', needed for correct color display (see below) */
-            *ptr_linefeed = '\0';
-          }
-          else {
-            /* no '\n' -> will be continued */
-            logger_control[id].cont = logger_true;
-          }
-        }
-
-        /* end variable arguments */
+        __logger_format_message(id, &message, format, argp);
         va_end(argp);
 
         /* loop over all possible outputs */
