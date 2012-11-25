@@ -24,7 +24,7 @@
 #ifdef LOGGER_ENABLE
 
 /** Number of possible simultaneous outputs. */
-#define LOGGER_OUTPUTS_MAX           (256)
+#define LOGGER_OUTPUTS_MAX           (16)
 
 /** Number of possible ids. */
 #define LOGGER_IDS_MAX               (256)
