@@ -124,34 +124,38 @@ typedef enum logger_text_fg_e {
 
 
 #ifdef LOGGER_ENABLE
-#define logger_version()                              __logger_version()
-#define logger_init()                                 __logger_init()
-#define logger_enable()                               __logger_enable()
-#define logger_disable()                              __logger_disable()
-#define logger_is_enabled()                           __logger_is_enabled()
-#define logger_output_register(__stream)              __logger_output_register(__stream)
-#define logger_output_deregister(__stream)            __logger_output_deregister(__stream)
-#define logger_output_level_set(__stream, __level)    __logger_output_level_set(__stream, __level)
-#define logger_output_level_get(__stream)             __logger_output_level_get(__stream)
-#define logger_output_flush()                         __logger_output_flush()
-#define logger_id_request(__name)                     __logger_id_request(__name)
-#define logger_id_release(__id)                       __logger_id_release(__id)
-#define logger_id_enable(__id)                        __logger_id_enable(__id)
-#define logger_id_disable(__id)                       __logger_id_disable(__id)
-#define logger_id_is_enabled(__id)                    __logger_id_is_enabled(__id)
-#define logger_id_level_set(__id, __level)            __logger_id_level_set(__id, __level)
-#define logger_id_level_get(__id)                     __logger_id_level_get(__id)
-#define logger_id_prefix_set(__id, __prefix)          __logger_id_prefix_set(__id, __prefix)
-#define logger_id_prefix_get(__id)                    __logger_id_prefix_get(__id)
-#define logger_id_name_get(__id)                      __logger_id_name_get(__id)
+#define logger_version()                                       __logger_version()
+#define logger_init()                                          __logger_init()
+#define logger_enable()                                        __logger_enable()
+#define logger_disable()                                       __logger_disable()
+#define logger_is_enabled()                                    __logger_is_enabled()
+#define logger_output_register(__stream)                       __logger_output_register(__stream)
+#define logger_output_deregister(__stream)                     __logger_output_deregister(__stream)
+#define logger_output_level_set(__stream, __level)             __logger_output_level_set(__stream, __level)
+#define logger_output_level_get(__stream)                      __logger_output_level_get(__stream)
+#define logger_output_flush()                                  __logger_output_flush()
+#define logger_id_request(__name)                              __logger_id_request(__name)
+#define logger_id_release(__id)                                __logger_id_release(__id)
+#define logger_id_enable(__id)                                 __logger_id_enable(__id)
+#define logger_id_disable(__id)                                __logger_id_disable(__id)
+#define logger_id_is_enabled(__id)                             __logger_id_is_enabled(__id)
+#define logger_id_level_set(__id, __level)                     __logger_id_level_set(__id, __level)
+#define logger_id_level_get(__id)                              __logger_id_level_get(__id)
+#define logger_id_prefix_set(__id, __prefix)                   __logger_id_prefix_set(__id, __prefix)
+#define logger_id_prefix_get(__id)                             __logger_id_prefix_get(__id)
+#define logger_id_name_get(__id)                               __logger_id_name_get(__id)
+#define logger_id_output_register(__id, __stream)              __logger_id_output_register(__id, __stream)
+#define logger_id_output_deregister(__id, __stream)            __logger_id_output_deregister(__id, __stream)
+#define logger_id_output_level_set(__id, __stream, __level)    __logger_output_level_set(__id, __stream, __level)
+#define logger_id_output_level_get(__id, __stream)             __logger_output_level_get(__id, __stream)
 #ifdef LOGGER_COLORS
-#define logger_color_set(__id, __fg, __bg, __attr)    __logger_color_set(__id, __fg, __bg, __attr)
-#define logger_color_reset(__id)                      __logger_color_reset(__id)
+#define logger_color_set(__id, __fg, __bg, __attr)             __logger_color_set(__id, __fg, __bg, __attr)
+#define logger_color_reset(__id)                               __logger_color_reset(__id)
 #else /* LOGGER_COLORS */
-#define logger_color_set(__id, __fg, __bg, __attr)    ((void)(0))
-#define logger_color_reset(__id)                      ((void)(0))
+#define logger_color_set(__id, __fg, __bg, __attr)             ((void)(0))
+#define logger_color_reset(__id)                               ((void)(0))
 #endif /* LOGGER_COLORS */
-#define logger(__id, __level, ...)                    __logger(__id, __level, LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define logger(__id, __level, ...)                             __logger(__id, __level, LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
 
 logger_version_t __logger_version(void);
 logger_return_t __logger_init(void);
@@ -159,10 +163,10 @@ logger_return_t __logger_enable(void);
 logger_return_t __logger_disable(void);
 logger_bool_t __logger_is_enabled(void);
 logger_return_t __logger_output_register(FILE *stream);
-logger_return_t __logger_output_deregister(const FILE *stream);
-logger_return_t __logger_output_level_set(const FILE           *stream,
+logger_return_t __logger_output_deregister(FILE *stream);
+logger_return_t __logger_output_level_set(FILE                 *stream,
                                           const logger_level_t level);
-logger_level_t __logger_output_level_get(const FILE *stream);
+logger_level_t __logger_output_level_get(FILE *stream);
 logger_return_t __logger_output_flush(void);
 logger_id_t __logger_id_request(const char *name);
 logger_return_t __logger_id_release(const logger_id_t id);
@@ -176,6 +180,15 @@ logger_return_t __logger_id_prefix_set(const logger_id_t    id,
                                        const logger_prefix_t prefix);
 logger_prefix_t __logger_id_prefix_get(const logger_id_t id);
 const char * __logger_id_name_get(const logger_id_t id);
+logger_return_t __logger_id_output_register(const logger_id_t id,
+                                            FILE              *stream);
+logger_return_t __logger_id_output_deregister(const logger_id_t id,
+                                              FILE              *stream);
+logger_return_t __logger_id_output_level_set(const logger_id_t    id,
+                                             FILE                 *stream,
+                                             const logger_level_t level);
+logger_level_t __logger_id_output_level_get(const logger_id_t id,
+                                            FILE              *stream);
 logger_return_t __logger_color_set(const logger_id_t        id,
                                    const logger_text_fg_t   fg,
                                    const logger_text_bg_t   bg,
@@ -197,29 +210,33 @@ static inline logger_id_t __logger_ignore_id(void) { return(0); }
 static inline logger_bool_t __logger_ignore_true(void) { return(logger_true); }
 static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); }
 
-#define logger_version()                               (LOGGER_VERSION)
-#define logger_init()                                  __logger_ignore_ok()
-#define logger_enable()                                __logger_ignore_ok()
-#define logger_disable()                               __logger_ignore_ok()
-#define logger_is_enabled(__id)                        __logger_ignore_false()
-#define logger_output_register(__stream)               __logger_ignore_ok()
-#define logger_output_deregister(__stream)             __logger_ignore_ok()
-#define logger_output_level_set(__stream, __level)     __logger_ignore_ok()
-#define logger_output_level_get(__stream)              __logger_ignore_err()
-#define logger_output_flush()                          __logger_ignore_ok()
-#define logger_id_request(__name)                      __logger_ignore_id()
-#define logger_id_release(__id)                        __logger_ignore_ok()
-#define logger_id_enable(__id)                         __logger_ignore_ok()
-#define logger_id_disable(__id)                        __logger_ignore_ok()
-#define logger_id_is_enabled(__id)                     __logger_ignore_false()
-#define logger_id_level_set(__id, __level)             __logger_ignore_ok()
-#define logger_id_level_get(__id)                      __logger_ignore_err()
-#define logger_id_prefix_set(__id, __prefix)           __logger_ignore_ok()
-#define logger_id_prefix_get(__id)                     __logger_ignore_err()
-#define logger_id_name_get(__id)                       ""
-#define logger_color_set(__id, __fg, __bg, __attr)     __logger_ignore_ok()
-#define logger_color_reset(__id)                       __logger_ignore_ok()
-#define logger(__id, __level, ...)                     __logger_ignore_ok()
+#define logger_version()                                      (LOGGER_VERSION)
+#define logger_init()                                         __logger_ignore_ok()
+#define logger_enable()                                       __logger_ignore_ok()
+#define logger_disable()                                      __logger_ignore_ok()
+#define logger_is_enabled(__id)                               __logger_ignore_false()
+#define logger_output_register(__stream)                      __logger_ignore_ok()
+#define logger_output_deregister(__stream)                    __logger_ignore_ok()
+#define logger_output_level_set(__stream, __level)            __logger_ignore_ok()
+#define logger_output_level_get(__stream)                     __logger_ignore_err()
+#define logger_output_flush()                                 __logger_ignore_ok()
+#define logger_id_request(__name)                             __logger_ignore_id()
+#define logger_id_release(__id)                               __logger_ignore_ok()
+#define logger_id_enable(__id)                                __logger_ignore_ok()
+#define logger_id_disable(__id)                               __logger_ignore_ok()
+#define logger_id_is_enabled(__id)                            __logger_ignore_false()
+#define logger_id_level_set(__id, __level)                    __logger_ignore_ok()
+#define logger_id_level_get(__id)                             __logger_ignore_err()
+#define logger_id_prefix_set(__id, __prefix)                  __logger_ignore_ok()
+#define logger_id_prefix_get(__id)                            __logger_ignore_err()
+#define logger_id_name_get(__id)                              ""
+#define logger_id_output_register(__id, __stream)             __logger_ignore_ok()
+#define logger_id_output_deregister(__id, __stream)           __logger_ignore_ok()
+#define logger_id_output_level_set(_id, __stream, __level)    __logger_ignore_ok()
+#define logger_id_output_level_get(_id, __stream)             __logger_ignore_err()
+#define logger_color_set(__id, __fg, __bg, __attr)            __logger_ignore_ok()
+#define logger_color_reset(__id)                              __logger_ignore_ok()
+#define logger(__id, __level, ...)                            __logger_ignore_ok()
 #endif /* LOGGER_ENABLE */
 
 #ifdef __cplusplus
