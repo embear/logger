@@ -65,6 +65,10 @@ Keep in mind that a message is only printed if the severity of the
 `logger()` call is higher than the level of the according ID *AND* the
 severity is higher than the level of the output.
 
+When logger is compiled with `LOGGER_FORCE_FLUSH` defined it forcibly flushes
+every stream after every output. This will produce horribly bad performance but
+might be helpful to debug aborting programs.
+
 Example
 -------
 

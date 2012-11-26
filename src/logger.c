@@ -1160,17 +1160,26 @@ static inline logger_return_t __logger_output(logger_id_t     id,
           ((outputs[index].stream == stdout) ||
            (outputs[index].stream == stderr))) {
         (void)fprintf(outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
+#ifdef LOGGER_FORCE_FLUSH
+        (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
       }
 #endif      /* LOGGER_COLORS */
 
       /* actually output prefix */
       if (prefix != NULL) {
         fputs(prefix, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+        (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
       }
 
       /* actually output message */
       if (message != NULL) {
         fputs(message, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+        (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
       }
 
       /* reset color */
@@ -1180,12 +1189,18 @@ static inline logger_return_t __logger_output(logger_id_t     id,
           ((outputs[index].stream == stdout) ||
            (outputs[index].stream == stderr))) {
         (void)fprintf(outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+#ifdef LOGGER_FORCE_FLUSH
+        (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
       }
 #endif      /* LOGGER_COLORS */
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].cont == logger_false) {
         fputc('\n', outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+        (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
       }
     }
   }
