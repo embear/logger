@@ -20,12 +20,13 @@ same ID. Thus it inherits all already done configurations. A ID needs to be
 enabled by `logger_id_enable()` and could be disabled by
 `logger_id_disable()`.
 
-Each ID has its own severity which needs to be set by
-`logger_id_level_set()`. Only calls to `logger()` with the same or
-higher severity are considered for output. This way it is possible to enable
-logging only for parts of a program. The function `logger_id_level_get()`
-can be used to get the current value, store it, increase the level for some
-part of thew program and restore it afterwards.
+Each ID has its own severity which needs to be set by `logger_id_level_set()`.
+Only calls to `logger()` with the same or higher severity are considered for
+output. This way it is possible to enable logging only for parts of a program.
+The function `logger_id_level_get()` can be used to get the current value,
+store it, increase the level for some part of thew program and restore it
+afterwards. **By default an ID has no level assigned and thus generates no
+output until a level is defined using `logger_id_level_set()`.**
 
 Each ID has its own prefix assigned. By default each ID prints the prefix
 `LOGGER_PREFIX_FULL`. The prefix is changed by `logger_id_prefix_set()` and it
@@ -48,18 +49,22 @@ as well as text attributes with `logger_id_color_set()` and reset them with
 work on stderr and stdout. File output does not contain any escape sequences.
 
 To get any messages an output needs to be registered to logger. Any stream of
-type `FILE` is supported and multiple outputs can be registered.
-Registration is done with `logger_output_register()` deregistration with
-`logger_output_deregister()`. Like IDs every output gets a severity. This
-makes it possible to write all messages with `LOGGER_INFO` to a file and
-only output messages with `LOGGER_ERR` to stdout. Setting the level ist
-done with `logger_output_level_set()`. As for IDs the current value can be
-get with `logger_output_level_get()`.
+type `FILE` is supported and multiple outputs can be registered. Registration
+is done with `logger_output_register()` deregistration with
+`logger_output_deregister()`. Like IDs every output gets a severity. This makes
+it possible to write all messages with `LOGGER_INFO` to a file and only output
+messages with `LOGGER_ERR` to stdout. Setting the level ist done with
+`logger_output_level_set()`. As for IDs the current value can be get with
+`logger_output_level_get()`. **By default an output has no level assigned and
+thus outputs no messages until a level is defined using
+`logger_output_level_set()`.**
 
 Additionally there are functions `logger_id_output_register()`,
 `logger_id_output_deregister()`, `logger_id_output_level_set()` and
 `logger_id_output_level_get()` functions to handle ID specific outputs. This
 way it is possible to write output of a specific subsystem to a separate file.
+**By default an ID specific output has no level assigned and thus outputs no
+messages until a level is defined using `logger_id_output_level_set()`.**
 
 Keep in mind that a message is only printed if the severity of the
 `logger()` call is higher than the level of the according ID *AND* the

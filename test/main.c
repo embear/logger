@@ -48,6 +48,7 @@ int main(int  argc,
   puts("No log message will be shown because id is not registered");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
 
   logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
   logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
@@ -73,6 +74,7 @@ int main(int  argc,
   puts("No log message will be shown because id is not enabled");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
 
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
@@ -97,9 +99,10 @@ int main(int  argc,
   puts("");
   printf("Starting test %d -- level not set ....\n", test);
 
-  puts("All log messages will be shown because id level is not set ( -> level is DEBUG by default)");
+  puts("No log messages will be shown because id level is not set ( -> level is UNKNOWN by default)");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
 
@@ -128,6 +131,7 @@ int main(int  argc,
   puts("Log messages are shown only if globally enabled");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
@@ -156,6 +160,7 @@ int main(int  argc,
   puts("Only log messages with level above or equal to WARNING will be shown");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_WARNING));
@@ -182,12 +187,15 @@ int main(int  argc,
   puts("");
   printf("Starting test %d -- id and id2 are the same ....\n", test);
 
-  puts("log messages of id and id2 will be shown");
+  puts("Log messages of id and id2 will be shown");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   id2 = logger_id_request("logger_test_id");
   assert(id == id2);
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger_id_enable(id));
 
@@ -210,8 +218,10 @@ int main(int  argc,
   puts("All possible prefixes will be shown");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
 
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_EMPTY));
@@ -243,10 +253,13 @@ int main(int  argc,
   puts("Different prefixes for id and id2 will be shown");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
   id2 = logger_id_request("logger_test_id2");
   assert(LOGGER_OK == logger_id_enable(id2));
+  assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_id_prefix_set(id2, LOGGER_PREFIX_SHORT));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
@@ -269,9 +282,12 @@ int main(int  argc,
   puts("Message will be shown two times, once for the global output, once for the id specific one");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_id_output_register(id, stdout));
+  assert(LOGGER_OK == logger_id_output_level_set(id, stdout, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
@@ -289,13 +305,16 @@ int main(int  argc,
   puts("");
   printf("Starting test %d -- only id specific output for id, none for id2 ....\n", test);
 
-  puts("No global output stream is registerns and only id gets its id specific one, id2 has no output");
+  puts("No global output stream is registered and only id gets its id specific one, id2 has no output");
 
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_id_output_register(id, stdout));
+  assert(LOGGER_OK == logger_id_output_level_set(id, stdout, LOGGER_DEBUG));
   id2 = logger_id_request("logger_test_id2");
   assert(LOGGER_OK == logger_id_enable(id2));
+  assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
   assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
@@ -317,8 +336,10 @@ int main(int  argc,
   puts("Change prefix for id and restore previous value");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
@@ -347,6 +368,7 @@ int main(int  argc,
   puts("Only log messages of id will be shown");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
 
@@ -369,7 +391,9 @@ int main(int  argc,
   puts("All log messages will be printed to stdout and stderr");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_output_register(stderr));
+  assert(LOGGER_OK == logger_output_level_set(stderr, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_ERR));
@@ -432,6 +456,7 @@ int main(int  argc,
   puts("Changing and restoring logging level");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_WARNING));
@@ -489,6 +514,7 @@ int main(int  argc,
   puts("Messages will be all in one line");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
@@ -518,6 +544,7 @@ int main(int  argc,
   puts("Messages will be written in multiple lines but all with correct prefix");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
@@ -540,6 +567,7 @@ int main(int  argc,
   puts("Print log messages in different colors");
 
   assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));

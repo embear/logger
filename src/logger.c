@@ -204,7 +204,7 @@ static logger_return_t __logger_output_common_register(logger_output_t *outputs,
       /* found an empty slot */
       if (found == logger_true) {
         outputs[index].count++;
-        outputs[index].level  = LOGGER_DEBUG;
+        outputs[index].level  = LOGGER_UNKNOWN;
         outputs[index].stream = stream;
 
         /* make a nonblocking stream */
@@ -514,7 +514,7 @@ logger_id_t __logger_id_request(const char* name)
         logger_control[index].used    = logger_true;
         logger_control[index].count   = 1;
         logger_control[index].enabled = logger_false;
-        logger_control[index].level   = LOGGER_DEBUG;
+        logger_control[index].level   = LOGGER_UNKNOWN;
         logger_control[index].prefix  = LOGGER_PREFIX_FULL;
         logger_control[index].color   = logger_false;
 
@@ -569,7 +569,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
         logger_control[id].used    = logger_false;
         logger_control[id].count   = 0;
         logger_control[id].enabled = logger_false;
-        logger_control[id].level   = LOGGER_DEBUG;
+        logger_control[id].level   = LOGGER_UNKNOWN;
         logger_control[id].color   = logger_false;
         logger_control[id].name[0] = '\0';
 
