@@ -48,7 +48,6 @@ typedef struct logger_output_s {
 } logger_output_t;
 
 typedef struct  logger_control_s {
-  logger_bool_t      cont;                           /**< Previous message didn't contain a newline, thus omit prefix for next message. */
   logger_bool_t      used;                           /**< This ID is used. */
   int16_t            count;                          /**< Number of registrations for this ID. */
   logger_bool_t      enabled;                        /**< This ID is enabled. */
@@ -60,6 +59,7 @@ typedef struct  logger_control_s {
   logger_text_bg_t   bg;                             /**< Background color of this ID. */
   logger_text_attr_t attr;                           /**< Attributes of this ID. */
 #endif      /* LOGGER_COLORS */
+  logger_bool_t      append;                         /**< Previous message didn't contain a newline just append next message */
   char               name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
   logger_output_t    outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
@@ -1012,7 +1012,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
   int16_t         characters;
 
   /* do prefix stuff only if needed */
-  if (logger_control[id].cont == logger_false) {
+  if (logger_control[id].append == logger_false) {
     /* calculate memory size */
     size = LOGGER_PREFIX_STRING_MAX * sizeof(char);
 
@@ -1172,14 +1172,14 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
     message_end = rindex(*message, '\n');
     if (message_end != NULL) {
       /* '\n' -> will not be continued */
-      logger_control[id].cont = logger_false;
+      logger_control[id].append = logger_false;
 
       /* remove '\n', needed for correct color display (see below) */
       *message_end = '\0';
     }
     else {
       /* no '\n' -> will be continued */
-      logger_control[id].cont = logger_true;
+      logger_control[id].append = logger_true;
     }
   }
 
@@ -1253,7 +1253,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       /* reset color */
 #ifdef LOGGER_COLORS
       if ((logger_control[id].color == logger_true) &&
-          (logger_control[id].cont == logger_false) &&
+          (logger_control[id].append == logger_false) &&
           ((outputs[index].stream == stdout) ||
            (outputs[index].stream == stderr))) {
         (void)fprintf(outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
@@ -1264,7 +1264,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 #endif      /* LOGGER_COLORS */
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
-      if (logger_control[id].cont == logger_false) {
+      if (logger_control[id].append == logger_false) {
         fputc('\n', outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
