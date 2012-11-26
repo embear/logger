@@ -570,6 +570,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
         logger_control[id].count   = 0;
         logger_control[id].enabled = logger_false;
         logger_control[id].level   = LOGGER_UNKNOWN;
+        logger_control[id].prefix  = LOGGER_PREFIX_FUNCTION;
         logger_control[id].color   = logger_false;
         logger_control[id].name[0] = '\0';
 
