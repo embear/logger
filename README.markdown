@@ -90,49 +90,49 @@ int main(void)
   FILE        *stream;
   logger_id_t id = logger_id_unknown;
 
-  // check logger version
+  /* check logger version */
   if(LOGGER_VERSION != logger_version()) {
     return(1);
   }
 
-  // initialize logger
+  /* initialize logger */
   logger_init();
 
-  // open a file as output for all messages
+  /* open a file as output for all messages */
   stream = fopen("logfile", "w");
   logger_output_register(stream);
   logger_output_level_set(stream, LOGGER_DEBUG);
 
-  // open stdout as output for messages above LOGGER_ERR
+  /* open stdout as output for messages above LOGGER_ERR */
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_ERR);
 
-  // get a logging id, enable it and set log level
+  /* get a logging id, enable it and set log level */
   id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_INFO);
   logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
 
-  // do the logging
-  logger(id, LOGGER_DEBUG,    "id %d - LOGGER_DEBUG   in line %d\n", id, __LINE__); // nothing written
-  logger(id, LOGGER_INFO,     "id %d - LOGGER_INFO    in line %d\n", id, __LINE__); // written to logfile
-  logger(id, LOGGER_NOTICE,   "id %d - LOGGER_NOTICE  in line %d\n", id, __LINE__); // written to logfile
-  logger(id, LOGGER_WARNING,  "id %d - LOGGER_WARNING in line %d\n", id, __LINE__); // written to logfile
-  logger(id, LOGGER_ERR,      "id %d - LOGGER_ERR     in line %d\n", id, __LINE__); // written to logfile and stdout
-  logger(id, LOGGER_CRIT,     "id %d - LOGGER_CRIT    in line %d\n", id, __LINE__); // written to logfile and stdout
-  logger(id, LOGGER_ALERT,    "id %d - LOGGER_ALERT   in line %d\n", id, __LINE__); // written to logfile and stdout
-  logger(id, LOGGER_EMERG,    "id %d - LOGGER_EMERG   in line %d\n", id, __LINE__); // written to logfile and stdout
+  /* do the logging */
+  logger(id, LOGGER_DEBUG,    "id %d - LOGGER_DEBUG   in line %d\n", id, __LINE__); /* nothing written */
+  logger(id, LOGGER_INFO,     "id %d - LOGGER_INFO    in line %d\n", id, __LINE__); /* written to logfile */
+  logger(id, LOGGER_NOTICE,   "id %d - LOGGER_NOTICE  in line %d\n", id, __LINE__); /* written to logfile */
+  logger(id, LOGGER_WARNING,  "id %d - LOGGER_WARNING in line %d\n", id, __LINE__); /* written to logfile */
+  logger(id, LOGGER_ERR,      "id %d - LOGGER_ERR     in line %d\n", id, __LINE__); /* written to logfile and stdout */
+  logger(id, LOGGER_CRIT,     "id %d - LOGGER_CRIT    in line %d\n", id, __LINE__); /* written to logfile and stdout */
+  logger(id, LOGGER_ALERT,    "id %d - LOGGER_ALERT   in line %d\n", id, __LINE__); /* written to logfile and stdout */
+  logger(id, LOGGER_EMERG,    "id %d - LOGGER_EMERG   in line %d\n", id, __LINE__); /* written to logfile and stdout */
 
-  // release id
+  /* release id */
   logger_id_release(id);
 
-  // deregister stdout output
+  /* deregister stdout output */
   logger_output_deregister(stdout);
 
-  // deregister file output
+  /* deregister file output */
   logger_output_deregister(stream);
 
-  // close file
+  /* close file */
   fclose(stream);
 
   return(0);
