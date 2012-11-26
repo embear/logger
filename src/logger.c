@@ -35,11 +35,11 @@
 /** Length of logger ID name including '\0' */
 #define LOGGER_NAME_MAX              (256)
 
-/** Length of logger prefix string including '\0' */
-#define LOGGER_PREFIX_STRING_MAX     (128)
+/** Initial length of logger prefix string including '\0' */
+#define LOGGER_PREFIX_STRING_MAX     (256)
 
-/** Length of logger message string including '\0' */
-#define LOGGER_MESSAGE_STRING_MAX    (512)
+/** Initial length of logger message string including '\0' */
+#define LOGGER_MESSAGE_STRING_MAX    (256)
 
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
@@ -1006,55 +1006,89 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                                      uint32_t       line)
 {
   logger_return_t ret = LOGGER_OK;
+  logger_bool_t   size_changed;
+  uint16_t        size;
+  int16_t         characters;
 
   /* do prefix stuff only if needed */
   if (logger_control[id].cont == logger_false) {
+    /* calculate memory size */
+    size = LOGGER_PREFIX_STRING_MAX * sizeof(char);
+
     /* allocate storage for prefix */
-    *prefix = (char *)malloc(LOGGER_PREFIX_STRING_MAX * sizeof(char));
+    *prefix = (char *)malloc(size);
 
-    /* print prefix to string */
-    if (*prefix != NULL) {
-      switch (logger_control[id].prefix) {
-        case LOGGER_PREFIX_UNKNOWN:
-          /* empty */
-          *prefix[0] = '\0';
-          break;
+    /* loop until storage is large enough */
+    do {
+      /* print prefix to string */
+      if (*prefix != NULL) {
+        switch (logger_control[id].prefix) {
+          case LOGGER_PREFIX_UNKNOWN:
+            /* empty */
+            *prefix[0] = '\0';
+            characters = 0;
+            break;
 
-        case LOGGER_PREFIX_EMPTY:
-          /* empty */
-          *prefix[0] = '\0';
-          break;
+          case LOGGER_PREFIX_EMPTY:
+            /* empty */
+            *prefix[0] = '\0';
+            characters = 0;
+            break;
 
-        case LOGGER_PREFIX_NAME:
-          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s: ", logger_id_name_get(id));
-          break;
+          case LOGGER_PREFIX_NAME:
+            characters = snprintf(*prefix, size, "%15s: ", logger_id_name_get(id));
+            break;
 
-        case LOGGER_PREFIX_SHORT:
-          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s: ", logger_id_name_get(id), level_str);
-          break;
+          case LOGGER_PREFIX_SHORT:
+            characters = snprintf(*prefix, size, "%15s:%15s: ", logger_id_name_get(id), level_str);
+            break;
 
-        case LOGGER_PREFIX_FUNCTION:
-          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
-          break;
+          case LOGGER_PREFIX_FUNCTION:
+            characters = snprintf(*prefix, size, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
+            break;
 
-        case LOGGER_PREFIX_FILE:
-          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
-          break;
+          case LOGGER_PREFIX_FILE:
+            characters = snprintf(*prefix, size, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
+            break;
 
-        case LOGGER_PREFIX_FULL:
-          (void)snprintf(*prefix, LOGGER_PREFIX_STRING_MAX - 1, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
-          break;
+          case LOGGER_PREFIX_FULL:
+            characters = snprintf(*prefix, size, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
+            break;
 
-        case LOGGER_PREFIX_MAX:
-          /* empty */
-          *prefix[0] = '\0';
-          break;
+          case LOGGER_PREFIX_MAX:
+            /* empty */
+            *prefix[0] = '\0';
+            characters = 0;
+            break;
+        }
+        (*prefix)[size - 1] = '\0';
       }
-      (*prefix)[LOGGER_PREFIX_STRING_MAX - 1] = '\0';
+      else {
+        ret = LOGGER_ERR_OUT_OF_MEMORY;
+      }
+
+      /* check if there was enough space in storage */
+      if ((characters < 0) || (characters > size)) {
+        if (characters < 0) {
+          /* glibc 2.0: double size */
+          size        *= 2;
+          size_changed = logger_true;
+        }
+        else {
+          /* glibc 2.1: allocate the correct size */
+          size         = characters + 1;
+          size_changed = logger_true;
+        }
+
+        /* try to allocate more storage */
+        *prefix = realloc(*prefix, size);
+      }
+      else {
+        /* reset size_changed value */
+        size_changed = logger_false;
+      }
     }
-    else {
-      ret = LOGGER_ERR_OUT_OF_MEMORY;
-    }
+    while (size_changed == logger_true && ret == LOGGER_OK);
   }
 
   return(ret);
@@ -1082,19 +1116,56 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
                                                       va_list     argp)
 {
   logger_return_t ret = LOGGER_OK;
+  logger_bool_t   size_changed;
+  uint16_t        size;
+  int16_t         characters;
   char            *message_end;
 
+  /* calculate memory size */
+  size = LOGGER_MESSAGE_STRING_MAX * sizeof(char);
+
   /* allocate storage for message */
-  *message = (char *)malloc(LOGGER_MESSAGE_STRING_MAX * sizeof(char));
+  *message = (char *)malloc(size);
 
-  /* print message to string */
+  /* loop until storage is large enough */
+  do {
+    /* print message to string */
+    if (*message != NULL) {
+      /* format message */
+      characters = vsnprintf(*message, size, format, argp);
+
+      /* make sure message is '\0' terminated */
+      (*message)[size - 1] = '\0';
+    }
+    else {
+      ret = LOGGER_ERR_OUT_OF_MEMORY;
+    }
+
+    /* check if there was enough space in storage */
+    if ((characters < 0) || (characters > size)) {
+      if (characters < 0) {
+        /* glibc 2.0: double size */
+        size        *= 2;
+        size_changed = logger_true;
+      }
+      else {
+        /* glibc 2.1: allocate the correct size */
+        size         = characters + 1;
+        size_changed = logger_true;
+      }
+
+      /* try to allocate more storage */
+      *message = realloc(*message, size);
+    }
+    else {
+      /* reset size_changed value */
+      size_changed = logger_false;
+    }
+  }
+  while (size_changed == logger_true && ret == LOGGER_OK);
+
+  /* do some string manipulation */
   if (*message != NULL) {
-
-    /* format message */
-    (void)vsnprintf(*message, LOGGER_MESSAGE_STRING_MAX - 1, format, argp);
-
-    /* make sure message is '\0' terminated */
-    (*message)[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
 
     /* check for multi line message */
     message_end = rindex(*message, '\n');
@@ -1109,10 +1180,6 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
       /* no '\n' -> will be continued */
       logger_control[id].cont = logger_true;
     }
-  }
-
-  else {
-    ret = LOGGER_ERR_OUT_OF_MEMORY;
   }
 
   return(ret);
