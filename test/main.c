@@ -225,16 +225,22 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
 
+  puts("Format: LOGGER_PREFIX_EMPTY");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_EMPTY));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("Format: LOGGER_PREFIX_NAME");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("Format: LOGGER_PREFIX_SHORT");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_SHORT));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("Format: LOGGER_PREFIX_FUNCTION");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("Format: LOGGER_PREFIX_FILE");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("Format: LOGGER_PREFIX_FULL");
   assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FULL));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
