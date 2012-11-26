@@ -55,9 +55,11 @@ typedef struct  logger_control_s {
   logger_level_t     level;                          /**< Level for this ID. */
   logger_prefix_t    prefix;                         /**< Prefix for this ID. */
   logger_bool_t      color;                          /**< Changed colors for this ID. */
+#ifdef LOGGER_COLORS
   logger_text_fg_t   fg;                             /**< Foreground color of this ID. */
   logger_text_bg_t   bg;                             /**< Background color of this ID. */
   logger_text_attr_t attr;                           /**< Attributes of this ID. */
+#endif      /* LOGGER_COLORS */
   char               name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
   logger_output_t    outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
@@ -334,9 +336,9 @@ static logger_return_t __logger_output_common_level_set(logger_output_t      *ou
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_return_t __logger_output_common_level_get(logger_output_t      *outputs,
-                                                        const uint16_t       size,
-                                                        FILE                 *stream)
+static logger_level_t __logger_output_common_level_get(logger_output_t      *outputs,
+                                                       const uint16_t       size,
+                                                       FILE                 *stream)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
   int16_t        index;
@@ -355,9 +357,6 @@ static logger_return_t __logger_output_common_level_get(logger_output_t      *ou
   if (found == logger_true) {
     /* set log level */
     ret = outputs[index].level;
-  }
-  else {
-    ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
   }
 
   return(ret);
@@ -1083,7 +1082,7 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
                                                       va_list     argp)
 {
   logger_return_t ret = LOGGER_OK;
-  char            *ptr_linefeed;
+  char            *message_end;
 
   /* allocate storage for message */
   *message = (char *)malloc(LOGGER_MESSAGE_STRING_MAX * sizeof(char));
@@ -1098,13 +1097,13 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
     (*message)[LOGGER_MESSAGE_STRING_MAX - 1] = '\0';
 
     /* check for multi line message */
-    ptr_linefeed = rindex(*message, '\n');
-    if (ptr_linefeed != NULL) {
+    message_end = rindex(*message, '\n');
+    if (message_end != NULL) {
       /* '\n' -> will not be continued */
       logger_control[id].cont = logger_false;
 
       /* remove '\n', needed for correct color display (see below) */
-      *ptr_linefeed = '\0';
+      *message_end = '\0';
     }
     else {
       /* no '\n' -> will be continued */
