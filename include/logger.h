@@ -146,8 +146,8 @@ typedef enum logger_text_fg_e {
 #define logger_id_name_get(__id)                               __logger_id_name_get(__id)
 #define logger_id_output_register(__id, __stream)              __logger_id_output_register(__id, __stream)
 #define logger_id_output_deregister(__id, __stream)            __logger_id_output_deregister(__id, __stream)
-#define logger_id_output_level_set(__id, __stream, __level)    __logger_output_level_set(__id, __stream, __level)
-#define logger_id_output_level_get(__id, __stream)             __logger_output_level_get(__id, __stream)
+#define logger_id_output_level_set(__id, __stream, __level)    __logger_id_output_level_set(__id, __stream, __level)
+#define logger_id_output_level_get(__id, __stream)             __logger_id_output_level_get(__id, __stream)
 #ifdef LOGGER_COLORS
 #define logger_color_set(__id, __fg, __bg, __attr)             __logger_color_set(__id, __fg, __bg, __attr)
 #define logger_color_reset(__id)                               __logger_color_reset(__id)
