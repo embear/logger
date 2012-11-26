@@ -204,6 +204,7 @@ int main(int  argc,
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
+  assert(LOGGER_OK == logger_id_release(id2));
 
   printf("Ending test %d ....\n", test);
 
