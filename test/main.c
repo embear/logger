@@ -264,6 +264,29 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- id with global and id specific output ....\n", test);
+
+  puts("Message will be shown two times, once for the global output, once for the id specific one");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_output_register(id, stdout));
+
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_id_output_deregister(id, stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- only id specific output for id, none for id2 ....\n", test);
 
   puts("No global output stream is registerns and only id gets its id specific one, id2 has no output");
