@@ -56,6 +56,11 @@ only output messages with `LOGGER_ERR` to stdout. Setting the level ist
 done with `logger_output_level_set()`. As for IDs the current value can be
 get with `logger_output_level_get()`.
 
+Additionally there are functions `logger_id_output_register()`,
+`logger_id_output_deregister()`, `logger_id_output_level_set()` and
+`logger_id_output_level_get()` functions to handle ID specific outputs. This
+way it is possible to write output of a specific subsystem to a separate file.
+
 Keep in mind that a message is only printed if the severity of the
 `logger()` call is higher than the level of the according ID *AND* the
 severity is higher than the level of the output.
