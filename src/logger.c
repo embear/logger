@@ -567,7 +567,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
 
         /* reset all ID dependent values to defaults */
         logger_control[id].used    = logger_false;
-        logger_control[id].count = 0;
+        logger_control[id].count   = 0;
         logger_control[id].enabled = logger_false;
         logger_control[id].level   = LOGGER_DEBUG;
         logger_control[id].color   = logger_false;
@@ -1151,6 +1151,8 @@ static inline logger_return_t __logger_output(logger_id_t     id,
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
     if ((outputs[index].count > 0) &&
+        (outputs[index].level > LOGGER_UNKNOWN) &&
+        (outputs[index].level < LOGGER_MAX) &&
         (outputs[index].level <= level)) {
       /* set color */
 #ifdef LOGGER_COLORS
@@ -1242,6 +1244,8 @@ logger_return_t __logger(logger_id_t    id,
 
       /* check if ID is enabled and level is high enough */
       if ((logger_control[id].enabled == logger_true) &&
+          (logger_control[id].level > LOGGER_UNKNOWN) &&
+          (logger_control[id].level < LOGGER_MAX) &&
           (logger_control[id].level <= level)) {
         /* format prefix */
         __logger_format_prefix(id, &prefix, level, level_str, file, function, line);
