@@ -515,7 +515,7 @@ logger_id_t __logger_id_request(const char* name)
         logger_control[index].count   = 1;
         logger_control[index].enabled = logger_false;
         logger_control[index].level   = LOGGER_UNKNOWN;
-        logger_control[index].prefix  = LOGGER_PREFIX_FULL;
+        logger_control[index].prefix  = LOGGER_PREFIX_FUNCTION;
         logger_control[index].color   = logger_false;
 
         /* copy the name */
