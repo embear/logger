@@ -112,14 +112,14 @@ typedef enum logger_text_bg_e {
 
 /** enum for text foreground color output. */
 typedef enum logger_text_fg_e {
-  LOGGER_FG_BLACK   = 30, /**< Black background color. */
-  LOGGER_FG_RED     = 31, /**< Red background color. */
-  LOGGER_FG_GREEN   = 32, /**< Green background color. */
-  LOGGER_FG_YELLOW  = 33, /**< Yellow background color. */
-  LOGGER_FG_BLUE    = 34, /**< Blue background color. */
-  LOGGER_FG_MAGENTA = 35, /**< Magenta background color. */
-  LOGGER_FG_CYAN    = 36, /**< Cyan background color. */
-  LOGGER_FG_WHITE   = 37  /**< White background color. */
+  LOGGER_FG_BLACK   = 30, /**< Black foreground color. */
+  LOGGER_FG_RED     = 31, /**< Red foreground color. */
+  LOGGER_FG_GREEN   = 32, /**< Green foreground color. */
+  LOGGER_FG_YELLOW  = 33, /**< Yellow foreground color. */
+  LOGGER_FG_BLUE    = 34, /**< Blue foreground color. */
+  LOGGER_FG_MAGENTA = 35, /**< Magenta foreground color. */
+  LOGGER_FG_CYAN    = 36, /**< Cyan foreground color. */
+  LOGGER_FG_WHITE   = 37  /**< White foreground color. */
 } logger_text_fg_t;
 
 

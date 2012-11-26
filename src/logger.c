@@ -145,7 +145,7 @@ logger_return_t __logger_disable(void)
  *
  * Query the current global enable state of logger.
  *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ * \return        \c logger_true if logger is enabled, logger_false otherwise
  ******************************************************************************/
 logger_bool_t __logger_is_enabled()
 {
@@ -510,7 +510,7 @@ logger_id_t __logger_id_request(const char* name)
         /* reset the ID */
         memset(&logger_control[index], 0, sizeof(logger_control[index]));
 
-        /* initialize thethe  ID */
+        /* initialize the ID */
         logger_control[index].used    = logger_true;
         logger_control[index].count   = 1;
         logger_control[index].enabled = logger_false;
