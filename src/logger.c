@@ -167,6 +167,39 @@ logger_bool_t __logger_is_enabled()
 
 
 /** ************************************************************************//**
+ * \brief  Search an output stream in a list of outputs.
+ *
+ * The given file stream is searched in the given list of outputs.
+ *
+ * \param[inout]  outputs List of logger file stream.
+ * \param[in]     size    Number of elements in list.
+ * \param[in]     stream  Opened file stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+static logger_bool_t __logger_output_common_is_registered(logger_output_t *outputs,
+                                                          const uint16_t  size,
+                                                          FILE            *stream)
+{
+  logger_bool_t ret = logger_false;
+  int16_t       index;
+
+  /* check if stream is not NULL */
+  if (stream != NULL) {
+    /* check if this output stream is already registered */
+    for (index = 0 ; index < size ; index++) {
+      if (outputs[index].stream == stream) {
+        ret = logger_true;
+        break;
+      }
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Register an output stream to a list of outputs.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -377,7 +410,7 @@ static logger_level_t __logger_output_common_level_get(logger_output_t      *out
 
 
 /** ************************************************************************//**
- * \brief  Register an global output stream.
+ * \brief  Register a global output stream.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
  * opened by the user. The default logging level is set to \c LOGGER_DEBUG thus
@@ -399,7 +432,7 @@ logger_return_t __logger_output_register(FILE *stream)
 
 
 /** ************************************************************************//**
- * \brief  Unregister an global output stream.
+ * \brief  Unregister a global output stream.
  *
  * Remove given file stream from list of outputs.
  *
@@ -413,6 +446,26 @@ logger_return_t __logger_output_deregister(FILE *stream)
 
   /* delete stream to global output streams */
   ret = __logger_output_common_deregister(logger_outputs, LOGGER_OUTPUTS_MAX, stream);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Search an output stream in list of global outputs.
+ *
+ * The given file stream is searched in the list of global outputs.
+ *
+ * \param[in]     stream  File stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_return_t __logger_output_is_registered(FILE *stream)
+{
+  logger_bool_t ret = logger_false;
+
+  /* search stream in global output streams */
+  ret = __logger_output_common_is_registered(logger_outputs, LOGGER_OUTPUTS_MAX, stream);
 
   return(ret);
 }
@@ -884,6 +937,35 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
       (logger_control[id].used == logger_true)) {
     /* delete stream to global output streams */
     ret = __logger_output_common_deregister(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Search an output stream in id specific outputs.
+ *
+ * The given file stream is searched in of id specific outputs.
+ *
+ * \param[in]     stream  File stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_return_t __logger_id_output_is_registered(const logger_id_t id,
+                                                 FILE              *stream)
+{
+  logger_bool_t ret = logger_false;
+
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* search stream in global output streams */
+    ret = __logger_output_common_is_registered(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;

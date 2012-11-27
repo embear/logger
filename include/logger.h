@@ -132,6 +132,7 @@ typedef enum logger_text_fg_e {
 #define logger_is_enabled()                                    __logger_is_enabled()
 #define logger_output_register(__stream)                       __logger_output_register(__stream)
 #define logger_output_deregister(__stream)                     __logger_output_deregister(__stream)
+#define logger_output_is_registered(__stream)                  __logger_output_is_registered(__stream)
 #define logger_output_level_set(__stream, __level)             __logger_output_level_set(__stream, __level)
 #define logger_output_level_get(__stream)                      __logger_output_level_get(__stream)
 #define logger_output_flush()                                  __logger_output_flush()
@@ -147,6 +148,7 @@ typedef enum logger_text_fg_e {
 #define logger_id_name_get(__id)                               __logger_id_name_get(__id)
 #define logger_id_output_register(__id, __stream)              __logger_id_output_register(__id, __stream)
 #define logger_id_output_deregister(__id, __stream)            __logger_id_output_deregister(__id, __stream)
+#define logger_id_output_is_registered(__id, __stream)         __logger_id_output_is_registered(__id, __stream)
 #define logger_id_output_level_set(__id, __stream, __level)    __logger_id_output_level_set(__id, __stream, __level)
 #define logger_id_output_level_get(__id, __stream)             __logger_id_output_level_get(__id, __stream)
 #ifdef LOGGER_COLORS
@@ -166,6 +168,7 @@ logger_return_t __logger_disable(void);
 logger_bool_t __logger_is_enabled(void);
 logger_return_t __logger_output_register(FILE *stream);
 logger_return_t __logger_output_deregister(FILE *stream);
+logger_return_t __logger_output_is_registered(FILE *stream);
 logger_return_t __logger_output_level_set(FILE                 *stream,
                                           const logger_level_t level);
 logger_level_t __logger_output_level_get(FILE *stream);
@@ -186,6 +189,8 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
                                             FILE              *stream);
 logger_return_t __logger_id_output_deregister(const logger_id_t id,
                                               FILE              *stream);
+logger_return_t __logger_id_output_is_registered(const logger_id_t id,
+                                                 FILE              *stream);
 logger_return_t __logger_id_output_level_set(const logger_id_t    id,
                                              FILE                 *stream,
                                              const logger_level_t level);
@@ -220,6 +225,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 #define logger_is_enabled(__id)                               __logger_ignore_false()
 #define logger_output_register(__stream)                      __logger_ignore_ok()
 #define logger_output_deregister(__stream)                    __logger_ignore_ok()
+#define logger_output_is_registered(__stream)                 __logger_ignore_ok()
 #define logger_output_level_set(__stream, __level)            __logger_ignore_ok()
 #define logger_output_level_get(__stream)                     __logger_ignore_err()
 #define logger_output_flush()                                 __logger_ignore_ok()
@@ -235,6 +241,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 #define logger_id_name_get(__id)                              ""
 #define logger_id_output_register(__id, __stream)             __logger_ignore_ok()
 #define logger_id_output_deregister(__id, __stream)           __logger_ignore_ok()
+#define logger_id_output_is_registered(__id, __stream)        __logger_ignore_ok()
 #define logger_id_output_level_set(_id, __stream, __level)    __logger_ignore_ok()
 #define logger_id_output_level_get(_id, __stream)             __logger_ignore_err()
 #define logger_color_set(__id, __fg, __bg, __attr)            __logger_ignore_ok()

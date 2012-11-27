@@ -322,6 +322,32 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- register test functions ....\n", test);
+
+  puts("No output just test functions which check for registered outputs");
+
+  assert(logger_false == logger_output_is_registered(stdout));
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(logger_true == logger_output_is_registered(stdout));
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(logger_false == logger_output_is_registered(stdout));
+
+  id = logger_id_request("logger_test_id");
+  assert(logger_false == logger_id_output_is_registered(id, stdout));
+  assert(LOGGER_OK == logger_id_output_register(id, stdout));
+  assert(logger_true == logger_id_output_is_registered(id, stdout));
+  assert(LOGGER_OK == logger_id_output_deregister(id, stdout));
+  assert(logger_false == logger_id_output_is_registered(id, stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- only id specific output for id, none for id2 ....\n", test);
 
   puts("No global output stream is registered and only id gets its id specific one, id2 has no output");
