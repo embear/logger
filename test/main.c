@@ -19,12 +19,15 @@
 int main(int  argc,
          char *argv[])
 {
-  int             test = 0;
-  FILE            *logger_stream;
-  logger_level_t  level;
-  logger_prefix_t prefix;
-  logger_id_t     id  = logger_id_unknown;
-  logger_id_t     id2 = logger_id_unknown;
+  int                test = 0;
+  FILE               *logger_stream;
+  logger_level_t     level;
+  logger_prefix_t    prefix;
+  logger_id_t        id  = logger_id_unknown;
+  logger_id_t        id2 = logger_id_unknown;
+  logger_text_attr_t attr;
+  logger_text_bg_t   bg_color;
+  logger_text_fg_t   fg_color;
 
   test++;
   puts("");
@@ -620,6 +623,43 @@ int main(int  argc,
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- show color combinations\n", test);
+
+  puts("Show all possible color combinations");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+
+  for(attr = LOGGER_ATTR_RESET; attr <= LOGGER_ATTR_HIDDEN; attr++)
+  {
+    for(bg_color = LOGGER_BG_BLACK; bg_color <= LOGGER_BG_WHITE; bg_color++)
+    {
+      for(fg_color = LOGGER_FG_BLACK; fg_color <= LOGGER_FG_WHITE; fg_color++)
+      {
+        logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
+        logger(id, LOGGER_DEBUG, "foreground: %d, background: %d, attr: %d  >>>>", fg_color, bg_color, attr);
+        logger_color_set(id, fg_color, bg_color, attr);
+        logger(id, LOGGER_DEBUG, "TEST TEST TEST TEST TEST");
+        logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
+        logger(id, LOGGER_DEBUG, "<<<<\n");
+      }
+    }
+  }
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
