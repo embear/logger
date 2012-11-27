@@ -26,7 +26,16 @@ int main(int  argc,
   logger_id_t     id  = logger_id_unknown;
   logger_id_t     id2 = logger_id_unknown;
 
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- check logger initialization test function ....\n", test);
+  assert(logger_false == logger_is_initialized());
   assert(LOGGER_OK == logger_init());
+  assert(logger_true == logger_is_initialized());
 
   test++;
   puts("");

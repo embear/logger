@@ -64,6 +64,7 @@ typedef struct  logger_control_s {
   logger_output_t    outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
 
+static logger_bool_t    logger_initialized = logger_false;  /**< logger is initialized. */
 static logger_bool_t    logger_enabled;                     /**< Logger is enabled. */
 static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage for possible IDs. */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
@@ -92,7 +93,6 @@ logger_version_t __logger_version(void)
  ******************************************************************************/
 logger_return_t __logger_init(void)
 {
-  static logger_bool_t logger_initialized = 0;
   logger_return_t ret = LOGGER_OK;
 
   if (logger_initialized == logger_false) {
@@ -103,6 +103,19 @@ logger_return_t __logger_init(void)
   }
 
   return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the current initialization state
+ *
+ * Query the current initialization state of logger.
+ *
+ * \return        \c logger_true if logger is initialized, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_is_initialized(void)
+{
+  return(logger_initialized);
 }
 
 

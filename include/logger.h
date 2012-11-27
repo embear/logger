@@ -126,6 +126,7 @@ typedef enum logger_text_fg_e {
 #ifdef LOGGER_ENABLE
 #define logger_version()                                       __logger_version()
 #define logger_init()                                          __logger_init()
+#define logger_is_initialized()                                __logger_is_initialized()
 #define logger_enable()                                        __logger_enable()
 #define logger_disable()                                       __logger_disable()
 #define logger_is_enabled()                                    __logger_is_enabled()
@@ -159,6 +160,7 @@ typedef enum logger_text_fg_e {
 
 logger_version_t __logger_version(void);
 logger_return_t __logger_init(void);
+logger_bool_t __logger_is_initialized(void);
 logger_return_t __logger_enable(void);
 logger_return_t __logger_disable(void);
 logger_bool_t __logger_is_enabled(void);
@@ -212,6 +214,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 
 #define logger_version()                                      (LOGGER_VERSION)
 #define logger_init()                                         __logger_ignore_ok()
+#define logger_is_initialized()                               __logger_ignore_ok()
 #define logger_enable()                                       __logger_ignore_ok()
 #define logger_disable()                                      __logger_ignore_ok()
 #define logger_is_enabled(__id)                               __logger_ignore_false()
