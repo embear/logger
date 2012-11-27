@@ -848,8 +848,16 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
 {
   logger_return_t ret = LOGGER_OK;
 
-  /* add stream to global output streams */
-  ret = __logger_output_common_register(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* add stream to global output streams */
+    ret = __logger_output_common_register(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
@@ -870,8 +878,16 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
 {
   logger_return_t ret = LOGGER_OK;
 
-  /* delete stream to global output streams */
-  ret = __logger_output_common_deregister(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* delete stream to global output streams */
+    ret = __logger_output_common_deregister(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
@@ -895,8 +911,16 @@ logger_return_t __logger_id_output_level_set(const logger_id_t    id,
 {
   logger_return_t ret = LOGGER_OK;
 
-  /* set stream output level to global output streams */
-  ret = __logger_output_common_level_set(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, level);
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* set stream output level to global output streams */
+    ret = __logger_output_common_level_set(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, level);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
@@ -917,8 +941,16 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
 {
   logger_level_t ret = LOGGER_UNKNOWN;
 
-  /* get stream output level to global output streams */
-  ret = __logger_output_common_level_get(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* get stream output level to global output streams */
+    ret = __logger_output_common_level_get(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
 
   return(ret);
 }
