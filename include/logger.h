@@ -158,7 +158,8 @@ typedef enum logger_text_fg_e {
 #define logger_color_set(__id, __fg, __bg, __attr)             ((void)(0))
 #define logger_color_reset(__id)                               ((void)(0))
 #endif /* LOGGER_COLORS */
-#define logger(__id, __level, ...)                             __logger(__id, __level, LOGGER_STRINGIFY(__level), __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define logger_level_name_get(__level)                         __logger_level_name_get(__level)
+#define logger(__id, __level, ...)                             __logger(__id, __level, __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
 
 logger_version_t __logger_version(void);
 logger_return_t __logger_init(void);
@@ -201,9 +202,9 @@ logger_return_t __logger_color_set(const logger_id_t        id,
                                    const logger_text_bg_t   bg,
                                    const logger_text_attr_t attr);
 logger_return_t __logger_color_reset(const logger_id_t id);
+const char * __logger_level_name_get(const logger_level_t level);
 logger_return_t __logger(logger_id_t    id,
                          logger_level_t level,
-                         const char     *level_str,
                          const char     *file,
                          const char     *function,
                          uint32_t       line,
@@ -246,6 +247,7 @@ static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); 
 #define logger_id_output_level_get(_id, __stream)             __logger_ignore_err()
 #define logger_color_set(__id, __fg, __bg, __attr)            __logger_ignore_ok()
 #define logger_color_reset(__id)                              __logger_ignore_ok()
+#define logger_level_name_get(__level)                        ""
 #define logger(__id, __level, ...)                            __logger_ignore_ok()
 #endif /* LOGGER_ENABLE */
 

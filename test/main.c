@@ -517,7 +517,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_WARNING));
 
   if (logger_id_is_enabled(id)) {
-    puts("Logging level is WARNING");
+    printf("Logging level is %s\n", logger_level_name_get(logger_id_level_get(id)));
     assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));
@@ -530,7 +530,7 @@ int main(int  argc,
     level = logger_id_level_get(id);
     assert(LOGGER_OK == logger_id_level_set(id, LOGGER_ALERT));
 
-    puts("Logging level is changed to ALERT");
+    printf("Logging level is %s\n", logger_level_name_get(logger_id_level_get(id)));
     assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));
@@ -542,7 +542,7 @@ int main(int  argc,
 
     assert(LOGGER_OK == logger_id_level_set(id, level));
 
-    puts("Logging level is restored");
+    printf("Logging level is restored to %s\n", logger_level_name_get(logger_id_level_get(id)));
     assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
     assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));

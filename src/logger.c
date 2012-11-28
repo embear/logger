@@ -68,6 +68,19 @@ static logger_bool_t    logger_initialized = logger_false;  /**< logger is initi
 static logger_bool_t    logger_enabled;                     /**< Logger is enabled. */
 static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage for possible IDs. */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
+static char *logger_level_names[] =
+{
+  "UNKNOWN", /* 0 */
+  "DEBUG",   /* 1 */
+  "INFO",    /* 2 */
+  "NOTICE",  /* 3 */
+  "WARNING", /* 4 */
+  "ERR",     /* 5 */
+  "CRIT",    /* 6 */
+  "ALERT",   /* 7 */
+  "EMERG"    /* 8 */
+};
+
 
 /** ************************************************************************//**
  * \brief  Version of logger.
@@ -1109,6 +1122,30 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 
 
 /** ************************************************************************//**
+ * \brief  Query name for level.
+ *
+ * Query the name for the given logging level.
+ *
+ * \param[in]     level   Level for querying name
+ *
+ * \return        Symbolic name of the level
+ ******************************************************************************/
+const char *__logger_level_name_get(const logger_level_t level)
+{
+  char *name = logger_level_names[0];
+
+  /* check for valid ID */
+  if ((level >= 0) &&
+      (level < LOGGER_MAX)) {
+    /* get ID level */
+    name = logger_level_names[level];
+  }
+
+  return(name);
+}
+
+
+/** ************************************************************************//**
  * \brief  Format message prefix
  *
  * Allocate memory for prefix and print prefix to allocated memory.
@@ -1118,7 +1155,6 @@ logger_return_t __logger_color_reset(const logger_id_t id)
  * \param[in]     id        ID outputting this message.
  * \param[out]    prefix    Formatted message prefix.
  * \param[in]     level     Level of this message.
- * \param[in]     level_str Level of this message as string.
  * \param[in]     file      Name of file where this call happend.
  * \param[in]     function  Name of function where this call happend.
  * \param[in]     line      Line where this call happend.
@@ -1128,7 +1164,6 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                                      char           **prefix,
                                                      logger_level_t level,
-                                                     const char     *level_str,
                                                      const char     *file,
                                                      const char     *function,
                                                      uint32_t       line)
@@ -1164,23 +1199,23 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
             break;
 
           case LOGGER_PREFIX_NAME:
-            characters = snprintf(*prefix, size, "%15s: ", logger_id_name_get(id));
+            characters = snprintf(*prefix, size, "%15s: ", __logger_id_name_get(id));
             break;
 
           case LOGGER_PREFIX_SHORT:
-            characters = snprintf(*prefix, size, "%15s:%15s: ", logger_id_name_get(id), level_str);
+            characters = snprintf(*prefix, size, "%15s:%7s: ", __logger_id_name_get(id), __logger_level_name_get(level));
             break;
 
           case LOGGER_PREFIX_FUNCTION:
-            characters = snprintf(*prefix, size, "%15s:%15s:%30s():%5d: ", logger_id_name_get(id), level_str, function, line);
+            characters = snprintf(*prefix, size, "%15s:%7s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), function, line);
             break;
 
           case LOGGER_PREFIX_FILE:
-            characters = snprintf(*prefix, size, "%15s:%15s:%30s:%5d: ", logger_id_name_get(id), level_str, file, line);
+            characters = snprintf(*prefix, size, "%15s:%7s:%30s:%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), file, line);
             break;
 
           case LOGGER_PREFIX_FULL:
-            characters = snprintf(*prefix, size, "%15s:%15s:%30s:%30s():%5d: ", logger_id_name_get(id), level_str, file, function, line);
+            characters = snprintf(*prefix, size, "%15s:%7s:%30s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), file, function, line);
             break;
 
           case LOGGER_PREFIX_MAX:
@@ -1418,7 +1453,6 @@ static inline logger_return_t __logger_output(logger_id_t     id,
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
- * \param[in]     level_str Level of this message as string.
  * \param[in]     file      Name of file where this call happend.
  * \param[in]     function  Name of function where this call happend.
  * \param[in]     line      Line where this call happend.
@@ -1429,7 +1463,6 @@ static inline logger_return_t __logger_output(logger_id_t     id,
  ******************************************************************************/
 logger_return_t __logger(logger_id_t    id,
                          logger_level_t level,
-                         const char     *level_str,
                          const char     *file,
                          const char     *function,
                          uint32_t       line,
@@ -1458,7 +1491,7 @@ logger_return_t __logger(logger_id_t    id,
           (logger_control[id].level < LOGGER_MAX) &&
           (logger_control[id].level <= level)) {
         /* format prefix */
-        __logger_format_prefix(id, &prefix, level, level_str, file, function, line);
+        __logger_format_prefix(id, &prefix, level, file, function, line);
 
         /* format message */
         va_start(argp, format);
