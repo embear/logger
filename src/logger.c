@@ -41,27 +41,33 @@
 /** Initial length of logger message string including '\0' */
 #define LOGGER_MESSAGE_STRING_MAX    (256)
 
+/** Length of logger color string including '\0' */
+#define LOGGER_COLOR_STRING_MAX    (16)
+
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
   logger_level_t level;   /**< Level for this stream. */
   FILE           *stream; /**< File pointer given during registration. */
 } logger_output_t;
 
+typedef struct logger_color_string_s {
+  char begin[LOGGER_COLOR_STRING_MAX]; /**< Color begin marker string. */
+  char end[LOGGER_COLOR_STRING_MAX];   /**< Color end marker string. */
+} logger_color_string_t;
+
 typedef struct  logger_control_s {
-  logger_bool_t      used;                           /**< This ID is used. */
-  int16_t            count;                          /**< Number of registrations for this ID. */
-  logger_bool_t      enabled;                        /**< This ID is enabled. */
-  logger_level_t     level;                          /**< Level for this ID. */
-  logger_prefix_t    prefix;                         /**< Prefix for this ID. */
-  logger_bool_t      color;                          /**< Changed colors for this ID. */
+  logger_bool_t         used;                           /**< This ID is used. */
+  int16_t               count;                          /**< Number of registrations for this ID. */
+  logger_bool_t         enabled;                        /**< This ID is enabled. */
+  logger_level_t        level;                          /**< Level for this ID. */
+  logger_prefix_t       prefix;                         /**< Prefix for this ID. */
+  logger_bool_t         color;                          /**< Changed colors for this ID. */
 #ifdef LOGGER_COLORS
-  logger_text_fg_t   fg;                             /**< Foreground color of this ID. */
-  logger_text_bg_t   bg;                             /**< Background color of this ID. */
-  logger_text_attr_t attr;                           /**< Attributes of this ID. */
-#endif      /* LOGGER_COLORS */
-  logger_bool_t      append;                         /**< Previous message didn't contain a newline just append next message */
-  char               name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
-  logger_output_t    outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
+  logger_color_string_t color_string;                   /**< Color string for this ID. */
+#endif /* LOGGER_COLORS */
+  logger_bool_t         append;                         /**< Previous message didn't contain a newline just append next message */
+  char                  name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
+  logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
 
 static logger_bool_t    logger_initialized = logger_false;  /**< logger is initialized. */
@@ -590,12 +596,14 @@ logger_id_t __logger_id_request(const char* name)
         memset(&logger_control[index], 0, sizeof(logger_control[index]));
 
         /* initialize the ID */
-        logger_control[index].used    = logger_true;
-        logger_control[index].count   = 1;
-        logger_control[index].enabled = logger_false;
-        logger_control[index].level   = LOGGER_UNKNOWN;
-        logger_control[index].prefix  = LOGGER_PREFIX_FUNCTION;
-        logger_control[index].color   = logger_false;
+        logger_control[index].used                  = logger_true;
+        logger_control[index].count                 = 1;
+        logger_control[index].enabled               = logger_false;
+        logger_control[index].level                 = LOGGER_UNKNOWN;
+        logger_control[index].prefix                = LOGGER_PREFIX_FUNCTION;
+        logger_control[index].color                 = logger_false;
+        logger_control[index].color_string.begin[0] = '\0';
+        logger_control[index].color_string.end[0]   = '\0';
 
         /* copy the name */
         strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
@@ -645,13 +653,15 @@ logger_return_t __logger_id_release(const logger_id_t id)
         memset(&logger_control[id], 0, sizeof(logger_control[id]));
 
         /* reset all ID dependent values to defaults */
-        logger_control[id].used    = logger_false;
-        logger_control[id].count   = 0;
-        logger_control[id].enabled = logger_false;
-        logger_control[id].level   = LOGGER_UNKNOWN;
-        logger_control[id].prefix  = LOGGER_PREFIX_FUNCTION;
-        logger_control[id].color   = logger_false;
-        logger_control[id].name[0] = '\0';
+        logger_control[id].used                  = logger_false;
+        logger_control[id].count                 = 0;
+        logger_control[id].enabled               = logger_false;
+        logger_control[id].level                 = LOGGER_UNKNOWN;
+        logger_control[id].prefix                = LOGGER_PREFIX_FUNCTION;
+        logger_control[id].color                 = logger_false;
+        logger_control[id].color_string.begin[0] = '\0';
+        logger_control[id].color_string.end[0]   = '\0';
+        logger_control[id].name[0]               = '\0';
 
         /* reset outputs */
         memset(logger_control[id].outputs, 0, sizeof(logger_control[id].outputs));
@@ -1080,9 +1090,8 @@ logger_return_t __logger_color_set(const logger_id_t        id,
       (id < LOGGER_IDS_MAX) &&
       (logger_control[id].used == logger_true)) {
     logger_control[id].color = logger_true;
-    logger_control[id].fg    = fg;
-    logger_control[id].bg    = bg;
-    logger_control[id].attr  = attr;
+    (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
+    (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1108,7 +1117,9 @@ logger_return_t __logger_color_reset(const logger_id_t id)
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
       (logger_control[id].used == logger_true)) {
-    logger_control[id].color = logger_false;
+    logger_control[id].color                 = logger_false;
+    logger_control[id].color_string.begin[0] = '\0';
+    logger_control[id].color_string.end[0]   = '\0';
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1389,12 +1400,12 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       if ((logger_control[id].color == logger_true) &&
           ((outputs[index].stream == stdout) ||
            (outputs[index].stream == stderr))) {
-        (void)fprintf(outputs[index].stream, "%c[%d;%d;%dm", 0x1B, logger_control[id].attr, logger_control[id].fg, logger_control[id].bg);
+        (void)fputs(logger_control[id].color_string.begin, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
       }
-#endif      /* LOGGER_COLORS */
+#endif /* LOGGER_COLORS */
 
       /* actually output prefix */
       if (prefix != NULL) {
@@ -1418,12 +1429,12 @@ static inline logger_return_t __logger_output(logger_id_t     id,
           (logger_control[id].append == logger_false) &&
           ((outputs[index].stream == stdout) ||
            (outputs[index].stream == stderr))) {
-        (void)fprintf(outputs[index].stream, "%c[%dm", 0x1B, LOGGER_ATTR_RESET);
+        (void)fputs(logger_control[id].color_string.end, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
       }
-#endif      /* LOGGER_COLORS */
+#endif /* LOGGER_COLORS */
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].append == logger_false) {
