@@ -231,16 +231,20 @@ static logger_bool_t __logger_output_common_is_registered(logger_output_t *outpu
   logger_bool_t ret = logger_false;
   int16_t       index;
 
-  /* check if stream is not NULL */
+  /* check if stream valid */
   if (stream != NULL) {
-    /* check if this output stream is already registered */
-    for (index = 0 ; index < size ; index++) {
-      if (outputs[index].stream == stream) {
-        ret = logger_true;
-        break;
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output stream is already registered */
+      for (index = 0 ; index < size ; index++) {
+        if (outputs[index].stream == stream) {
+          ret = logger_true;
+          break;
+        }
       }
     }
   }
+
 
   return(ret);
 }
@@ -267,49 +271,55 @@ static logger_return_t __logger_output_common_register(logger_output_t *outputs,
   int16_t         index;
   logger_bool_t   found;
 
-  /* check if stream is not NULL */
+  /* check if stream valid */
   if (stream != NULL) {
-    /* check if this output stream is already registered */
-    found = logger_false;
-    for (index = 0 ; index < size ; index++) {
-      if (outputs[index].stream == stream) {
-        found = logger_true;
-        break;
-      }
-    }
-
-    /* stream is already registered */
-    if (found == logger_true) {
-      outputs[index].count++;
-      ret = LOGGER_ERR_OUTPUT_REGISTERED;
-    }
-    /* stream is not registered */
-    else {
-      /* search for an empty slot */
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output stream is already registered */
       found = logger_false;
       for (index = 0 ; index < size ; index++) {
-        if (outputs[index].count == 0) {
+        if (outputs[index].stream == stream) {
           found = logger_true;
           break;
         }
       }
 
-      /* found an empty slot */
+      /* stream is already registered */
       if (found == logger_true) {
         outputs[index].count++;
-        outputs[index].level  = LOGGER_UNKNOWN;
-        outputs[index].stream = stream;
-
-        /* make a nonblocking stream */
-        /*fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);*/
+        ret = LOGGER_ERR_OUTPUT_REGISTERED;
       }
+      /* stream is not registered */
       else {
-        ret = LOGGER_ERR_OUTPUTS_FULL;
+        /* search for an empty slot */
+        found = logger_false;
+        for (index = 0 ; index < size ; index++) {
+          if (outputs[index].count == 0) {
+            found = logger_true;
+            break;
+          }
+        }
+
+        /* found an empty slot */
+        if (found == logger_true) {
+          outputs[index].count++;
+          outputs[index].level  = LOGGER_UNKNOWN;
+          outputs[index].stream = stream;
+
+          /* make a nonblocking stream */
+          /*fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);*/
+        }
+        else {
+          ret = LOGGER_ERR_OUTPUTS_FULL;
+        }
       }
+    }
+    else {
+      ret = LOGGER_ERR_OUTPUT_INVALID;
     }
   }
   else {
-    ret = LOGGER_ERR_OUTPUT_INVALID;
+    ret = LOGGER_ERR_STREAM_INVALID;
   }
 
   return(ret);
@@ -335,32 +345,44 @@ static logger_return_t __logger_output_common_deregister(logger_output_t *output
   int16_t         index;
   logger_bool_t   found;
 
-  /* check if this output is already registered */
-  found = logger_false;
-  for (index = 0 ; index < size ; index++) {
-    if (outputs[index].stream == stream) {
-      found = logger_true;
-      break;
+  /* check if stream valid */
+  if (stream != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output is already registered */
+      found = logger_false;
+      for (index = 0 ; index < size ; index++) {
+        if (outputs[index].stream == stream) {
+          found = logger_true;
+          break;
+        }
+      }
+
+      /* found given stream in a slot */
+      if (found == logger_true) {
+        outputs[index].count--;
+
+        /* remove this stream if this was the last reference */
+        if (outputs[index].count <= 0) {
+          /* flush everything in this stream */
+          fflush(outputs[index].stream);
+
+          /* reset output to default values */
+          outputs[index].count  = 0;
+          outputs[index].level  = LOGGER_UNKNOWN;
+          outputs[index].stream = (FILE *)NULL;
+        }
+      }
+      else {
+        ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+      }
     }
-  }
-
-  /* found given stream in a slot */
-  if (found == logger_true) {
-    outputs[index].count--;
-
-    /* remove this stream if this was the last reference */
-    if (outputs[index].count <= 0) {
-      /* flush everything in this stream */
-      fflush(outputs[index].stream);
-
-      /* reset output to default values */
-      outputs[index].count  = 0;
-      outputs[index].level  = LOGGER_UNKNOWN;
-      outputs[index].stream = (FILE *)NULL;
+    else {
+      ret = LOGGER_ERR_OUTPUT_INVALID;
     }
   }
   else {
-    ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+    ret = LOGGER_ERR_STREAM_INVALID;
   }
 
   return(ret);
@@ -389,29 +411,41 @@ static logger_return_t __logger_output_common_level_set(logger_output_t      *ou
   int16_t         index;
   logger_bool_t   found;
 
-  /* check for valid level */
-  if ((level >= LOGGER_DEBUG) &&
-      (level <= LOGGER_MAX)) {
-    /* check if this output is already registered */
-    found = logger_false;
-    for (index = 0 ; index < size ; index++) {
-      if (outputs[index].stream == stream) {
-        found = logger_true;
-        break;
+  /* check if stream valid */
+  if (stream != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check for valid level */
+      if ((level >= LOGGER_DEBUG) &&
+          (level <= LOGGER_MAX)) {
+        /* check if this output is already registered */
+        found = logger_false;
+        for (index = 0 ; index < size ; index++) {
+          if (outputs[index].stream == stream) {
+            found = logger_true;
+            break;
+          }
+        }
+
+        /* found given stream in a slot */
+        if (found == logger_true) {
+          /* set log level */
+          outputs[index].level = level;
+        }
+        else {
+          ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+        }
+      }
+      else {
+        ret = LOGGER_ERR_LEVEL_UNKNOWN;
       }
     }
-
-    /* found given stream in a slot */
-    if (found == logger_true) {
-      /* set log level */
-      outputs[index].level = level;
-    }
     else {
-      ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
+      ret = LOGGER_ERR_OUTPUT_INVALID;
     }
   }
   else {
-    ret = LOGGER_ERR_LEVEL_UNKNOWN;
+    ret = LOGGER_ERR_STREAM_INVALID;
   }
 
   return(ret);
@@ -437,19 +471,31 @@ static logger_level_t __logger_output_common_level_get(logger_output_t      *out
   int16_t        index;
   logger_bool_t  found;
 
-  /* check if this output is already registered */
-  found = logger_false;
-  for (index = 0 ; index < size ; index++) {
-    if (outputs[index].stream == stream) {
-      found = logger_true;
-      break;
+  /* check if stream valid */
+  if (stream != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output is already registered */
+      found = logger_false;
+      for (index = 0 ; index < size ; index++) {
+        if (outputs[index].stream == stream) {
+          found = logger_true;
+          break;
+        }
+      }
+
+      /* found given stream in a slot */
+      if (found == logger_true) {
+        /* set log level */
+        ret = outputs[index].level;
+      }
+    }
+    else {
+      ret = LOGGER_ERR_OUTPUT_INVALID;
     }
   }
-
-  /* found given stream in a slot */
-  if (found == logger_true) {
-    /* set log level */
-    ret = outputs[index].level;
+  else {
+    ret = LOGGER_ERR_STREAM_INVALID;
   }
 
   return(ret);
@@ -572,11 +618,21 @@ logger_return_t __logger_output_flush(void)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
+  int16_t         id;
 
-  /* search for an empty slot */
+  /* search for used global outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     if (logger_outputs[index].count > 0) {
       fflush(logger_outputs[index].stream);
+    }
+  }
+
+  /* search for used id specific outputs */
+  for (id = 0 ; id < LOGGER_IDS_MAX ; id++) {
+    for (index = 0 ; index < LOGGER_ID_OUTPUTS_MAX ; index++) {
+      if (logger_control[id].outputs[index].count > 0) {
+        fflush(logger_control[id].outputs[index].stream);
+      }
     }
   }
 
@@ -601,53 +657,59 @@ logger_id_t __logger_id_request(const char* name)
   int16_t         index;
   logger_bool_t   found;
 
-  /* start search */
-  found = logger_false;
+  /* check validity of name */
+  if (name != NULL) {
+    /* start search */
+    found = logger_false;
 
-  /* search for an already existing ID with the same name */
-  for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-    if (logger_control[index].used == logger_true) {
-      if (strncmp(logger_control[index].name, name, LOGGER_NAME_MAX) == 0) {
-        logger_control[index].count++;
-        found = logger_true;
-        break;
-      }
-    }
-  }
-
-  /* search for an available ID */
-  if (found == logger_false) {
+    /* search for an already existing ID with the same name */
     for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
-      if (logger_control[index].used == logger_false) {
-        found = logger_true;
-        /* reset the ID */
-        memset(&logger_control[index], 0, sizeof(logger_control[index]));
-
-        /* initialize the ID */
-        logger_control[index].used                  = logger_true;
-        logger_control[index].count                 = 1;
-        logger_control[index].enabled               = logger_false;
-        logger_control[index].level                 = LOGGER_UNKNOWN;
-        logger_control[index].prefix                = LOGGER_PREFIX_FUNCTION;
-        logger_control[index].color                 = logger_false;
-        logger_control[index].color_string.begin[0] = '\0';
-        logger_control[index].color_string.end[0]   = '\0';
-
-        /* copy the name */
-        strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
-        logger_control[index].name[LOGGER_NAME_MAX - 1] = '\0';
-
-        break;
+      if (logger_control[index].used == logger_true) {
+        if (strncmp(logger_control[index].name, name, LOGGER_NAME_MAX) == 0) {
+          logger_control[index].count++;
+          found = logger_true;
+          break;
+        }
       }
     }
-  }
 
-  /* found an empty slot */
-  if (found == logger_true) {
-    ret = index;
+    /* search for an available ID */
+    if (found == logger_false) {
+      for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+        if (logger_control[index].used == logger_false) {
+          found = logger_true;
+          /* reset the ID */
+          memset(&logger_control[index], 0, sizeof(logger_control[index]));
+
+          /* initialize the ID */
+          logger_control[index].used                  = logger_true;
+          logger_control[index].count                 = 1;
+          logger_control[index].enabled               = logger_false;
+          logger_control[index].level                 = LOGGER_UNKNOWN;
+          logger_control[index].prefix                = LOGGER_PREFIX_FUNCTION;
+          logger_control[index].color                 = logger_false;
+          logger_control[index].color_string.begin[0] = '\0';
+          logger_control[index].color_string.end[0]   = '\0';
+
+          /* copy the name */
+          strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
+          logger_control[index].name[LOGGER_NAME_MAX - 1] = '\0';
+
+          break;
+        }
+      }
+    }
+
+    /* found an empty slot */
+    if (found == logger_true) {
+      ret = index;
+    }
+    else {
+      ret = LOGGER_ERR_IDS_FULL;
+    }
   }
   else {
-    ret = LOGGER_ERR_IDS_FULL;
+    ret = LOGGER_ERR_NAME_INVALID;
   }
 
   return(ret);
@@ -1533,56 +1595,75 @@ logger_return_t __logger(logger_id_t    id,
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
       (logger_enabled == logger_true)) {
-
     /* check for valid level */
     if ((level >= LOGGER_DEBUG) &&
         (level <= LOGGER_MAX)) {
+      /* check if file valid */
+      if (file != NULL) {
+        /* check if function valid */
+        if (function != NULL) {
+          /* check if format valid */
+          if (format != NULL) {
+            /* check if ID is enabled and level is high enough */
+            if ((logger_control[id].enabled == logger_true) &&
+                (logger_control[id].level > LOGGER_UNKNOWN) &&
+                (logger_control[id].level < LOGGER_MAX) &&
+                (logger_control[id].level <= level)) {
+              /* format prefix */
+              __logger_format_prefix(id, &prefix, level, file, function, line);
 
-      /* check if ID is enabled and level is high enough */
-      if ((logger_control[id].enabled == logger_true) &&
-          (logger_control[id].level > LOGGER_UNKNOWN) &&
-          (logger_control[id].level < LOGGER_MAX) &&
-          (logger_control[id].level <= level)) {
-        /* format prefix */
-        __logger_format_prefix(id, &prefix, level, file, function, line);
+              /* format message */
+              va_start(argp, format);
+              __logger_format_message(id, &message, format, argp);
+              va_end(argp);
 
-        /* format message */
-        va_start(argp, format);
-        __logger_format_message(id, &message, format, argp);
-        va_end(argp);
+              /* initialize message pointer */
+              message_part = message;
 
-        /* initialize message pointer */
-        message_part = message;
+              /* loop over all message parts */
+              do {
+                /* search for the next linefeed */
+                message_end = index(message_part, '\n');
 
-        /* loop over all message parts */
-        do {
-          /* search for the next linefeed */
-          message_end = index(message_part, '\n');
-          if (message_end != NULL) {
-            /* replace linefeed with string end */
-            *message_end = '\0';
+                if (message_end != NULL) {
+                  /* replace linefeed with string end */
+                  *message_end = '\0';
 
-            /* make message_end point to the next message part */
-            message_end++;
+                  /* make message_end point to the next message part */
+                  message_end++;
+                }
+
+                /* output message to global streams */
+                __logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, prefix, message_part);
+
+                /* output message to id streams */
+                __logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, prefix, message_part);
+
+                /* update message part for next loop */
+                message_part = message_end;
+              }
+              while (message_part != NULL);
+
+              /* release memory of prefix and message */
+              if (prefix != NULL) {
+                free(prefix);
+              }
+
+              if (message != NULL) {
+                free(message);
+              }
+            }
           }
-
-          /* output message to global streams */
-          __logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, prefix, message_part);
-
-          /* output message to id streams */
-          __logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, prefix, message_part);
-
-          /* update message part for next loop */
-          message_part = message_end;
-        } while (message_part != NULL);
-
-        /* release memory of prefix and message */
-        if (prefix != NULL) {
-          free(prefix);
+          else {
+            ret = LOGGER_ERR_FORMAT_INVALID;
+          }
         }
-        if (message != NULL) {
-          free(message);
+        else {
+          ret = LOGGER_ERR_OUTPUT_INVALID;
         }
+      }
+      else {
+        ret = LOGGER_ERR_FILE_INVALID;
       }
     }
     else {

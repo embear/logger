@@ -70,18 +70,21 @@ typedef int16_t  logger_id_t;                  /**< Logger ID type. */
 
 
 typedef enum logger_return_e {
-  LOGGER_OK                    = 0,    /**< Ok. */
-  LOGGER_ERR_UNKNOWN           = -1,   /**< Unspecified error. */
-  LOGGER_ERR_OUTPUT_INVALID    = -2,   /**< Given output stream is invalid. */
-  LOGGER_ERR_OUTPUTS_FULL      = -3,   /**< All available outputs are used. */
-  LOGGER_ERR_OUTPUT_REGISTERED = -4,   /**< Output already registered. */
-  LOGGER_ERR_OUTPUT_NOT_FOUND  = -5,   /**< Output not registered. */
-  LOGGER_ERR_IDS_FULL          = -6,   /**< All available ids are used. */
-  LOGGER_ERR_ID_UNKNOWN        = -7,   /**< Id is unknown. */
-  LOGGER_ERR_LEVEL_UNKNOWN     = -8,   /**< Level is unknown. */
-  LOGGER_ERR_PREFIX_UNKNOWN    = -9,   /**< Prefix is unknown. */
-  LOGGER_ERR_OUT_OF_MEMORY     = -10,  /**< Memory allocation error. */
-
+  LOGGER_OK                    =   0,   /**< Ok. */
+  LOGGER_ERR_UNKNOWN           =  -1,   /**< Unspecified error. */
+  LOGGER_ERR_OUTPUT_INVALID    =  -2,   /**< Given output stream is invalid. */
+  LOGGER_ERR_OUTPUTS_FULL      =  -3,   /**< All available outputs are used. */
+  LOGGER_ERR_OUTPUT_REGISTERED =  -4,   /**< Output already registered. */
+  LOGGER_ERR_OUTPUT_NOT_FOUND  =  -5,   /**< Output not registered. */
+  LOGGER_ERR_IDS_FULL          =  -6,   /**< All available ids are used. */
+  LOGGER_ERR_ID_UNKNOWN        =  -7,   /**< Id is unknown. */
+  LOGGER_ERR_LEVEL_UNKNOWN     =  -8,   /**< Level is unknown. */
+  LOGGER_ERR_PREFIX_UNKNOWN    =  -9,   /**< Prefix is unknown. */
+  LOGGER_ERR_OUT_OF_MEMORY     = -10,   /**< Memory allocation error. */
+  LOGGER_ERR_STREAM_INVALID    = -11,   /**< File stream is invalid. */
+  LOGGER_ERR_NAME_INVALID      = -12,   /**< Name string is invalid. */
+  LOGGER_ERR_FORMAT_INVALID    = -13,   /**< Format string is invalid. */
+  LOGGER_ERR_FILE_INVALID      = -14    /**< File string is invalid. */
 } logger_return_t;
 
 
