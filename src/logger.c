@@ -62,9 +62,7 @@ typedef struct  logger_control_s {
   logger_level_t        level;                          /**< Level for this ID. */
   logger_prefix_t       prefix;                         /**< Prefix for this ID. */
   logger_bool_t         color;                          /**< Changed colors for this ID. */
-#ifdef LOGGER_COLORS
   logger_color_string_t color_string;                   /**< Color string for this ID. */
-#endif /* LOGGER_COLORS */
   logger_bool_t         append;                         /**< Previous message didn't contain a newline just append next message */
   char                  name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
   logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
@@ -92,6 +90,7 @@ static char *logger_level_names[] =
 /** level to color translation */
 static logger_color_string_t logger_level_colors[] =
 {
+#ifdef LOGGER_PREFIX_COLORS
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" == 0 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   == 1 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
   { "\x1B[0;30;47m", "\x1B[0m" }, /* Prefix color string for level "INFO"    == 2 -> LOGGER_BG_WHITE,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
@@ -101,6 +100,17 @@ static logger_color_string_t logger_level_colors[] =
   { "\x1B[0;30;43m", "\x1B[0m" }, /* Prefix color string for level "CRIT"    == 6 -> LOGGER_BG_BLUE,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   == 7 -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+#else /* LOGGER_PREFIX_COLORS */
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" },
+  { "", "" }
+#endif /* LOGGER_PREFIX_COLORS */
 };
 
 static logger_color_string_t logger_no_color = { "", ""}; /**< Empty color string */
@@ -1079,9 +1089,6 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
 }
 
 
-#ifdef LOGGER_COLORS
-
-
 /** ************************************************************************//**
  * \brief  Change terminal text color and attributes.
  *
@@ -1107,9 +1114,15 @@ logger_return_t __logger_color_set(const logger_id_t        id,
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
       (logger_control[id].used == logger_true)) {
+#ifdef LOGGER_COLORS
     logger_control[id].color = logger_true;
     (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
     (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
+#else /* LOGGER_COLORS */
+    logger_control[id].color                 = logger_false;
+    logger_control[id].color_string.begin[0] = '\0';
+    logger_control[id].color_string.end[0]   = '\0';
+#endif /* LOGGER_COLORS */
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1145,9 +1158,6 @@ logger_return_t __logger_color_reset(const logger_id_t id)
 
   return(ret);
 }
-
-
-#endif /* LOGGER_COLORS */
 
 
 /** ************************************************************************//**
@@ -1419,16 +1429,8 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       /* set colors */
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
-#ifdef LOGGER_PREFIX_COLORS
         prefix_color = &logger_level_colors[level];
-#else /* LOGGER_PREFIX_COLORS */
-        message_color = &logger_no_color;
-#endif /* LOGGER_PREFIX_COLORS */
-#ifdef LOGGER_COLORS
         message_color = &logger_control[id].color_string;
-#else /* LOGGER_COLORS */
-        message_color = &logger_no_color;
-#endif /* LOGGER_COLORS */
       }
       else {
         prefix_color = &logger_no_color;
