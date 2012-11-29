@@ -74,18 +74,36 @@ static logger_bool_t    logger_initialized = logger_false;  /**< logger is initi
 static logger_bool_t    logger_enabled;                     /**< Logger is enabled. */
 static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage for possible IDs. */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
+
+/** level to name translation */
 static char *logger_level_names[] =
 {
-  "UNKNOWN", /* 0 */
-  "DEBUG",   /* 1 */
-  "INFO",    /* 2 */
-  "NOTICE",  /* 3 */
-  "WARNING", /* 4 */
-  "ERR",     /* 5 */
-  "CRIT",    /* 6 */
-  "ALERT",   /* 7 */
-  "EMERG"    /* 8 */
+  "UNKNOWN", /**< Name for level "UNKNOWN" == 0 */
+  "DEBUG",   /**< Name for level "DEBUG"   == 1 */
+  "INFO",    /**< Name for level "INFO"    == 2 */
+  "NOTICE",  /**< Name for level "NOTICE"  == 3 */
+  "WARNING", /**< Name for level "WARNING" == 4 */
+  "ERR",     /**< Name for level "ERR"     == 5 */
+  "CRIT",    /**< Name for level "CRIT"    == 6 */
+  "ALERT",   /**< Name for level "ALERT"   == 7 */
+  "EMERG"    /**< Name for level "EMERG"   == 8 */
 };
+
+/** level to color translation */
+static logger_color_string_t logger_level_colors[] =
+{
+  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" == 0 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
+  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   == 1 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;47m", "\x1B[0m" }, /* Prefix color string for level "INFO"    == 2 -> LOGGER_BG_WHITE,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;44m", "\x1B[0m" }, /* Prefix color string for level "NOTICE"  == 3 -> LOGGER_BG_GREEN,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;46m", "\x1B[0m" }, /* Prefix color string for level "WARNING" == 4 -> LOGGER_BG_YELLOW,  LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;42m", "\x1B[0m" }, /* Prefix color string for level "ERR"     == 5 -> LOGGER_BG_CYAN,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;43m", "\x1B[0m" }, /* Prefix color string for level "CRIT"    == 6 -> LOGGER_BG_BLUE,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   == 7 -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+};
+
+static logger_color_string_t logger_no_color = { "", ""}; /**< Empty color string */
 
 
 /** ************************************************************************//**
@@ -1388,6 +1406,8 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
+  logger_color_string_t *prefix_color;
+  logger_color_string_t *message_color;
 
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
@@ -1395,17 +1415,35 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         (outputs[index].level > LOGGER_UNKNOWN) &&
         (outputs[index].level < LOGGER_MAX) &&
         (outputs[index].level <= level)) {
-      /* set color */
+
+      /* set colors */
+      if ((outputs[index].stream == stdout) ||
+          (outputs[index].stream == stderr)) {
+#ifdef LOGGER_PREFIX_COLORS
+        prefix_color = &logger_level_colors[level];
+#else /* LOGGER_PREFIX_COLORS */
+        message_color = &logger_no_color;
+#endif /* LOGGER_PREFIX_COLORS */
 #ifdef LOGGER_COLORS
-      if ((logger_control[id].color == logger_true) &&
-          ((outputs[index].stream == stdout) ||
-           (outputs[index].stream == stderr))) {
-        (void)fputs(logger_control[id].color_string.begin, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
-      }
+        message_color = &logger_control[id].color_string;
+#else /* LOGGER_COLORS */
+        message_color = &logger_no_color;
 #endif /* LOGGER_COLORS */
+      }
+      else {
+        prefix_color = &logger_no_color;
+        message_color = &logger_no_color;
+      }
+
+      (void)fputs(message_color->begin, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+      (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
+
+      (void)fputs(prefix_color->begin, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+      (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
 
       /* actually output prefix */
       if (prefix != NULL) {
@@ -1415,6 +1453,16 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 #endif /* LOGGER_FORCE_FLUSH */
       }
 
+      (void)fputs(prefix_color->end, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+      (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
+
+      (void)fputs(message_color->begin, outputs[index].stream);
+#ifdef LOGGER_FORCE_FLUSH
+      (void)fflush(outputs[index].stream);
+#endif /* LOGGER_FORCE_FLUSH */
+
       /* actually output message */
       if (message != NULL) {
         fputs(message, outputs[index].stream);
@@ -1423,18 +1471,10 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 #endif /* LOGGER_FORCE_FLUSH */
       }
 
-      /* reset color */
-#ifdef LOGGER_COLORS
-      if ((logger_control[id].color == logger_true) &&
-          (logger_control[id].append == logger_false) &&
-          ((outputs[index].stream == stdout) ||
-           (outputs[index].stream == stderr))) {
-        (void)fputs(logger_control[id].color_string.end, outputs[index].stream);
+      (void)fputs(message_color->end, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
+      (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
-      }
-#endif /* LOGGER_COLORS */
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].append == logger_false) {
