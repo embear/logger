@@ -186,10 +186,10 @@ logger_bool_t __logger_id_is_enabled(const logger_id_t id);
 logger_return_t __logger_id_level_set(const logger_id_t    id,
                                       const logger_level_t level);
 logger_level_t __logger_id_level_get(const logger_id_t id);
-logger_return_t __logger_id_prefix_set(const logger_id_t    id,
+logger_return_t __logger_id_prefix_set(const logger_id_t     id,
                                        const logger_prefix_t prefix);
 logger_prefix_t __logger_id_prefix_get(const logger_id_t id);
-const char * __logger_id_name_get(const logger_id_t id);
+const char *__logger_id_name_get(const logger_id_t id);
 logger_return_t __logger_id_output_register(const logger_id_t id,
                                             FILE              *stream);
 logger_return_t __logger_id_output_deregister(const logger_id_t id,
@@ -212,7 +212,7 @@ logger_return_t __logger_color_set(const logger_id_t        id,
                                    const logger_text_bg_t   bg,
                                    const logger_text_attr_t attr);
 logger_return_t __logger_color_reset(const logger_id_t id);
-const char * __logger_level_name_get(const logger_level_t level);
+const char *__logger_level_name_get(const logger_level_t level);
 logger_return_t __logger(logger_id_t    id,
                          logger_level_t level,
                          const char     *file,
@@ -222,11 +222,35 @@ logger_return_t __logger(logger_id_t    id,
                          ...);
 
 #else  /* LOGGER_ENABLE */
-static inline logger_return_t __logger_ignore_ok(void) { return(LOGGER_OK); }
-static inline logger_return_t __logger_ignore_err(void) { return(LOGGER_ERR_UNKNOWN); }
-static inline logger_id_t __logger_ignore_id(void) { return(0); }
-static inline logger_bool_t __logger_ignore_true(void) { return(logger_true); }
-static inline logger_bool_t __logger_ignore_false(void) { return(logger_false); }
+static inline logger_return_t __logger_ignore_ok(void)
+{
+  return(LOGGER_OK);
+}
+
+
+static inline logger_return_t __logger_ignore_err(void)
+{
+  return(LOGGER_ERR_UNKNOWN);
+}
+
+
+static inline logger_id_t __logger_ignore_id(void)
+{
+  return(0);
+}
+
+
+static inline logger_bool_t __logger_ignore_true(void)
+{
+  return(logger_true);
+}
+
+
+static inline logger_bool_t __logger_ignore_false(void)
+{
+  return(logger_false);
+}
+
 
 #define logger_version()                                      (LOGGER_VERSION)
 #define logger_init()                                         __logger_ignore_ok()

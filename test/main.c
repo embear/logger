@@ -84,14 +84,14 @@ int main(int  argc,
   assert(LOGGER_OK == logger_output_register(stdout));
   assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
 
-  logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__);
-  logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__);
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
 
@@ -181,7 +181,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_disable());
   assert(logger_false == logger_is_enabled());
   puts("Logging disabled");
-  logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__);
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   assert(logger_false == logger_is_enabled());
   assert(LOGGER_OK == logger_enable());
   assert(logger_true == logger_is_enabled());
@@ -235,7 +235,7 @@ int main(int  argc,
 
   assert(LOGGER_OK == logger_output_register(stdout));
   assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
-  id = logger_id_request("logger_test_id");
+  id  = logger_id_request("logger_test_id");
   id2 = logger_id_request("logger_test_id");
   assert(id == id2);
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
@@ -596,14 +596,14 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 1"));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 2"));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 3\n"));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 1"));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 2"));
-  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   " - continued 3\n"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 1"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 2"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 3\n"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 1"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 2"));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG, " - continued 3\n"));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
@@ -733,11 +733,11 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
-  for(attr = LOGGER_ATTR_RESET; attr <= LOGGER_ATTR_HIDDEN; attr++)
+  for (attr = LOGGER_ATTR_RESET ; attr <= LOGGER_ATTR_HIDDEN ; attr++)
   {
-    for(bg_color = LOGGER_BG_BLACK; bg_color <= LOGGER_BG_WHITE; bg_color++)
+    for (bg_color = LOGGER_BG_BLACK ; bg_color <= LOGGER_BG_WHITE ; bg_color++)
     {
-      for(fg_color = LOGGER_FG_BLACK; fg_color <= LOGGER_FG_WHITE; fg_color++)
+      for (fg_color = LOGGER_FG_BLACK ; fg_color <= LOGGER_FG_WHITE ; fg_color++)
       {
         logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
         logger(id, LOGGER_DEBUG, "foreground: %d, background: %d, attr: %d  >>>>", fg_color, bg_color, attr);

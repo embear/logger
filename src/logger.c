@@ -103,7 +103,11 @@ static logger_color_string_t logger_level_colors[] =
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
 
-static logger_color_string_t logger_no_color = { "", ""}; /**< Empty color string */
+/** Empty color string */
+static logger_color_string_t logger_no_color =
+{
+  "", ""
+};
 
 
 /** ************************************************************************//**
@@ -236,7 +240,6 @@ static logger_bool_t __logger_output_common_is_registered(logger_output_t *outpu
       }
     }
   }
-
 
   return(ret);
 }
@@ -455,9 +458,9 @@ static logger_return_t __logger_output_common_level_set(logger_output_t      *ou
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_level_t __logger_output_common_level_get(logger_output_t      *outputs,
-                                                       const uint16_t       size,
-                                                       FILE                 *stream)
+static logger_level_t __logger_output_common_level_get(logger_output_t *outputs,
+                                                       const uint16_t  size,
+                                                       FILE            *stream)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
   int16_t        index;
@@ -643,7 +646,7 @@ logger_return_t __logger_output_flush(void)
  *
  * \return        Id number if ID is available, error code otherwise.
  ******************************************************************************/
-logger_id_t __logger_id_request(const char* name)
+logger_id_t __logger_id_request(const char *name)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -726,6 +729,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
       (id < LOGGER_IDS_MAX)) {
     if (logger_control[id].used == logger_true) {
       logger_control[id].count--;
+
       /* if this was the last ID */
       if (logger_control[id].count <= 0) {
         /* flush all streams */
@@ -912,7 +916,7 @@ logger_level_t __logger_id_level_get(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_prefix_set(const logger_id_t    id,
+logger_return_t __logger_id_prefix_set(const logger_id_t     id,
                                        const logger_prefix_t prefix)
 {
   logger_return_t ret = LOGGER_OK;
@@ -1510,9 +1514,9 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
 
   /* do some string manipulation */
   if (*message != NULL) {
-
     /* check for multi line message */
     message_end = rindex(*message, '\n');
+
     if (message_end != NULL) {
       /* '\n' -> will not be continued */
       logger_control[id].append = logger_false;
@@ -1556,8 +1560,8 @@ static inline logger_return_t __logger_output(logger_id_t     id,
                                               const char      *prefix,
                                               const char      *message)
 {
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
+  logger_return_t       ret = LOGGER_OK;
+  int16_t               index;
   logger_color_string_t *prefix_color;
   logger_color_string_t *message_color;
 
@@ -1567,7 +1571,6 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         (outputs[index].level > LOGGER_UNKNOWN) &&
         (outputs[index].level < LOGGER_MAX) &&
         (outputs[index].level <= level)) {
-
       /* set colors */
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
@@ -1577,6 +1580,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         else {
           prefix_color = &logger_no_color;
         }
+
         if (logger_color_enabled == logger_true) {
           message_color = &logger_control[id].color_string;
         }
@@ -1585,7 +1589,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         }
       }
       else {
-        prefix_color = &logger_no_color;
+        prefix_color  = &logger_no_color;
         message_color = &logger_no_color;
       }
 
@@ -1604,7 +1608,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         fputs(prefix, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+#endif  /* LOGGER_FORCE_FLUSH */
       }
 
       (void)fputs(prefix_color->end, outputs[index].stream);
@@ -1622,7 +1626,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         fputs(message, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+#endif  /* LOGGER_FORCE_FLUSH */
       }
 
       (void)fputs(message_color->end, outputs[index].stream);
@@ -1635,7 +1639,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         fputc('\n', outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
         (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+#endif  /* LOGGER_FORCE_FLUSH */
       }
     }
   }
