@@ -55,6 +55,28 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- color enable functions ....\n", test);
+  assert(logger_false == logger_color_enable());
+  assert(logger_false == logger_color_prefix_enable());
+  assert(LOGGER_OK == logger_color_enable());
+  assert(LOGGER_OK == logger_color_prefix_enable());
+  assert(logger_true == logger_color_is_enabled());
+  assert(logger_true == logger_color_prefix_is_enabled());
+  assert(LOGGER_OK == logger_color_disable());
+  assert(LOGGER_OK == logger_color_prefix_disable());
+  assert(logger_false == logger_color_is_enabled());
+  assert(logger_false == logger_color_prefix_is_enabled());
+  assert(LOGGER_OK == logger_color_enable());
+  assert(LOGGER_OK == logger_color_prefix_enable());
+  assert(logger_true == logger_color_is_enabled());
+  assert(logger_true == logger_color_prefix_is_enabled());
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- id not registered ....\n", test);
 
   puts("No log message will be shown because id is not registered");

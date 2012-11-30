@@ -10,8 +10,7 @@ Introduction
 
 Logger needs to be enabled using the global define `LOGGER_ENABLE` when
 compiling the sources. Otherwise all functions will be excluded from
-compilation. To get color support `LOGGER_COLORS` needs to be defined
-additionally.
+compilation.
 
 Logger supports multiple IDs. A logger ID is requested with a call to
 `logger_id_request()` and released with `logger_id_release()`. Multiple
@@ -80,7 +79,7 @@ Example
 Below is a basic example for using logger. Store it as `main.c` and compile
 with:
 
-`gcc -DLOGGER_ENABLE -DLOGGER_COLORS -Iinclude -o main main.c src/logger.c`
+`gcc -DLOGGER_ENABLE -Iinclude -o main main.c src/logger.c`
 
 ```c
 #include "logger.h"
@@ -111,6 +110,8 @@ int main(void)
   id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_INFO);
+  logger_color_enable();
+  logger_color_prefix_enable();
   logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
 
   /* do the logging */

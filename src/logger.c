@@ -42,7 +42,7 @@
 #define LOGGER_MESSAGE_STRING_MAX    (256)
 
 /** Length of logger color string including '\0' */
-#define LOGGER_COLOR_STRING_MAX    (16)
+#define LOGGER_COLOR_STRING_MAX      (16)
 
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
@@ -68,10 +68,12 @@ typedef struct  logger_control_s {
   logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
 
-static logger_bool_t    logger_initialized = logger_false;  /**< logger is initialized. */
-static logger_bool_t    logger_enabled;                     /**< Logger is enabled. */
-static logger_control_t logger_control[LOGGER_IDS_MAX];     /**< Control storage for possible IDs. */
-static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX]; /**< Storage for possible output streams. */
+static logger_bool_t    logger_initialized          = logger_false; /**< logger is initialized. */
+static logger_bool_t    logger_enabled              = logger_false; /**< Logger is enabled. */
+static logger_bool_t    logger_color_enabled        = logger_false; /**< Logger color is enabled. */
+static logger_bool_t    logger_color_prefix_enabled = logger_false; /**< Logger prefix color is enabled. */
+static logger_control_t logger_control[LOGGER_IDS_MAX];             /**< Control storage for possible IDs. */
+static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];         /**< Storage for possible output streams. */
 
 /** level to name translation */
 static char *logger_level_names[] =
@@ -90,7 +92,6 @@ static char *logger_level_names[] =
 /** level to color translation */
 static logger_color_string_t logger_level_colors[] =
 {
-#ifdef LOGGER_PREFIX_COLORS
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" == 0 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   == 1 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
   { "\x1B[0;30;47m", "\x1B[0m" }, /* Prefix color string for level "INFO"    == 2 -> LOGGER_BG_WHITE,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
@@ -100,17 +101,6 @@ static logger_color_string_t logger_level_colors[] =
   { "\x1B[0;30;43m", "\x1B[0m" }, /* Prefix color string for level "CRIT"    == 6 -> LOGGER_BG_BLUE,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   == 7 -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-#else /* LOGGER_PREFIX_COLORS */
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" },
-  { "", "" }
-#endif /* LOGGER_PREFIX_COLORS */
 };
 
 static logger_color_string_t logger_no_color = { "", ""}; /**< Empty color string */
@@ -143,10 +133,12 @@ logger_return_t __logger_init(void)
   logger_return_t ret = LOGGER_OK;
 
   if (logger_initialized == logger_false) {
-    logger_enabled = logger_true;
+    logger_initialized          = logger_true;
+    logger_enabled              = logger_true;
+    logger_color_enabled        = logger_false;
+    logger_color_prefix_enabled = logger_false;
     memset(logger_control, 0, sizeof(logger_control));
     memset(logger_outputs, 0, sizeof(logger_outputs));
-    logger_initialized = logger_true;
   }
 
   return(ret);
@@ -1152,6 +1144,100 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
 
 
 /** ************************************************************************//**
+ * \brief  Enable logger colors.
+ *
+ * Enable logger color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_enable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_enabled = logger_true;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Disable logger colors.
+ *
+ * Disable logger color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_disable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_enabled = logger_false;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Enable logger prefix colors.
+ *
+ * Enable logger prefix color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_prefix_enable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_prefix_enabled = logger_true;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Disable logger prefix colors.
+ *
+ * Disable logger prefix color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_prefix_disable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_prefix_enabled = logger_false;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the current enable state of logger colors.
+ *
+ * Query the current color enable state of logger.
+ *
+ * \return        \c logger_true if logger color is enabled, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_color_is_enabled(void)
+{
+  return(logger_color_enabled);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the current enable state of logger prefix colors.
+ *
+ * Query the current prefix color enable state of logger.
+ *
+ * \return        \c logger_true if logger prefix color is enabled, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_color_prefix_is_enabled(void)
+{
+  return(logger_color_prefix_enabled);
+}
+
+
+/** ************************************************************************//**
  * \brief  Change terminal text color and attributes.
  *
  * Change text color and attributes for all messages of given ID when they are
@@ -1176,15 +1262,9 @@ logger_return_t __logger_color_set(const logger_id_t        id,
   if ((id >= 0) &&
       (id < LOGGER_IDS_MAX) &&
       (logger_control[id].used == logger_true)) {
-#ifdef LOGGER_COLORS
     logger_control[id].color = logger_true;
     (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
     (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
-#else /* LOGGER_COLORS */
-    logger_control[id].color                 = logger_false;
-    logger_control[id].color_string.begin[0] = '\0';
-    logger_control[id].color_string.end[0]   = '\0';
-#endif /* LOGGER_COLORS */
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1491,8 +1571,18 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       /* set colors */
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
-        prefix_color = &logger_level_colors[level];
-        message_color = &logger_control[id].color_string;
+        if (logger_color_prefix_enabled == logger_true) {
+          prefix_color = &logger_level_colors[level];
+        }
+        else {
+          prefix_color = &logger_no_color;
+        }
+        if (logger_color_enabled == logger_true) {
+          message_color = &logger_control[id].color_string;
+        }
+        else {
+          message_color = &logger_no_color;
+        }
       }
       else {
         prefix_color = &logger_no_color;

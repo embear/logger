@@ -6,8 +6,6 @@ project(logger)
 
 # compile flag definition
 add_definitions(-DLOGGER_ENABLE)
-add_definitions(-DLOGGER_COLORS)
-add_definitions(-DLOGGER_PREFIX_COLORS)
 
 # destination of libraries
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
