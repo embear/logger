@@ -163,7 +163,7 @@ typedef enum logger_text_fg_e {
 #define logger_color_set(__id, __fg, __bg, __attr)             __logger_color_set(__id, __fg, __bg, __attr)
 #define logger_color_reset(__id)                               __logger_color_reset(__id)
 #define logger_level_name_get(__level)                         __logger_level_name_get(__level)
-#define logger(__id, __level, ...)                             __logger(__id, __level, __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define logger(__id, __level, ...)                             __logger(__id, __level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 logger_version_t __logger_version(void);
 logger_return_t __logger_init(void);
