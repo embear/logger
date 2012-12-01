@@ -67,12 +67,12 @@ typedef struct  logger_control_s {
   logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
 
-static logger_bool_t    logger_initialized          = logger_false; /**< logger is initialized. */
-static logger_bool_t    logger_enabled              = logger_false; /**< Logger is enabled. */
-static logger_bool_t    logger_color_enabled        = logger_false; /**< Logger color is enabled. */
-static logger_bool_t    logger_color_prefix_enabled = logger_false; /**< Logger prefix color is enabled. */
-static logger_control_t logger_control[LOGGER_IDS_MAX];             /**< Control storage for possible IDs. */
-static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];         /**< Storage for possible output streams. */
+static logger_bool_t    logger_initialized           = logger_false; /**< logger is initialized. */
+static logger_bool_t    logger_enabled               = logger_false; /**< Logger is enabled. */
+static logger_bool_t    logger_color_prefix_enabled  = logger_false; /**< Logger prefix color is enabled. */
+static logger_bool_t    logger_color_message_enabled = logger_false; /**< Logger message color is enabled. */
+static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Control storage for possible IDs. */
+static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible output streams. */
 
 /** level to name translation */
 static char *logger_level_names[] =
@@ -136,10 +136,10 @@ logger_return_t __logger_init(void)
   logger_return_t ret = LOGGER_OK;
 
   if (logger_initialized == logger_false) {
-    logger_initialized          = logger_true;
-    logger_enabled              = logger_true;
-    logger_color_enabled        = logger_false;
-    logger_color_prefix_enabled = logger_false;
+    logger_initialized           = logger_true;
+    logger_enabled               = logger_true;
+    logger_color_prefix_enabled  = logger_false;
+    logger_color_message_enabled = logger_false;
     memset(logger_control, 0, sizeof(logger_control));
     memset(logger_outputs, 0, sizeof(logger_outputs));
   }
@@ -1147,40 +1147,6 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
 
 
 /** ************************************************************************//**
- * \brief  Enable logger colors.
- *
- * Enable logger color output.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t __logger_color_enable(void)
-{
-  logger_return_t ret = LOGGER_OK;
-
-  logger_color_enabled = logger_true;
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Disable logger colors.
- *
- * Disable logger color output.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t __logger_color_disable(void)
-{
-  logger_return_t ret = LOGGER_OK;
-
-  logger_color_enabled = logger_false;
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
  * \brief  Enable logger prefix colors.
  *
  * Enable logger prefix color output.
@@ -1215,19 +1181,6 @@ logger_return_t __logger_color_prefix_disable(void)
 
 
 /** ************************************************************************//**
- * \brief  Query the current enable state of logger colors.
- *
- * Query the current color enable state of logger.
- *
- * \return        \c logger_true if logger color is enabled, logger_false otherwise
- ******************************************************************************/
-logger_bool_t __logger_color_is_enabled(void)
-{
-  return(logger_color_enabled);
-}
-
-
-/** ************************************************************************//**
  * \brief  Query the current enable state of logger prefix colors.
  *
  * Query the current prefix color enable state of logger.
@@ -1237,6 +1190,53 @@ logger_bool_t __logger_color_is_enabled(void)
 logger_bool_t __logger_color_prefix_is_enabled(void)
 {
   return(logger_color_prefix_enabled);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Enable logger message colors.
+ *
+ * Enable logger message color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_message_enable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_message_enabled = logger_true;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Disable logger message colors.
+ *
+ * Disable logger message color output.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_color_message_disable(void)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  logger_color_message_enabled = logger_false;
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the current enable state of logger message colors.
+ *
+ * Query the current color message enable state of logger.
+ *
+ * \return        \c logger_true if logger color is enabled, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_color_message_is_enabled(void)
+{
+  return(logger_color_message_enabled);
 }
 
 
@@ -1580,7 +1580,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
           prefix_color = &logger_no_color;
         }
 
-        if (logger_color_enabled == logger_true) {
+        if (logger_color_message_enabled == logger_true) {
           message_color = &logger_control[id].color_string;
         }
         else {
