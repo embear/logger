@@ -1592,11 +1592,6 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         message_color = &logger_no_color;
       }
 
-      (void)fputs(message_color->begin, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
-
       (void)fputs(prefix_color->begin, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
       (void)fflush(outputs[index].stream);
