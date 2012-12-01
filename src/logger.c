@@ -29,7 +29,7 @@
 #define LOGGER_ID_OUTPUTS_MAX        (4)
 
 /** Number of possible ids. */
-#define LOGGER_IDS_MAX               (256)
+#define LOGGER_IDS_MAX               (128)
 
 /** Length of logger ID name including '\0' */
 #define LOGGER_NAME_MAX              (256)
