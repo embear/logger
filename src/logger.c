@@ -1573,19 +1573,26 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       /* set colors */
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
-        if (logger_color_prefix_enabled == logger_true) {
-          prefix_color = &logger_level_colors[level];
-        }
-        else {
-          prefix_color = &logger_no_color;
-        }
-
+        /* message color */
         if (logger_color_message_enabled == logger_true) {
+          /* use ID message color */
           message_color = &logger_control[id].color_string;
         }
         else {
+          /* no color for message */
           message_color = &logger_no_color;
         }
+
+        /* prefix color */
+        if (logger_color_prefix_enabled == logger_true) {
+          /* use level severity color */
+          prefix_color = &logger_level_colors[level];
+        }
+        else {
+          /* use same color like message */
+          prefix_color = message_color;
+        }
+
       }
       else {
         prefix_color  = &logger_no_color;
