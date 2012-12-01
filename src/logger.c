@@ -12,7 +12,6 @@
  * \author Markus Braun
  ******************************************************************************/
 #include <string.h>
-#include <strings.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -1515,7 +1514,7 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
   /* do some string manipulation */
   if (*message != NULL) {
     /* check for multi line message */
-    message_end = rindex(*message, '\n');
+    message_end = strrchr(*message, '\n');
 
     if (message_end != NULL) {
       /* '\n' -> will not be continued */
@@ -1717,7 +1716,7 @@ logger_return_t __logger(logger_id_t    id,
               /* loop over all message parts */
               do {
                 /* search for the next linefeed */
-                message_end = index(message_part, '\n');
+                message_end = strchr(message_part, '\n');
 
                 if (message_end != NULL) {
                   /* replace linefeed with string end */
