@@ -736,6 +736,7 @@ int main(int  argc,
   puts("Other message");
   puts("Other message");
 
+  assert(LOGGER_OK == logger_color_message_disable());
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
 
@@ -779,6 +780,8 @@ int main(int  argc,
   assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__));
   assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
+  assert(LOGGER_OK == logger_color_prefix_disable());
+  assert(LOGGER_OK == logger_color_message_disable());
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
 
@@ -799,6 +802,7 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_color_message_enable());
 
   for (attr = LOGGER_ATTR_RESET ; attr <= LOGGER_ATTR_HIDDEN ; attr++)
   {
@@ -816,6 +820,7 @@ int main(int  argc,
     }
   }
 
+  assert(LOGGER_OK == logger_color_message_disable());
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
 
