@@ -21,6 +21,7 @@ int main(int  argc,
 {
   int                test = 0;
   FILE               *logger_stream;
+  FILE               *logger_stream2;
   logger_level_t     level;
   logger_prefix_t    prefix;
   logger_id_t        id  = logger_id_unknown;
@@ -515,6 +516,62 @@ int main(int  argc,
   assert(LOGGER_OK == logger_output_deregister(logger_stream));
   fclose(logger_stream);
   assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- output to stdout, global and id specific file ....\n", test);
+
+  puts("All log messages will be printed to stdout and appended to file \"logfile\", messages to id2 additionally to \"logfile2\"");
+
+  logger_stream = fopen("logfile", "w");
+  assert(LOGGER_OK == logger_output_register(logger_stream));
+  assert(LOGGER_OK == logger_output_level_set(logger_stream, LOGGER_DEBUG));
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_ERR));
+
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+
+  id2 = logger_id_request("logger_test_id2");
+  assert(LOGGER_OK == logger_id_enable(id2));
+  assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
+
+  logger_stream2 = fopen("logfile2", "w");
+  assert(LOGGER_OK == logger_id_output_register(id2, logger_stream2));
+  assert(LOGGER_OK == logger_id_output_level_set(id2, logger_stream2, LOGGER_NOTICE));
+
+  assert(LOGGER_OK == logger(id,  LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id,  __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id2, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_output_deregister(logger_stream));
+  assert(LOGGER_OK == logger_id_release(id));
+  assert(LOGGER_OK == logger_id_output_deregister(id2, logger_stream2));
+  assert(LOGGER_OK == logger_id_release(id2));
+  fclose(logger_stream);
+  fclose(logger_stream2);
 
   printf("Ending test %d ....\n", test);
 
