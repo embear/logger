@@ -1268,6 +1268,8 @@ logger_return_t __logger_color_set(const logger_id_t        id,
     logger_control[id].color = logger_true;
     (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
     (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
+    logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+    logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1] = '\0';
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
