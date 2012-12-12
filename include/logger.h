@@ -51,7 +51,7 @@ typedef enum logger_level_e {
   LOGGER_CRIT    = 6,  /**< Critical conditions. */
   LOGGER_ALERT   = 7,  /**< Action must be taken immediately. */
   LOGGER_EMERG   = 8,  /**< System is unusable. */
-  LOGGER_MAX           /**< Last entry, always! */
+  LOGGER_MAX     = 9   /**< Last entry, always! */
 } logger_level_t;
 
 typedef enum logger_prefix_e {
@@ -62,7 +62,7 @@ typedef enum logger_prefix_e {
   LOGGER_PREFIX_FUNCTION = 4, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:" */
   LOGGER_PREFIX_FILE     = 5, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:" */
   LOGGER_PREFIX_FULL     = 6, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE": */
-  LOGGER_PREFIX_MAX           /**< Last entry, always! */
+  LOGGER_PREFIX_MAX      = 7  /**< Last entry, always! */
 } logger_prefix_t;
 
 typedef int16_t  logger_id_t;                  /**< Logger ID type. */
