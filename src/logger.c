@@ -11,6 +11,9 @@
  * \brief  Logging facility for C.
  * \author Markus Braun
  ******************************************************************************/
+#include "logger.h"
+
+#ifdef LOGGER_ENABLE
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,9 +21,6 @@
 #include <unistd.h>
 #include <stddef.h>
 #include <fcntl.h>
-#include "logger.h"
-
-#ifdef LOGGER_ENABLE
 
 /** Number of possible simultaneous outputs. */
 #define LOGGER_OUTPUTS_MAX           (16)
