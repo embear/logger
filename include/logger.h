@@ -173,7 +173,7 @@ logger_return_t __logger_disable(void);
 logger_bool_t __logger_is_enabled(void);
 logger_return_t __logger_output_register(FILE *stream);
 logger_return_t __logger_output_deregister(FILE *stream);
-logger_return_t __logger_output_is_registered(FILE *stream);
+logger_bool_t __logger_output_is_registered(FILE *stream);
 logger_return_t __logger_output_level_set(FILE                 *stream,
                                           const logger_level_t level);
 logger_level_t __logger_output_level_get(FILE *stream);
