@@ -657,7 +657,7 @@ logger_id_t __logger_id_request(const char *name)
     found = logger_false;
 
     /* search for an already existing ID with the same name */
-    for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+    for (index = 0 ; index < LOGGER_IDS_MAX ; index++) {
       if (logger_control[index].used == logger_true) {
         if (strncmp(logger_control[index].name, name, LOGGER_NAME_MAX) == 0) {
           logger_control[index].count++;
@@ -669,7 +669,7 @@ logger_id_t __logger_id_request(const char *name)
 
     /* search for an available ID */
     if (found == logger_false) {
-      for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
+      for (index = 0 ; index < LOGGER_IDS_MAX ; index++) {
         if (logger_control[index].used == logger_false) {
           found = logger_true;
           /* reset the ID */
