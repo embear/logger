@@ -410,8 +410,8 @@ static logger_return_t __logger_output_common_level_set(logger_output_t      *ou
     /* check if outputs valid */
     if (outputs != NULL) {
       /* check for valid level */
-      if ((level >= LOGGER_DEBUG) &&
-          (level <= LOGGER_MAX)) {
+      if ((level > LOGGER_UNKNOWN) &&
+          (level < LOGGER_MAX)) {
         /* check if this output is already registered */
         found = logger_false;
         for (index = 0 ; index < size ; index++) {
@@ -862,8 +862,8 @@ logger_return_t __logger_id_level_set(const logger_id_t    id,
       (id < LOGGER_IDS_MAX) &&
       (logger_control[id].used == logger_true)) {
     /* check for valid level */
-    if ((level >= LOGGER_DEBUG) &&
-        (level <= LOGGER_MAX)) {
+    if ((level > LOGGER_UNKNOWN) &&
+        (level < LOGGER_MAX)) {
       /* set ID level */
       logger_control[id].level = level;
     }
@@ -1321,7 +1321,7 @@ const char *__logger_level_name_get(const logger_level_t level)
   const char *name = logger_level_names[0];
 
   /* check for valid ID */
-  if ((level >= 0) &&
+  if ((level > LOGGER_UNKNOWN) &&
       (level < LOGGER_MAX)) {
     /* get ID level */
     name = logger_level_names[level];
@@ -1693,8 +1693,8 @@ logger_return_t __logger(logger_id_t    id,
       (id < LOGGER_IDS_MAX) &&
       (logger_enabled == logger_true)) {
     /* check for valid level */
-    if ((level >= LOGGER_DEBUG) &&
-        (level <= LOGGER_MAX)) {
+    if ((level > LOGGER_UNKNOWN) &&
+        (level < LOGGER_MAX)) {
       /* check if file valid */
       if (file != NULL) {
         /* check if function valid */
