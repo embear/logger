@@ -75,7 +75,7 @@ static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Contro
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible output streams. */
 
 /** level to name translation */
-static char *logger_level_names[] =
+static const char *logger_level_names[] =
 {
   "UNKNOWN", /**< Name for level "UNKNOWN" == 0 */
   "DEBUG",   /**< Name for level "DEBUG"   == 1 */
@@ -1318,7 +1318,7 @@ logger_return_t __logger_color_reset(const logger_id_t id)
  ******************************************************************************/
 const char *__logger_level_name_get(const logger_level_t level)
 {
-  char *name = logger_level_names[0];
+  const char *name = logger_level_names[0];
 
   /* check for valid ID */
   if ((level >= 0) &&
