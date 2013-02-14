@@ -1357,7 +1357,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
   logger_return_t ret = LOGGER_OK;
   logger_bool_t   size_changed;
   uint16_t        size;
-  int16_t         characters;
+  int16_t         characters = 0;
 
   /* do prefix stuff only if needed */
   if (logger_control[id].append == logger_false) {
@@ -1467,7 +1467,7 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
   logger_return_t ret = LOGGER_OK;
   logger_bool_t   size_changed;
   uint16_t        size;
-  int16_t         characters;
+  int16_t         characters = 0;
   char            *message_end;
 
   /* calculate memory size */
