@@ -28,7 +28,7 @@
 /** Number of possible outputs per ID. */
 #define LOGGER_ID_OUTPUTS_MAX        (4)
 
-/** Number of possible ids. */
+/** Number of possible IDs. */
 #define LOGGER_IDS_MAX               (128)
 
 /** Length of logger ID name including '\0' */
@@ -164,7 +164,7 @@ logger_bool_t __logger_is_initialized(void)
 /** ************************************************************************//**
  * \brief  Enable logger.
  *
- * Enable logger globally for all ids and all outputs.
+ * Enable logger globally for all IDs and all outputs.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -181,7 +181,7 @@ logger_return_t __logger_enable(void)
 /** ************************************************************************//**
  * \brief  Disable logger.
  *
- * Disable logger globally for all ids and all outputs.
+ * Disable logger globally for all IDs and all outputs.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -643,7 +643,7 @@ logger_return_t __logger_output_flush(void)
  *
  * \param[in]     name    Symbolic name for the ID.
  *
- * \return        Id number if ID is available, error code otherwise.
+ * \return        ID number if ID is available, error code otherwise.
  ******************************************************************************/
 logger_id_t __logger_id_request(const char *name)
 {
