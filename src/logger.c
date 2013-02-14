@@ -547,7 +547,7 @@ logger_return_t __logger_output_deregister(FILE *stream)
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_return_t __logger_output_is_registered(FILE *stream)
+logger_bool_t __logger_output_is_registered(FILE *stream)
 {
   logger_bool_t ret = logger_false;
 
