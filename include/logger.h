@@ -219,7 +219,7 @@ logger_return_t __logger(logger_id_t    id,
                          const char     *function,
                          uint32_t       line,
                          const char     *format,
-                         ...);
+                         ...) __attribute__((format(printf, 6, 7)));
 
 #else  /* LOGGER_ENABLE */
 static inline logger_return_t __logger_ignore_ok(void)
