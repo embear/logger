@@ -208,8 +208,8 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
                                             FILE              *stream);
 logger_return_t __logger_id_output_deregister(const logger_id_t id,
                                               FILE              *stream);
-logger_return_t __logger_id_output_is_registered(const logger_id_t id,
-                                                 FILE              *stream);
+logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
+                                               FILE              *stream);
 logger_return_t __logger_id_output_level_set(const logger_id_t    id,
                                              FILE                 *stream,
                                              const logger_level_t level);

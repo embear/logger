@@ -504,11 +504,11 @@ static logger_level_t __logger_output_common_level_get(logger_output_t *outputs,
       }
     }
     else {
-      ret = LOGGER_ERR_OUTPUT_INVALID;
+      ret = LOGGER_UNKNOWN;
     }
   }
   else {
-    ret = LOGGER_ERR_STREAM_INVALID;
+    ret = LOGGER_UNKNOWN;
   }
 
   return(ret);
@@ -666,9 +666,9 @@ logger_return_t __logger_output_flush(void)
  ******************************************************************************/
 logger_id_t __logger_id_request(const char *name)
 {
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
-  logger_bool_t   found;
+  logger_id_t   id = logger_id_unknown;
+  int16_t       index;
+  logger_bool_t found;
 
   /* check validity of name */
   if (name != NULL) {
@@ -715,17 +715,17 @@ logger_id_t __logger_id_request(const char *name)
 
     /* found an empty slot */
     if (found == logger_true) {
-      ret = index;
+      id = (logger_id_t)index;
     }
     else {
-      ret = LOGGER_ERR_IDS_FULL;
+      id = logger_id_unknown;
     }
   }
   else {
-    ret = LOGGER_ERR_NAME_INVALID;
+    id = logger_id_unknown;
   }
 
-  return(ret);
+  return(id);
 }
 
 
@@ -1082,7 +1082,7 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_return_t __logger_id_output_is_registered(const logger_id_t id,
+logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
                                                  FILE              *stream)
 {
   logger_bool_t ret = logger_false;
@@ -1095,7 +1095,7 @@ logger_return_t __logger_id_output_is_registered(const logger_id_t id,
     ret = __logger_output_common_is_registered(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
   }
   else {
-    ret = LOGGER_ERR_ID_UNKNOWN;
+    ret = logger_false;
   }
 
   return(ret);
@@ -1158,7 +1158,7 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
     ret = __logger_output_common_level_get(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
   }
   else {
-    ret = LOGGER_ERR_ID_UNKNOWN;
+    ret = LOGGER_UNKNOWN;
   }
 
   return(ret);
