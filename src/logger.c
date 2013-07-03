@@ -24,58 +24,58 @@
 
 /** Number of possible simultaneous outputs. */
 #ifndef LOGGER_OUTPUTS_MAX
-#define LOGGER_OUTPUTS_MAX           (16)
+#define LOGGER_OUTPUTS_MAX             (16)
 #endif /* LOGGER_OUTPUTS_MAX */
 
 /** Number of possible output streams per ID. */
 #ifndef LOGGER_ID_OUTPUTS_MAX
-#define LOGGER_ID_OUTPUTS_MAX        (4)
+#define LOGGER_ID_OUTPUTS_MAX          (4)
 #endif /* LOGGER_ID_OUTPUTS_MAX */
 
 /** Number of possible IDs. */
 #ifndef LOGGER_IDS_MAX
-#define LOGGER_IDS_MAX               (128)
+#define LOGGER_IDS_MAX                 (128)
 #endif /* LOGGER_IDS_MAX */
 
 /** Length of logger ID name including '\0' */
 #ifndef LOGGER_NAME_MAX
-#define LOGGER_NAME_MAX              (256)
+#define LOGGER_NAME_MAX                (256)
 #endif /* LOGGER_NAME_MAX */
 
 /** Initial length of logger prefix string including '\0' */
 #ifndef LOGGER_PREFIX_STRING_MAX
-#define LOGGER_PREFIX_STRING_MAX     (256)
+#define LOGGER_PREFIX_STRING_MAX       (256)
 #endif /* LOGGER_PREFIX_STRING_MAX */
 
 /** Initial length of logger message string including '\0' */
 #ifndef LOGGER_MESSAGE_STRING_MAX
-#define LOGGER_MESSAGE_STRING_MAX    (256)
+#define LOGGER_MESSAGE_STRING_MAX      (256)
 #endif /* LOGGER_MESSAGE_STRING_MAX */
 
 /** Length of logger color string including '\0' */
 #ifndef LOGGER_COLOR_STRING_MAX
-#define LOGGER_COLOR_STRING_MAX      (16)
+#define LOGGER_COLOR_STRING_MAX        (16)
 #endif /* LOGGER_COLOR_STRING_MAX */
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
-#define LOGGER_PREFIX_STANDARD LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
+#define LOGGER_PREFIX_STANDARD       LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
 #endif /* LOGGER_PREFIX_STANDARD */
 
 /** Format sting for prefix file name */
-#define LOGGER_FORMAT_STRING_FILE "%30s"
+#define LOGGER_FORMAT_STRING_FILE      "%30s"
 
 /** Format sting for prefix function name */
-#define LOGGER_FORMAT_STRING_FUNCTION "%30s()"
+#define LOGGER_FORMAT_STRING_FUNCTION  "%30s()"
 
 /** Format sting for prefix line number */
-#define LOGGER_FORMAT_STRING_LINE "%5d"
+#define LOGGER_FORMAT_STRING_LINE      "%5d"
 
 /** Format sting for prefix logger id name */
-#define LOGGER_FORMAT_STRING_NAME "%15s"
+#define LOGGER_FORMAT_STRING_NAME      "%15s"
 
 /** Format sting for prefix logger id level name */
-#define LOGGER_FORMAT_STRING_LEVEL "%7s"
+#define LOGGER_FORMAT_STRING_LEVEL     "%7s"
 
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
