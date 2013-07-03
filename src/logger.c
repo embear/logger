@@ -23,25 +23,39 @@
 #include <fcntl.h>
 
 /** Number of possible simultaneous outputs. */
+#ifndef LOGGER_OUTPUTS_MAX
 #define LOGGER_OUTPUTS_MAX           (16)
+#endif /* LOGGER_OUTPUTS_MAX */
 
 /** Number of possible output streams per ID. */
+#ifndef LOGGER_ID_OUTPUTS_MAX
 #define LOGGER_ID_OUTPUTS_MAX        (4)
+#endif /* LOGGER_ID_OUTPUTS_MAX */
 
 /** Number of possible IDs. */
+#ifndef LOGGER_IDS_MAX
 #define LOGGER_IDS_MAX               (128)
+#endif /* LOGGER_IDS_MAX */
 
 /** Length of logger ID name including '\0' */
+#ifndef LOGGER_NAME_MAX
 #define LOGGER_NAME_MAX              (256)
+#endif /* LOGGER_NAME_MAX */
 
 /** Initial length of logger prefix string including '\0' */
+#ifndef LOGGER_PREFIX_STRING_MAX
 #define LOGGER_PREFIX_STRING_MAX     (256)
+#endif /* LOGGER_PREFIX_STRING_MAX */
 
 /** Initial length of logger message string including '\0' */
+#ifndef LOGGER_MESSAGE_STRING_MAX
 #define LOGGER_MESSAGE_STRING_MAX    (256)
+#endif /* LOGGER_MESSAGE_STRING_MAX */
 
 /** Length of logger color string including '\0' */
+#ifndef LOGGER_COLOR_STRING_MAX
 #define LOGGER_COLOR_STRING_MAX      (16)
+#endif /* LOGGER_COLOR_STRING_MAX */
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
