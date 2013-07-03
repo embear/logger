@@ -43,6 +43,11 @@
 /** Length of logger color string including '\0' */
 #define LOGGER_COLOR_STRING_MAX      (16)
 
+/** Standard prefix */
+#ifndef LOGGER_PREFIX_STANDARD
+#define LOGGER_PREFIX_STANDARD LOGGER_PREFIX_FUNCTION
+#endif /* LOGGER_PREFIX_STANDARD */
+
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
   logger_level_t level;   /**< Level for this stream. */
@@ -680,7 +685,7 @@ logger_id_t __logger_id_request(const char *name)
           logger_control[index].count                 = 1;
           logger_control[index].enabled               = logger_false;
           logger_control[index].level                 = LOGGER_UNKNOWN;
-          logger_control[index].prefix                = LOGGER_PREFIX_FUNCTION;
+          logger_control[index].prefix                = LOGGER_PREFIX_STANDARD;
           logger_control[index].color                 = logger_false;
           logger_control[index].color_string.begin[0] = '\0';
           logger_control[index].color_string.end[0]   = '\0';
@@ -742,7 +747,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
         logger_control[id].count                 = 0;
         logger_control[id].enabled               = logger_false;
         logger_control[id].level                 = LOGGER_UNKNOWN;
-        logger_control[id].prefix                = LOGGER_PREFIX_FUNCTION;
+        logger_control[id].prefix                = LOGGER_PREFIX_STANDARD;
         logger_control[id].color                 = logger_false;
         logger_control[id].color_string.begin[0] = '\0';
         logger_control[id].color_string.end[0]   = '\0';
