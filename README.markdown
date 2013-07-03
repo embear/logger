@@ -110,8 +110,8 @@ int main(void)
   id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_INFO);
-  logger_color_enable();
   logger_color_prefix_enable();
+  logger_color_message_enable();
   logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
 
   /* do the logging */
