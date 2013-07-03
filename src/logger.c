@@ -1366,6 +1366,35 @@ const char *__logger_level_name_get(const logger_level_t level)
 
 
 /** ************************************************************************//**
+ * \brief  strip path from file name.
+ *
+ * Strip path from a fully qualified file name. Returns pointer to string part
+ * after last separator.
+ *
+ * \param[in]     file    File name containing path
+ *
+ * \return        Pointer to file name.
+ ******************************************************************************/
+static inline const char *__logger_strip_path(const char *file)
+{
+  const char *basename;
+
+  /* find last separator */
+  basename = strrchr(file, '/');
+  if (basename != NULL) {
+    /* eat last separator */
+    basename++;
+  }
+  else {
+    /* unable to find separator, use whole file name */
+    basename = file;
+  }
+
+  return(basename);
+}
+
+
+/** ************************************************************************//**
  * \brief  Format message prefix
  *
  * Allocate memory for prefix and print prefix to allocated memory.
@@ -1424,7 +1453,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   LOGGER_FORMAT_STRING_FUNCTION ":"
                                   LOGGER_FORMAT_STRING_LINE ":"
                                   " ",
-                                  file,
+                                  __logger_strip_path(file),
                                   function,
                                   line);
             break;
@@ -1434,7 +1463,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   LOGGER_FORMAT_STRING_FILE ":"
                                   LOGGER_FORMAT_STRING_LINE ":"
                                   " ",
-                                  file,
+                                  __logger_strip_path(file),
                                   line);
             break;
 
@@ -1462,7 +1491,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   LOGGER_FORMAT_STRING_LINE ":"
                                   " ",
                                   __logger_id_name_get(id),
-                                  file,
+                                  __logger_strip_path(file),
                                   function,
                                   line);
             break;
@@ -1474,7 +1503,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   LOGGER_FORMAT_STRING_LINE ":"
                                   " ",
                                   __logger_id_name_get(id),
-                                  file,
+                                  __logger_strip_path(file),
                                   line);
             break;
 
@@ -1508,7 +1537,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   " ",
                                   __logger_id_name_get(id),
                                   __logger_level_name_get(level),
-                                  file,
+                                  __logger_strip_path(file),
                                   function,
                                   line);
             break;
@@ -1522,7 +1551,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                                   " ",
                                   __logger_id_name_get(id),
                                   __logger_level_name_get(level),
-                                  file,
+                                  __logger_strip_path(file),
                                   line);
             break;
 
