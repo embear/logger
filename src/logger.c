@@ -59,7 +59,7 @@
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
-#define LOGGER_PREFIX_STANDARD LOGGER_PREFIX_FUNCTION
+#define LOGGER_PREFIX_STANDARD LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
 #endif /* LOGGER_PREFIX_STANDARD */
 
 typedef struct logger_output_s {
@@ -1403,24 +1403,48 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
             characters = 0;
             break;
 
+          case LOGGER_PREFIX_FILE_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%30s:%30s():%5d: ", file, function, line);
+            break;
+
+          case LOGGER_PREFIX_FILE_LINE:
+            characters = snprintf(*prefix, size, "%30s:%5d: ", file, line);
+            break;
+
+          case LOGGER_PREFIX_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%30s():%5d: ", function, line);
+            break;
+
           case LOGGER_PREFIX_NAME:
             characters = snprintf(*prefix, size, "%15s: ", __logger_id_name_get(id));
             break;
 
-          case LOGGER_PREFIX_SHORT:
+          case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%15s:%30s:%30s():%5d: ", __logger_id_name_get(id), file, function, line);
+            break;
+
+          case LOGGER_PREFIX_NAME_FILE_LINE:
+            characters = snprintf(*prefix, size, "%15s:%30s:%5d: ", __logger_id_name_get(id), file, line);
+            break;
+
+          case LOGGER_PREFIX_NAME_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%15s:%30s():%5d: ", __logger_id_name_get(id), function, line);
+            break;
+
+          case LOGGER_PREFIX_NAME_LEVEL:
             characters = snprintf(*prefix, size, "%15s:%7s: ", __logger_id_name_get(id), __logger_level_name_get(level));
             break;
 
-          case LOGGER_PREFIX_FUNCTION:
-            characters = snprintf(*prefix, size, "%15s:%7s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), function, line);
+          case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%15s:%7s:%30s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), file, function, line);
             break;
 
-          case LOGGER_PREFIX_FILE:
+          case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
             characters = snprintf(*prefix, size, "%15s:%7s:%30s:%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), file, line);
             break;
 
-          case LOGGER_PREFIX_FULL:
-            characters = snprintf(*prefix, size, "%15s:%7s:%30s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), file, function, line);
+          case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
+            characters = snprintf(*prefix, size, "%15s:%7s:%30s():%5d: ", __logger_id_name_get(id), __logger_level_name_get(level), function, line);
             break;
 
           case LOGGER_PREFIX_MAX:

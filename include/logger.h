@@ -55,15 +55,27 @@ typedef enum logger_level_e {
 } logger_level_t;
 
 typedef enum logger_prefix_e {
-  LOGGER_PREFIX_UNKNOWN  = 0, /**< Unknown prefix. */
-  LOGGER_PREFIX_EMPTY    = 1, /**< Prefix "" */
-  LOGGER_PREFIX_NAME     = 2, /**< Prefix "LOGGER_ID_NAME:" */
-  LOGGER_PREFIX_SHORT    = 3, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:" */
-  LOGGER_PREFIX_FUNCTION = 4, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:" */
-  LOGGER_PREFIX_FILE     = 5, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:" */
-  LOGGER_PREFIX_FULL     = 6, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE": */
-  LOGGER_PREFIX_MAX      = 7  /**< Last entry, always! */
+  LOGGER_PREFIX_UNKNOWN                       =  0, /**< Unknown prefix. */
+  LOGGER_PREFIX_EMPTY                         =  1, /**< Prefix "" */
+  LOGGER_PREFIX_FILE_FUNCTION_LINE            =  2, /**< Prefix "FILE:FUNCTION:LINE:" */
+  LOGGER_PREFIX_FILE_LINE                     =  3, /**< Prefix "FILE:LINE:" */
+  LOGGER_PREFIX_FUNCTION_LINE                 =  4, /**< Prefix "FUNCTION:LINE:" */
+  LOGGER_PREFIX_NAME                          =  5, /**< Prefix "LOGGER_ID_NAME:" */
+  LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE       =  6, /**< Prefix "LOGGER_ID_NAME:FILE:FUNCTION:LINE:" */
+  LOGGER_PREFIX_NAME_FILE_LINE                =  7, /**< Prefix "LOGGER_ID_NAME:FILE:LINE:" */
+  LOGGER_PREFIX_NAME_FUNCTION_LINE            =  8, /**< Prefix "LOGGER_ID_NAME:FUNCTION:LINE:" */
+  LOGGER_PREFIX_NAME_LEVEL                    =  9, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:" */
+  LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE = 10, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE": */
+  LOGGER_PREFIX_NAME_LEVEL_FILE_LINE          = 11, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:" */
+  LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE      = 12, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:" */
+  LOGGER_PREFIX_MAX                           = 13  /**< Last entry, always! */
 } logger_prefix_t;
+
+/* legacy defines */
+#define LOGGER_PREFIX_SHORT    LOGGER_PREFIX_NAME_LEVEL
+#define LOGGER_PREFIX_FUNCTION LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
+#define LOGGER_PREFIX_FILE     LOGGER_PREFIX_NAME_LEVEL_FILE_LINE
+#define LOGGER_PREFIX_FULL     LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE
 
 typedef int16_t  logger_id_t;                  /**< Logger ID type. */
 
