@@ -24,15 +24,15 @@ extern "C" {
 #define LOGGER_STRINGIFY_(x)    # x
 #define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
 
-#define LOGGER_VERSION_MAJOR    (255)
-#define LOGGER_VERSION_MINOR    (255)
-#define LOGGER_VERSION_PATCH    (255)
+#define LOGGER_VERSION_MAJOR    255
+#define LOGGER_VERSION_MINOR    255
+#define LOGGER_VERSION_PATCH    255
 #define LOGGER_VERSION          ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
-#define LOGGER_VERSION_STRING   LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "."LOGGER_STRINGIFY (LOGGER_VERSION_MINOR)"."LOGGER_STRINGIFY (LOGGER_VERSION_PATCH)
+#define LOGGER_VERSION_STRING   LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "." LOGGER_STRINGIFY(LOGGER_VERSION_MINOR) "." LOGGER_STRINGIFY(LOGGER_VERSION_PATCH)
 
 typedef uint32_t logger_version_t; /**< Logger version type. */
 
-typedef uint8_t  logger_bool_t;            /**< Logger boolean type. */
+typedef uint8_t  logger_bool_t;    /**< Logger boolean type. */
 
 /** Logger boolean true. */
 #define logger_true     ((logger_bool_t)1)
