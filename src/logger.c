@@ -25,7 +25,7 @@
 /** Number of possible simultaneous outputs. */
 #define LOGGER_OUTPUTS_MAX           (16)
 
-/** Number of possible outputs per ID. */
+/** Number of possible output streams per ID. */
 #define LOGGER_ID_OUTPUTS_MAX        (4)
 
 /** Number of possible IDs. */
@@ -1346,9 +1346,9 @@ const char *__logger_level_name_get(const logger_level_t level)
  * \param[in]     id        ID outputting this message.
  * \param[out]    prefix    Formatted message prefix.
  * \param[in]     level     Level of this message.
- * \param[in]     file      Name of file where this call happend.
- * \param[in]     function  Name of function where this call happend.
- * \param[in]     line      Line where this call happend.
+ * \param[in]     file      Name of file where this call happened.
+ * \param[in]     function  Name of function where this call happened.
+ * \param[in]     line      Line where this call happened.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/

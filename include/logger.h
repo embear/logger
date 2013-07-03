@@ -66,7 +66,9 @@ typedef enum logger_prefix_e {
 } logger_prefix_t;
 
 typedef int16_t  logger_id_t;                  /**< Logger ID type. */
-#define logger_id_unknown    ((logger_id_t)-1) /**< Unknown logger ID. */
+
+/** Unknown logger ID. */
+#define logger_id_unknown    ((logger_id_t)-1)
 
 
 typedef enum logger_return_e {
