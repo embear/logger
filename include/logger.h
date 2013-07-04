@@ -41,6 +41,7 @@ typedef uint8_t  logger_bool_t;    /**< Logger boolean type. */
 #define logger_false    ((logger_bool_t)0)
 
 
+/** log level type */
 typedef enum logger_level_e {
   LOGGER_UNKNOWN = 0,  /**< Unknown level. */
   LOGGER_DEBUG   = 1,  /**< Debug-level message. */
@@ -77,12 +78,14 @@ typedef enum logger_prefix_e {
 #define LOGGER_PREFIX_FILE     LOGGER_PREFIX_NAME_LEVEL_FILE_LINE
 #define LOGGER_PREFIX_FULL     LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE
 
-typedef int16_t  logger_id_t;                  /**< Logger ID type. */
+/** Logger ID type. */
+typedef int16_t  logger_id_t;
 
 /** Unknown logger ID. */
 #define logger_id_unknown    ((logger_id_t)-1)
 
 
+/** logger function return codes */
 typedef enum logger_return_e {
   LOGGER_OK                    =   0,   /**< Ok. */
   LOGGER_ERR_UNKNOWN           =  -1,   /**< Unspecified error. */
