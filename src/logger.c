@@ -139,12 +139,6 @@ static logger_color_string_t logger_level_colors[] =
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
 
-/** Empty color string */
-static logger_color_string_t logger_no_color =
-{
-  "", ""
-};
-
 
 /** ************************************************************************//**
  * \brief  Version of logger.
@@ -1702,6 +1696,10 @@ static inline logger_return_t __logger_output(logger_id_t     id,
   int16_t               index;
   logger_color_string_t *prefix_color;
   logger_color_string_t *message_color;
+  logger_bool_t         prefix_color_print_begin;
+  logger_bool_t         prefix_color_print_end;
+  logger_bool_t         message_color_print_begin;
+  logger_bool_t         message_color_print_end;
 
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
@@ -1713,35 +1711,59 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
         /* message color */
-        if (logger_color_message_enabled == logger_true) {
-          /* use ID message color */
-          message_color = &logger_control[id].color_string;
+        if (logger_color_prefix_enabled == logger_false &&
+            logger_color_message_enabled == logger_false) {
+          prefix_color_print_begin  = logger_false;
+          prefix_color_print_end    = logger_false;
+          message_color_print_begin = logger_false;
+          message_color_print_end   = logger_false;
         }
         else {
-          /* no color for message */
-          message_color = &logger_no_color;
+          if (logger_color_prefix_enabled == logger_true &&
+              logger_color_message_enabled == logger_false) {
+            prefix_color_print_begin  = logger_true;
+            prefix_color_print_end    = logger_true;
+            message_color_print_begin = logger_false;
+            message_color_print_end   = logger_false;
+            prefix_color = &logger_level_colors[level];
+          }
+          else {
+            if (logger_color_prefix_enabled == logger_false &&
+                logger_color_message_enabled == logger_true) {
+              prefix_color_print_begin  = logger_true;
+              prefix_color_print_end    = logger_false;
+              message_color_print_begin = logger_false;
+              message_color_print_end   = logger_true;
+              prefix_color = &logger_control[id].color_string;
+              message_color = &logger_control[id].color_string;
+            }
+            else {
+              if (logger_color_prefix_enabled == logger_true &&
+                  logger_color_message_enabled == logger_true) {
+                prefix_color_print_begin  = logger_true;
+                prefix_color_print_end    = logger_true;
+                message_color_print_begin = logger_true;
+                message_color_print_end   = logger_true;
+                prefix_color = &logger_level_colors[level];
+                message_color = &logger_control[id].color_string;
+              }
+              else {
+                prefix_color_print_begin  = logger_false;
+                prefix_color_print_end    = logger_false;
+                message_color_print_begin = logger_false;
+                message_color_print_end   = logger_false;
+              }
+            }
+          }
         }
-
-        /* prefix color */
-        if (logger_color_prefix_enabled == logger_true) {
-          /* use level severity color */
-          prefix_color = &logger_level_colors[level];
-        }
-        else {
-          /* use same color like message */
-          prefix_color = message_color;
-        }
-
       }
-      else {
-        prefix_color  = &logger_no_color;
-        message_color = &logger_no_color;
-      }
 
-      (void)fputs(prefix_color->begin, outputs[index].stream);
+      if (prefix_color_print_begin == logger_true) {
+        (void)fputs(prefix_color->begin, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
+        (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
+      }
 
       /* actually output prefix */
       if (prefix != NULL) {
@@ -1751,15 +1773,19 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 #endif  /* LOGGER_FORCE_FLUSH */
       }
 
-      (void)fputs(prefix_color->end, outputs[index].stream);
+      if (prefix_color_print_end == logger_true) {
+        (void)fputs(prefix_color->end, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
+        (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
+      }
 
-      (void)fputs(message_color->begin, outputs[index].stream);
+      if (message_color_print_begin == logger_true) {
+        (void)fputs(message_color->begin, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
+        (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
+      }
 
       /* actually output message */
       if (message != NULL) {
@@ -1769,10 +1795,12 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 #endif  /* LOGGER_FORCE_FLUSH */
       }
 
-      (void)fputs(message_color->end, outputs[index].stream);
+      if (message_color_print_end == logger_true) {
+        (void)fputs(message_color->end, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
+        (void)fflush(outputs[index].stream);
 #endif /* LOGGER_FORCE_FLUSH */
+      }
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].append == logger_false) {
