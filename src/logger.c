@@ -107,6 +107,9 @@ static logger_bool_t    logger_color_prefix_enabled  = logger_false; /**< Logger
 static logger_bool_t    logger_color_message_enabled = logger_false; /**< Logger message color is enabled. */
 static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Control storage for possible IDs. */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible output streams. */
+static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];     /**< Storage for prefix string */
+static char             logger_message[LOGGER_MESSAGE_STRING_MAX];   /**< Storage for message string */
+
 
 /** level to name translation */
 static const char *logger_level_names[] =
@@ -176,6 +179,8 @@ logger_return_t __logger_init(void)
     logger_color_message_enabled = logger_false;
     memset(logger_control, 0, sizeof(logger_control));
     memset(logger_outputs, 0, sizeof(logger_outputs));
+    memset(logger_message, 0, sizeof(logger_message));
+    memset(logger_prefix, 0, sizeof(logger_prefix));
   }
 
   return(ret);
@@ -1401,207 +1406,194 @@ static inline const char *__logger_strip_path(const char *file)
  *
  * Memory needs to be deallocated using free() when the sting is not needed anymore.
  *
- * \param[in]     id        ID outputting this message.
- * \param[out]    prefix    Formatted message prefix.
- * \param[in]     level     Level of this message.
- * \param[in]     file      Name of file where this call happened.
- * \param[in]     function  Name of function where this call happened.
- * \param[in]     line      Line where this call happened.
+ * \param[in]     id           ID outputting this message.
+ * \param[out]    prefix       Formatted message prefix.
+ * \param[in]     prefix_size  String length of formatted message prefix.
+ * \param[in]     level        Level of this message.
+ * \param[in]     file         Name of file where this call happened.
+ * \param[in]     function     Name of function where this call happened.
+ * \param[in]     line         Line where this call happened.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 static inline logger_return_t __logger_format_prefix(logger_id_t    id,
-                                                     char           **prefix,
+                                                     char           *prefix,
+                                                     uint16_t       prefix_size,
                                                      logger_level_t level,
                                                      const char     *file,
                                                      const char     *function,
                                                      uint32_t       line)
 {
-  logger_return_t ret = LOGGER_OK;
-  logger_bool_t   size_changed;
-  uint16_t        size;
+  logger_return_t ret        = LOGGER_OK;
   int16_t         characters = 0;
+  uint16_t        rev_idx;
 
-  /* do prefix stuff only if needed */
-  if (logger_control[id].append == logger_false) {
-    /* calculate memory size */
-    size = LOGGER_PREFIX_STRING_MAX * sizeof(char);
+  /* print prefix to string */
+  if (prefix != NULL) {
+    /* do prefix stuff only if needed */
+    if (logger_control[id].append == logger_false) {
+      switch (logger_control[id].prefix) {
+        case LOGGER_PREFIX_UNKNOWN:
+          /* empty */
+          prefix[0] = '\0';
+          characters = 0;
+          break;
 
-    /* allocate storage for prefix */
-    *prefix = (char *)malloc(size);
+        case LOGGER_PREFIX_EMPTY:
+          /* empty */
+          prefix[0] = '\0';
+          characters = 0;
+          break;
 
-    /* loop until storage is large enough */
-    do {
-      /* print prefix to string */
-      if (*prefix != NULL) {
-        switch (logger_control[id].prefix) {
-          case LOGGER_PREFIX_UNKNOWN:
-            /* empty */
-            *prefix[0] = '\0';
-            characters = 0;
-            break;
+        case LOGGER_PREFIX_FILE_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_strip_path(file),
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_EMPTY:
-            /* empty */
-            *prefix[0] = '\0';
-            characters = 0;
-            break;
+        case LOGGER_PREFIX_FILE_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_strip_path(file),
+                                line);
+          break;
 
-          case LOGGER_PREFIX_FILE_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_strip_path(file),
-                                  function,
-                                  line);
-            break;
+        case LOGGER_PREFIX_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_FILE_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_strip_path(file),
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                " ",
+                                __logger_id_name_get(id));
+          break;
 
-          case LOGGER_PREFIX_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  function,
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_strip_path(file),
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  " ",
-                                  __logger_id_name_get(id));
-            break;
+        case LOGGER_PREFIX_NAME_FILE_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_strip_path(file),
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_strip_path(file),
-                                  function,
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME_FILE_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_strip_path(file),
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME_LEVEL:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_LEVEL ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_level_name_get(level));
+          break;
 
-          case LOGGER_PREFIX_NAME_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  function,
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_LEVEL ":"
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_level_name_get(level),
+                                __logger_strip_path(file),
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME_LEVEL:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_LEVEL ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_level_name_get(level));
-            break;
+        case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_LEVEL ":"
+                                LOGGER_FORMAT_STRING_FILE ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_level_name_get(level),
+                                __logger_strip_path(file),
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_LEVEL ":"
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_level_name_get(level),
-                                  __logger_strip_path(file),
-                                  function,
-                                  line);
-            break;
+        case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
+          characters = snprintf(prefix, prefix_size,
+                                LOGGER_FORMAT_STRING_NAME ":"
+                                LOGGER_FORMAT_STRING_LEVEL ":"
+                                LOGGER_FORMAT_STRING_FUNCTION ":"
+                                LOGGER_FORMAT_STRING_LINE ":"
+                                " ",
+                                __logger_id_name_get(id),
+                                __logger_level_name_get(level),
+                                function,
+                                line);
+          break;
 
-          case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_LEVEL ":"
-                                  LOGGER_FORMAT_STRING_FILE ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_level_name_get(level),
-                                  __logger_strip_path(file),
-                                  line);
-            break;
-
-          case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
-            characters = snprintf(*prefix, size,
-                                  LOGGER_FORMAT_STRING_NAME ":"
-                                  LOGGER_FORMAT_STRING_LEVEL ":"
-                                  LOGGER_FORMAT_STRING_FUNCTION ":"
-                                  LOGGER_FORMAT_STRING_LINE ":"
-                                  " ",
-                                  __logger_id_name_get(id),
-                                  __logger_level_name_get(level),
-                                  function,
-                                  line);
-            break;
-
-          case LOGGER_PREFIX_MAX:
-            /* empty */
-            *prefix[0] = '\0';
-            characters = 0;
-            break;
-        }
-        (*prefix)[size - 1] = '\0';
+        case LOGGER_PREFIX_MAX:
+          /* empty */
+          prefix[0] = '\0';
+          characters = 0;
+          break;
       }
-      else {
-        ret = LOGGER_ERR_OUT_OF_MEMORY;
-      }
+
+      /* set rev_idx to the last valid character in string */
+      rev_idx = prefix_size - 1;
+
+      /* make sure message is '\0' terminated */
+      prefix[rev_idx--] = '\0';
 
       /* check if there was enough space in storage */
-      if ((characters < 0) || (characters > size)) {
-        if (characters < 0) {
-          /* glibc 2.0: double size */
-          size        *= 2;
-          size_changed = logger_true;
-        }
-        else {
-          /* glibc 2.1: allocate the correct size */
-          size         = characters + 1;
-          size_changed = logger_true;
-        }
-
-        /* try to allocate more storage */
-        *prefix = realloc(*prefix, size);
-      }
-      else {
-        /* reset size_changed value */
-        size_changed = logger_false;
+      if ((characters < 0) || (characters >= prefix_size)) {
+        prefix[rev_idx--] = ' ';
+        prefix[rev_idx--] = '.';
+        prefix[rev_idx--] = '.';
+        prefix[rev_idx--] = '.';
       }
     }
-    while (size_changed == logger_true && ret == LOGGER_OK);
+    else {
+      /* clearn prefix */
+      prefix[0] = '\0';
+    }
+  }
+  else {
+    ret = LOGGER_ERR_OUT_OF_MEMORY;
   }
 
   return(ret);
@@ -1616,71 +1608,49 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
  * Memory needs to be deallocated using free() when the sting is not needed
  * anymore.
  *
- * \param[in]     id        ID outputting this message.
- * \param[out]    message   Formatted message.
- * \param[in]     format    \c printf() like format string.
- * \param[in]     va_args   Argument list.
+ * \param[in]     id            ID outputting this message.
+ * \param[out]    message       Formatted message.
+ * \param[in]     message_size  String length of formatted message.
+ * \param[in]     format        \c printf() like format string.
+ * \param[in]     va_args       Argument list.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 static inline logger_return_t __logger_format_message(logger_id_t id,
-                                                      char        **message,
+                                                      char        *message,
+                                                      uint16_t    message_size,
                                                       const char  *format,
                                                       va_list     argp)
 {
-  logger_return_t ret = LOGGER_OK;
-  logger_bool_t   size_changed;
-  uint16_t        size;
+  logger_return_t ret        = LOGGER_OK;
   int16_t         characters = 0;
+  uint16_t        rev_idx;
   char            *message_end;
 
-  /* calculate memory size */
-  size = LOGGER_MESSAGE_STRING_MAX * sizeof(char);
+  /* print message to string */
+  if (message != NULL) {
+    /* format message */
+    characters = vsnprintf(message, message_size, format, argp);
 
-  /* allocate storage for message */
-  *message = (char *)malloc(size);
+    /* set rev_idx to the last valid character in string */
+    rev_idx = message_size - 1;
 
-  /* loop until storage is large enough */
-  do {
-    /* print message to string */
-    if (*message != NULL) {
-      /* format message */
-      characters = vsnprintf(*message, size, format, argp);
-
-      /* make sure message is '\0' terminated */
-      (*message)[size - 1] = '\0';
-    }
-    else {
-      ret = LOGGER_ERR_OUT_OF_MEMORY;
-    }
+    /* make sure message is '\0' terminated */
+    message[rev_idx--] = '\0';
 
     /* check if there was enough space in storage */
-    if ((characters < 0) || (characters > size)) {
-      if (characters < 0) {
-        /* glibc 2.0: double size */
-        size        *= 2;
-        size_changed = logger_true;
+    if ((characters < 0) || (characters >= message_size)) {
+      if (strrchr(format, '\n') != NULL) {
+        message[rev_idx--] = '\n';
       }
-      else {
-        /* glibc 2.1: allocate the correct size */
-        size         = characters + 1;
-        size_changed = logger_true;
-      }
-
-      /* try to allocate more storage */
-      *message = realloc(*message, size);
+      message[rev_idx--] = ' ';
+      message[rev_idx--] = '.';
+      message[rev_idx--] = '.';
+      message[rev_idx--] = '.';
     }
-    else {
-      /* reset size_changed value */
-      size_changed = logger_false;
-    }
-  }
-  while (size_changed == logger_true && ret == LOGGER_OK);
 
-  /* do some string manipulation */
-  if (*message != NULL) {
     /* check for multi line message */
-    message_end = strrchr(*message, '\n');
+    message_end = strrchr(message, '\n');
 
     if (message_end != NULL) {
       /* '\n' -> will not be continued */
@@ -1693,6 +1663,9 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
       /* no '\n' -> will be continued */
       logger_control[id].append = logger_true;
     }
+  }
+  else {
+    ret = LOGGER_ERR_OUT_OF_MEMORY;
   }
 
   return(ret);
@@ -1847,8 +1820,6 @@ logger_return_t __logger(logger_id_t    id,
 {
   logger_return_t ret = LOGGER_OK;
   va_list         argp;
-  char            *prefix  = NULL;
-  char            *message = NULL;
   char            *message_part;
   char            *message_end;
 
@@ -1871,15 +1842,15 @@ logger_return_t __logger(logger_id_t    id,
                 (logger_control[id].level < LOGGER_MAX) &&
                 (logger_control[id].level <= level)) {
               /* format prefix */
-              __logger_format_prefix(id, &prefix, level, file, function, line);
+              __logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
 
               /* format message */
               va_start(argp, format);
-              __logger_format_message(id, &message, format, argp);
+              __logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
               va_end(argp);
 
               /* initialize message pointer */
-              message_part = message;
+              message_part = logger_message;
 
               /* loop over all message parts */
               do {
@@ -1895,24 +1866,15 @@ logger_return_t __logger(logger_id_t    id,
                 }
 
                 /* output message to global streams */
-                __logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, prefix, message_part);
+                __logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
 
                 /* output message to id streams */
-                __logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, prefix, message_part);
+                __logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
 
                 /* update message part for next loop */
                 message_part = message_end;
               }
               while (message_part != NULL);
-
-              /* release memory of prefix and message */
-              if (prefix != NULL) {
-                free(prefix);
-              }
-
-              if (message != NULL) {
-                free(message);
-              }
             }
           }
           else {
