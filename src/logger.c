@@ -96,6 +96,7 @@ typedef struct  logger_control_s {
   logger_prefix_t       prefix;                         /**< Prefix for this ID. */
   logger_bool_t         color;                          /**< Changed colors for this ID. */
   logger_color_string_t color_string;                   /**< Color string for this ID. */
+  logger_bool_t         color_string_changed;           /**< Color string had been changed for this ID. */
   logger_bool_t         append;                         /**< Previous message didn't contain a newline just append next message */
   char                  name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
   logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
@@ -717,6 +718,7 @@ logger_id_t __logger_id_request(const char *name)
           logger_control[index].color                 = logger_false;
           logger_control[index].color_string.begin[0] = '\0';
           logger_control[index].color_string.end[0]   = '\0';
+          logger_control[index].color_string_changed  = logger_false;
 
           /* copy the name */
           strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
@@ -779,6 +781,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
         logger_control[id].color                 = logger_false;
         logger_control[id].color_string.begin[0] = '\0';
         logger_control[id].color_string.end[0]   = '\0';
+        logger_control[id].color_string_changed  = logger_false;
         logger_control[id].name[0]               = '\0';
 
         /* reset outputs */
@@ -1302,7 +1305,8 @@ logger_return_t __logger_color_set(const logger_id_t        id,
     (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
     (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
     logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
-    logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+    logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+    logger_control[id].color_string_changed = logger_true;
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1331,6 +1335,7 @@ logger_return_t __logger_color_reset(const logger_id_t id)
     logger_control[id].color                 = logger_false;
     logger_control[id].color_string.begin[0] = '\0';
     logger_control[id].color_string.end[0]   = '\0';
+    logger_control[id].color_string_changed  = logger_true;
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1750,37 +1755,39 @@ static inline logger_return_t __logger_output(logger_id_t     id,
           }
         }
 
-        /* modify color printing for continued messages */
-        if (logger_control[id].append == logger_true &&
-            prefix[0] != '\0') {
-          /* first message in a continued message */
-          /* prefix_color_print_begin unchanged */
-          /* prefix_color_print_end unchanged */
-
-          /* message_color_print_begin unchanged */
-          message_color_print_end   = logger_false;
-        }
-        else {
+        /* modify color printing for continued messages if color setting had not been changed since the last call */
+        if (logger_control[id].color_string_changed == logger_false) {
           if (logger_control[id].append == logger_true &&
-              prefix[0] == '\0') {
-            /* inner message in a continued message */
-            prefix_color_print_begin = logger_false;
-            prefix_color_print_end   = logger_false;
+              prefix[0] != '\0') {
+            /* first message in a continued message */
+            /* prefix_color_print_begin unchanged */
+            /* prefix_color_print_end unchanged */
 
-            message_color_print_begin = logger_false;
+            /* message_color_print_begin unchanged */
             message_color_print_end   = logger_false;
           }
           else {
-            if (logger_control[id].append == logger_false &&
+            if (logger_control[id].append == logger_true &&
                 prefix[0] == '\0') {
-              /* last message in a continued message */
+              /* inner message in a continued message */
               prefix_color_print_begin = logger_false;
               prefix_color_print_end   = logger_false;
 
               message_color_print_begin = logger_false;
-              /* message_color_print_end unchanged */
+              message_color_print_end   = logger_false;
             }
             else {
+              if (logger_control[id].append == logger_false &&
+                  prefix[0] == '\0') {
+                /* last message in a continued message */
+                prefix_color_print_begin = logger_false;
+                prefix_color_print_end   = logger_false;
+
+                message_color_print_begin = logger_false;
+                /* message_color_print_end unchanged */
+              }
+              else {
+              }
             }
           }
         }
@@ -1842,6 +1849,9 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       }
     }
   }
+
+  /* reset the color string changed flag */
+  logger_control[id].color_string_changed = logger_false;
 
   return(ret);
 }
