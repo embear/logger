@@ -1749,6 +1749,41 @@ static inline logger_return_t __logger_output(logger_id_t     id,
             }
           }
         }
+
+        /* modify color printing for continued messages */
+        if (logger_control[id].append == logger_true &&
+            prefix[0] != '\0') {
+          /* first message in a continued message */
+          /* prefix_color_print_begin unchanged */
+          /* prefix_color_print_end unchanged */
+
+          /* message_color_print_begin unchanged */
+          message_color_print_end   = logger_false;
+        }
+        else {
+          if (logger_control[id].append == logger_true &&
+              prefix[0] == '\0') {
+            /* inner message in a continued message */
+            prefix_color_print_begin = logger_false;
+            prefix_color_print_end   = logger_false;
+
+            message_color_print_begin = logger_false;
+            message_color_print_end   = logger_false;
+          }
+          else {
+            if (logger_control[id].append == logger_false &&
+                prefix[0] == '\0') {
+              /* last message in a continued message */
+              prefix_color_print_begin = logger_false;
+              prefix_color_print_end   = logger_false;
+
+              message_color_print_begin = logger_false;
+              /* message_color_print_end unchanged */
+            }
+            else {
+            }
+          }
+        }
       }
       else {
         prefix_color_print_begin = logger_false;
