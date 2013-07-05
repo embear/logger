@@ -1694,12 +1694,12 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 {
   logger_return_t       ret = LOGGER_OK;
   int16_t               index;
-  logger_color_string_t *prefix_color;
-  logger_color_string_t *message_color;
   logger_bool_t         prefix_color_print_begin;
   logger_bool_t         prefix_color_print_end;
+  logger_color_string_t *prefix_color;
   logger_bool_t         message_color_print_begin;
   logger_bool_t         message_color_print_end;
+  logger_color_string_t *message_color;
 
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
@@ -1711,51 +1711,63 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       if ((outputs[index].stream == stdout) ||
           (outputs[index].stream == stderr)) {
         /* message color */
-        if (logger_color_prefix_enabled == logger_false &&
-            logger_color_message_enabled == logger_false) {
+        if ((logger_color_prefix_enabled == logger_false) &&
+            (logger_color_message_enabled == logger_false)) {
           prefix_color_print_begin  = logger_false;
           prefix_color_print_end    = logger_false;
+
           message_color_print_begin = logger_false;
           message_color_print_end   = logger_false;
         }
         else {
-          if (logger_color_prefix_enabled == logger_true &&
-              logger_color_message_enabled == logger_false) {
-            prefix_color_print_begin  = logger_true;
-            prefix_color_print_end    = logger_true;
+          if ((logger_color_prefix_enabled == logger_true) &&
+              (logger_color_message_enabled == logger_false)) {
+            prefix_color_print_begin = logger_true;
+            prefix_color_print_end   = logger_true;
+            prefix_color             = &logger_level_colors[level];
+
             message_color_print_begin = logger_false;
             message_color_print_end   = logger_false;
-            prefix_color = &logger_level_colors[level];
           }
           else {
-            if (logger_color_prefix_enabled == logger_false &&
-                logger_color_message_enabled == logger_true) {
-              prefix_color_print_begin  = logger_true;
-              prefix_color_print_end    = logger_false;
+            if ((logger_color_prefix_enabled == logger_false) &&
+                (logger_color_message_enabled == logger_true)) {
+              prefix_color_print_begin = logger_true;
+              prefix_color_print_end   = logger_false;
+              prefix_color             = &logger_control[id].color_string;
+
               message_color_print_begin = logger_false;
               message_color_print_end   = logger_true;
-              prefix_color = &logger_control[id].color_string;
-              message_color = &logger_control[id].color_string;
+              message_color             = &logger_control[id].color_string;
             }
             else {
-              if (logger_color_prefix_enabled == logger_true &&
-                  logger_color_message_enabled == logger_true) {
-                prefix_color_print_begin  = logger_true;
-                prefix_color_print_end    = logger_true;
+              if ((logger_color_prefix_enabled == logger_true) &&
+                  (logger_color_message_enabled == logger_true)) {
+                prefix_color_print_begin = logger_true;
+                prefix_color_print_end   = logger_true;
+                prefix_color             = &logger_level_colors[level];
+
                 message_color_print_begin = logger_true;
                 message_color_print_end   = logger_true;
-                prefix_color = &logger_level_colors[level];
-                message_color = &logger_control[id].color_string;
+                message_color             = &logger_control[id].color_string;
               }
               else {
-                prefix_color_print_begin  = logger_false;
-                prefix_color_print_end    = logger_false;
+                prefix_color_print_begin = logger_false;
+                prefix_color_print_end   = logger_false;
+
                 message_color_print_begin = logger_false;
                 message_color_print_end   = logger_false;
               }
             }
           }
         }
+      }
+      else {
+        prefix_color_print_begin = logger_false;
+        prefix_color_print_end   = logger_false;
+
+        message_color_print_begin = logger_false;
+        message_color_print_end   = logger_false;
       }
 
       if (prefix_color_print_begin == logger_true) {
