@@ -1422,172 +1422,166 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
   int16_t         characters = 0;
   uint16_t        rev_idx;
 
-  /* print prefix to string */
-  if (prefix != NULL) {
-    /* do prefix stuff only if needed */
-    if (logger_control[id].append == logger_false) {
-      switch (logger_control[id].prefix) {
-        case LOGGER_PREFIX_UNKNOWN:
-          /* empty */
-          prefix[0] = '\0';
-          characters = 0;
-          break;
+  /* do prefix stuff only if needed */
+  if (logger_control[id].append == logger_false) {
+    switch (logger_control[id].prefix) {
+      case LOGGER_PREFIX_UNKNOWN:
+        /* empty */
+        prefix[0] = '\0';
+        characters = 0;
+        break;
 
-        case LOGGER_PREFIX_EMPTY:
-          /* empty */
-          prefix[0] = '\0';
-          characters = 0;
-          break;
+      case LOGGER_PREFIX_EMPTY:
+        /* empty */
+        prefix[0] = '\0';
+        characters = 0;
+        break;
 
-        case LOGGER_PREFIX_FILE_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_strip_path(file),
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_FILE_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_strip_path(file),
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_FILE_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_strip_path(file),
-                                line);
-          break;
+      case LOGGER_PREFIX_FILE_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_strip_path(file),
+                              line);
+        break;
 
-        case LOGGER_PREFIX_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                " ",
-                                __logger_id_name_get(id));
-          break;
+      case LOGGER_PREFIX_NAME:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              " ",
+                              __logger_id_name_get(id));
+        break;
 
-        case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_strip_path(file),
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_strip_path(file),
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME_FILE_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_strip_path(file),
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_FILE_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_strip_path(file),
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME_LEVEL:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_LEVEL ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_level_name_get(level));
-          break;
+      case LOGGER_PREFIX_NAME_LEVEL:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_LEVEL ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_level_name_get(level));
+        break;
 
-        case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_LEVEL ":"
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_level_name_get(level),
-                                __logger_strip_path(file),
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_LEVEL ":"
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_level_name_get(level),
+                              __logger_strip_path(file),
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_LEVEL ":"
-                                LOGGER_FORMAT_STRING_FILE ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_level_name_get(level),
-                                __logger_strip_path(file),
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_LEVEL ":"
+                              LOGGER_FORMAT_STRING_FILE ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_level_name_get(level),
+                              __logger_strip_path(file),
+                              line);
+        break;
 
-        case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
-          characters = snprintf(prefix, prefix_size,
-                                LOGGER_FORMAT_STRING_NAME ":"
-                                LOGGER_FORMAT_STRING_LEVEL ":"
-                                LOGGER_FORMAT_STRING_FUNCTION ":"
-                                LOGGER_FORMAT_STRING_LINE ":"
-                                " ",
-                                __logger_id_name_get(id),
-                                __logger_level_name_get(level),
-                                function,
-                                line);
-          break;
+      case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
+        characters = snprintf(prefix, prefix_size,
+                              LOGGER_FORMAT_STRING_NAME ":"
+                              LOGGER_FORMAT_STRING_LEVEL ":"
+                              LOGGER_FORMAT_STRING_FUNCTION ":"
+                              LOGGER_FORMAT_STRING_LINE ":"
+                              " ",
+                              __logger_id_name_get(id),
+                              __logger_level_name_get(level),
+                              function,
+                              line);
+        break;
 
-        case LOGGER_PREFIX_MAX:
-          /* empty */
-          prefix[0] = '\0';
-          characters = 0;
-          break;
-      }
-
-      /* set rev_idx to the last valid character in string */
-      rev_idx = prefix_size - 1;
-
-      /* make sure message is '\0' terminated */
-      prefix[rev_idx--] = '\0';
-
-      /* check if there was enough space in storage */
-      if ((characters < 0) || (characters >= prefix_size)) {
-        prefix[rev_idx--] = ' ';
-        prefix[rev_idx--] = '.';
-        prefix[rev_idx--] = '.';
-        prefix[rev_idx--] = '.';
-      }
+      case LOGGER_PREFIX_MAX:
+        /* empty */
+        prefix[0] = '\0';
+        characters = 0;
+        break;
     }
-    else {
-      /* clearn prefix */
-      prefix[0] = '\0';
+
+    /* set rev_idx to the last valid character in string */
+    rev_idx = prefix_size - 1;
+
+    /* make sure message is '\0' terminated */
+    prefix[rev_idx--] = '\0';
+
+    /* check if there was enough space in storage */
+    if ((characters < 0) || (characters >= prefix_size)) {
+      prefix[rev_idx--] = ' ';
+      prefix[rev_idx--] = '.';
+      prefix[rev_idx--] = '.';
+      prefix[rev_idx--] = '.';
     }
   }
   else {
-    ret = LOGGER_ERR_OUT_OF_MEMORY;
+    /* clearn prefix */
+    prefix[0] = '\0';
   }
 
   return(ret);
@@ -1621,45 +1615,39 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
   uint16_t        rev_idx;
   char            *message_end;
 
-  /* print message to string */
-  if (message != NULL) {
-    /* format message */
-    characters = vsnprintf(message, message_size, format, argp);
+  /* format message */
+  characters = vsnprintf(message, message_size, format, argp);
 
-    /* set rev_idx to the last valid character in string */
-    rev_idx = message_size - 1;
+  /* set rev_idx to the last valid character in string */
+  rev_idx = message_size - 1;
 
-    /* make sure message is '\0' terminated */
-    message[rev_idx--] = '\0';
+  /* make sure message is '\0' terminated */
+  message[rev_idx--] = '\0';
 
-    /* check if there was enough space in storage */
-    if ((characters < 0) || (characters >= message_size)) {
-      if (strrchr(format, '\n') != NULL) {
-        message[rev_idx--] = '\n';
-      }
-      message[rev_idx--] = ' ';
-      message[rev_idx--] = '.';
-      message[rev_idx--] = '.';
-      message[rev_idx--] = '.';
+  /* check if there was enough space in storage */
+  if ((characters < 0) || (characters >= message_size)) {
+    if (strrchr(format, '\n') != NULL) {
+      message[rev_idx--] = '\n';
     }
+    message[rev_idx--] = ' ';
+    message[rev_idx--] = '.';
+    message[rev_idx--] = '.';
+    message[rev_idx--] = '.';
+  }
 
-    /* check for multi line message */
-    message_end = strrchr(message, '\n');
+  /* check for multi line message */
+  message_end = strrchr(message, '\n');
 
-    if (message_end != NULL) {
-      /* '\n' -> will not be continued */
-      logger_control[id].append = logger_false;
+  if (message_end != NULL) {
+    /* '\n' -> will not be continued */
+    logger_control[id].append = logger_false;
 
-      /* remove '\n', needed for correct color display (see below) */
-      *message_end = '\0';
-    }
-    else {
-      /* no '\n' -> will be continued */
-      logger_control[id].append = logger_true;
-    }
+    /* remove '\n', needed for correct color display (see below) */
+    *message_end = '\0';
   }
   else {
-    ret = LOGGER_ERR_OUT_OF_MEMORY;
+    /* no '\n' -> will be continued */
+    logger_control[id].append = logger_true;
   }
 
   return(ret);
@@ -1778,12 +1766,10 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       }
 
       /* actually output prefix */
-      if (prefix != NULL) {
-        fputs(prefix, outputs[index].stream);
+      fputs(prefix, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
+      (void)fflush(outputs[index].stream);
 #endif  /* LOGGER_FORCE_FLUSH */
-      }
 
       if (prefix_color_print_end == logger_true) {
         (void)fputs(prefix_color->end, outputs[index].stream);
@@ -1800,12 +1786,10 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       }
 
       /* actually output message */
-      if (message != NULL) {
-        fputs(message, outputs[index].stream);
+      fputs(message, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
+      (void)fflush(outputs[index].stream);
 #endif  /* LOGGER_FORCE_FLUSH */
-      }
 
       if (message_color_print_end == logger_true) {
         (void)fputs(message_color->end, outputs[index].stream);
