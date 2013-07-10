@@ -41,21 +41,33 @@
 #ifndef LOGGER_NAME_MAX
 #define LOGGER_NAME_MAX                (256)
 #endif /* LOGGER_NAME_MAX */
+#if (LOGGER_NAME_MAX < 1)
+#error "LOGGER_NAME_MAX must be at least 1"
+#endif /* (LOGGER_NAME_MAX < 1) */
 
 /** Initial length of logger prefix string including '\0' */
 #ifndef LOGGER_PREFIX_STRING_MAX
 #define LOGGER_PREFIX_STRING_MAX       (256)
 #endif /* LOGGER_PREFIX_STRING_MAX */
+#if (LOGGER_PREFIX_STRING_MAX < 5)
+#error "LOGGER_PREFIX_STRING_MAX must be at least 5"
+#endif /* (LOGGER_PREFIX_STRING_MAX < 5) */
 
 /** Initial length of logger message string including '\0' */
 #ifndef LOGGER_MESSAGE_STRING_MAX
 #define LOGGER_MESSAGE_STRING_MAX      (256)
 #endif /* LOGGER_MESSAGE_STRING_MAX */
+#if (LOGGER_MESSAGE_STRING_MAX < 6)
+#error "LOGGER_MESSAGE_STRING_MAX must be at least 6"
+#endif /* (LOGGER_MESSAGE_STRING_MAX < 6) */
 
 /** Length of logger color string including '\0' */
 #ifndef LOGGER_COLOR_STRING_MAX
 #define LOGGER_COLOR_STRING_MAX        (16)
 #endif /* LOGGER_COLOR_STRING_MAX */
+#if (LOGGER_COLOR_STRING_MAX < 1)
+#error "LOGGER_COLOR_STRING_MAX must be at least 1"
+#endif /* (LOGGER_COLOR_STRING_MAX < 1) */
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
