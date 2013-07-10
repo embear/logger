@@ -32,6 +32,24 @@ Each ID has its own prefix assigned. By default each ID prints the prefix
 is possible to get the current value for later restore with
 `logger_id_prefix_get()`. All available prefixes are:
 
+  Prefix enum                                   Generated prefix
+  --------------------------------------------- ---------------------------------------------------
+  `LOGGER_PREFIX_EMPTY`                         `""`
+  `LOGGER_PREFIX_FILE_FUNCTION_LINE`            `"FILE:FUNCTION:LINE:"`
+  `LOGGER_PREFIX_FILE_LINE`                     `"FILE:LINE:"`
+  `LOGGER_PREFIX_FUNCTION_LINE`                 `"FUNCTION:LINE:"`
+  `LOGGER_PREFIX_NAME`                          `"LOGGER_ID_NAME:"`
+  `LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE`       `"LOGGER_ID_NAME:FILE:FUNCTION:LINE:"`
+  `LOGGER_PREFIX_NAME_FILE_LINE`                `"LOGGER_ID_NAME:FILE:LINE:"`
+  `LOGGER_PREFIX_NAME_FUNCTION_LINE`            `"LOGGER_ID_NAME:FUNCTION:LINE:"`
+  `LOGGER_PREFIX_NAME_LEVEL`                    `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
+  `LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE` `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE":`
+  `LOGGER_PREFIX_NAME_LEVEL_FILE_LINE`          `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
+  `LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE`      `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
+  --------------------------------------------- ---------------------------------------------------
+
+For backward compatibility the following prefix enums are also supported:
+
   Prefix enum              Generated prefix
   ------------------------ ---------------------------------------------------
   `LOGGER_PREFIX_EMPTY`    `""`
