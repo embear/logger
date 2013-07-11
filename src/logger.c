@@ -69,6 +69,13 @@
 #error "LOGGER_MESSAGE_STRING_MAX must be at least 6"
 #endif /* (LOGGER_MESSAGE_STRING_MAX < 6) */
 
+/** Length of logger line string including '\0' */
+#ifndef LOGGER_LINE_STRING_MAX
+#define LOGGER_LINE_STRING_MAX      (LOGGER_COLOR_STRING_MAX + LOGGER_PREFIX_STRING_MAX + LOGGER_COLOR_STRING_MAX + LOGGER_COLOR_STRING_MAX + LOGGER_MESSAGE_STRING_MAX + LOGGER_COLOR_STRING_MAX)
+#endif /* LOGGER_LINE_STRING_MAX */
+#if (LOGGER_LINE_STRING_MAX < 5)
+#error "LOGGER_LINE_STRING_MAX must be at least 5"
+#endif /* (LOGGER_LINE_STRING_MAX < 5) */
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
@@ -130,6 +137,7 @@ static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Contro
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible output streams. */
 static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];     /**< Storage for prefix string */
 static char             logger_message[LOGGER_MESSAGE_STRING_MAX];   /**< Storage for message string */
+static char             logger_line[LOGGER_LINE_STRING_MAX];         /**< Storage for whole output line */
 
 
 /** level to name translation */
@@ -1615,6 +1623,37 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
 
 
 /** ************************************************************************//**
+ * \brief  String copy
+ *
+ * Copies string from `src` to `dest` until end od `src` is reached or `n`
+ * characters are copied. The string in `dest` is '\0' terminated if length of
+ * string in `src` is less than `n`. Otherwise the string will *not* be
+ * terminated. The function returns the number of characters copied to `dest`
+ * not including the '\0'.
+ *
+ * \param[out]    dest  Destination string.
+ * \param[in]     src   Source string.
+ * \param[in]     n     Maximum amount of characters available in destination string.
+ *
+ * \return     Number of characters written to destination string
+ ******************************************************************************/
+static inline size_t __logger_string_copy(char *dest, const char *src, size_t n)
+{
+  size_t idx;
+
+  for (idx = 0 ; idx < n && src[idx] != '\0' ; idx++) {
+    dest[idx] = src[idx];
+  }
+
+  if (idx < n) {
+    dest[idx] = '\0';
+  }
+
+  return(idx);
+}
+
+
+/** ************************************************************************//**
  * \brief  Format log message.
  *
  * Allocate memory for message and print message to allocated memory.
@@ -1714,6 +1753,9 @@ static inline logger_return_t __logger_output(logger_id_t     id,
   logger_bool_t         message_color_print_begin;
   logger_bool_t         message_color_print_end;
   logger_color_string_t *message_color;
+  size_t                line_characters;
+  char                  *line;
+  size_t                line_size;
 
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
@@ -1821,53 +1863,59 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         message_color_print_end   = logger_false;
       }
 
+      /* iniialize variables */
+      line      = logger_line;
+      line_size = sizeof(logger_line);
+
       if (prefix_color_print_begin == logger_true) {
-        (void)fputs(prefix_color->begin, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+        line_characters = __logger_string_copy(line, prefix_color->begin, line_size);
+        line           += line_characters;
+        line_size      -= line_characters;
       }
 
       /* actually output prefix */
-      fputs(prefix, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
-#endif  /* LOGGER_FORCE_FLUSH */
+      line_characters = __logger_string_copy(line, prefix, line_size);
+      line           += line_characters;
+      line_size      -= line_characters;
 
       if (prefix_color_print_end == logger_true) {
-        (void)fputs(prefix_color->end, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+        line_characters = __logger_string_copy(line, prefix_color->end, line_size);
+        line           += line_characters;
+        line_size      -= line_characters;
       }
 
       if (message_color_print_begin == logger_true) {
-        (void)fputs(message_color->begin, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+        line_characters = __logger_string_copy(line, message_color->begin, line_size);
+        line           += line_characters;
+        line_size      -= line_characters;
       }
 
       /* actually output message */
-      fputs(message, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-      (void)fflush(outputs[index].stream);
-#endif  /* LOGGER_FORCE_FLUSH */
+      line_characters = __logger_string_copy(line, message, line_size);
+      line           += line_characters;
+      line_size      -= line_characters;
 
       if (message_color_print_end == logger_true) {
-        (void)fputs(message_color->end, outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif /* LOGGER_FORCE_FLUSH */
+        line_characters = __logger_string_copy(line, message_color->end, line_size);
+        line           += line_characters;
+        line_size      -= line_characters;
       }
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].append == logger_false) {
-        fputc('\n', outputs[index].stream);
-#ifdef LOGGER_FORCE_FLUSH
-        (void)fflush(outputs[index].stream);
-#endif  /* LOGGER_FORCE_FLUSH */
+        line_characters = __logger_string_copy(line, "\n", line_size);
+        line           += line_characters;
+        line_size      -= line_characters;
       }
+
+      /* make sure line is '\0' terminated */
+      logger_line[sizeof(logger_line) - 1] = '\0';
+
+      /* put the message to stream */
+      fputs(logger_line, outputs[index].stream);
+      #ifdef LOGGER_FORCE_FLUSH
+      (void)fflush(outputs[index].stream);
+      #endif  /* LOGGER_FORCE_FLUSH */
     }
   }
 
