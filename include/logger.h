@@ -41,7 +41,7 @@ typedef uint8_t  logger_bool_t;    /**< Logger boolean type. */
 #define logger_false    ((logger_bool_t)0)
 
 
-/** log level type */
+/** Logger log level types */
 typedef enum logger_level_e {
   LOGGER_UNKNOWN = 0,  /**< Unknown level. */
   LOGGER_DEBUG   = 1,  /**< Debug-level message. */
@@ -55,6 +55,8 @@ typedef enum logger_level_e {
   LOGGER_MAX     = 9   /**< Last entry, always! */
 } logger_level_t;
 
+
+/** Logger prefix types */
 typedef enum logger_prefix_e {
   LOGGER_PREFIX_UNKNOWN                       =  0, /**< Unknown prefix. */
   LOGGER_PREFIX_EMPTY                         =  1, /**< Prefix "" */
@@ -85,7 +87,7 @@ typedef int16_t  logger_id_t;
 #define logger_id_unknown    ((logger_id_t)-1)
 
 
-/** logger function return codes */
+/** Logger function return codes */
 typedef enum logger_return_e {
   LOGGER_OK                    =   0,   /**< Ok. */
   LOGGER_ERR_UNKNOWN           =  -1,   /**< Unspecified error. */
@@ -105,7 +107,7 @@ typedef enum logger_return_e {
 } logger_return_t;
 
 
-/** enum for text style output. */
+/** Logger enum for text style output. */
 typedef enum logger_text_attr_e {
   LOGGER_ATTR_RESET     = 0, /**< Reset attributes. */
   LOGGER_ATTR_BRIGHT    = 1, /**< Bright attribute. */
@@ -117,7 +119,7 @@ typedef enum logger_text_attr_e {
 } logger_text_attr_t;
 
 
-/** enum for text background color output. */
+/** Logger enum for text background color output. */
 typedef enum logger_text_bg_e {
   LOGGER_BG_BLACK   = 40, /**< Black background color. */
   LOGGER_BG_RED     = 41, /**< Red background color. */
@@ -130,7 +132,7 @@ typedef enum logger_text_bg_e {
 } logger_text_bg_t;
 
 
-/** enum for text foreground color output. */
+/** Logger enum for text foreground color output. */
 typedef enum logger_text_fg_e {
   LOGGER_FG_BLACK   = 30, /**< Black foreground color. */
   LOGGER_FG_RED     = 31, /**< Red foreground color. */

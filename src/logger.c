@@ -45,22 +45,6 @@
 #error "LOGGER_NAME_MAX must be at least 1"
 #endif /* (LOGGER_NAME_MAX < 1) */
 
-/** Initial length of logger prefix string including '\0' */
-#ifndef LOGGER_PREFIX_STRING_MAX
-#define LOGGER_PREFIX_STRING_MAX       (256)
-#endif /* LOGGER_PREFIX_STRING_MAX */
-#if (LOGGER_PREFIX_STRING_MAX < 5)
-#error "LOGGER_PREFIX_STRING_MAX must be at least 5"
-#endif /* (LOGGER_PREFIX_STRING_MAX < 5) */
-
-/** Initial length of logger message string including '\0' */
-#ifndef LOGGER_MESSAGE_STRING_MAX
-#define LOGGER_MESSAGE_STRING_MAX      (256)
-#endif /* LOGGER_MESSAGE_STRING_MAX */
-#if (LOGGER_MESSAGE_STRING_MAX < 6)
-#error "LOGGER_MESSAGE_STRING_MAX must be at least 6"
-#endif /* (LOGGER_MESSAGE_STRING_MAX < 6) */
-
 /** Length of logger color string including '\0' */
 #ifndef LOGGER_COLOR_STRING_MAX
 #define LOGGER_COLOR_STRING_MAX        (16)
@@ -68,6 +52,23 @@
 #if (LOGGER_COLOR_STRING_MAX < 1)
 #error "LOGGER_COLOR_STRING_MAX must be at least 1"
 #endif /* (LOGGER_COLOR_STRING_MAX < 1) */
+
+/** Length of logger prefix string including '\0' */
+#ifndef LOGGER_PREFIX_STRING_MAX
+#define LOGGER_PREFIX_STRING_MAX       (256)
+#endif /* LOGGER_PREFIX_STRING_MAX */
+#if (LOGGER_PREFIX_STRING_MAX < 5)
+#error "LOGGER_PREFIX_STRING_MAX must be at least 5"
+#endif /* (LOGGER_PREFIX_STRING_MAX < 5) */
+
+/** Length of logger message string including '\0' */
+#ifndef LOGGER_MESSAGE_STRING_MAX
+#define LOGGER_MESSAGE_STRING_MAX      (256)
+#endif /* LOGGER_MESSAGE_STRING_MAX */
+#if (LOGGER_MESSAGE_STRING_MAX < 6)
+#error "LOGGER_MESSAGE_STRING_MAX must be at least 6"
+#endif /* (LOGGER_MESSAGE_STRING_MAX < 6) */
+
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
@@ -89,17 +90,23 @@
 /** Format sting for prefix logger id level name */
 #define LOGGER_FORMAT_STRING_LEVEL     "%7s"
 
+
+/** Logger output structure */
 typedef struct logger_output_s {
   int16_t        count;   /**< Number of registrations for this stream. */
   logger_level_t level;   /**< Level for this stream. */
   FILE           *stream; /**< File pointer given during registration. */
 } logger_output_t;
 
+
+/** Logger color definition */
 typedef struct logger_color_string_s {
   char begin[LOGGER_COLOR_STRING_MAX]; /**< Color begin marker string. */
   char end[LOGGER_COLOR_STRING_MAX];   /**< Color end marker string. */
 } logger_color_string_t;
 
+
+/** Logger control structure */
 typedef struct  logger_control_s {
   logger_bool_t         used;                           /**< This ID is used. */
   int16_t               count;                          /**< Number of registrations for this ID. */
@@ -113,6 +120,7 @@ typedef struct  logger_control_s {
   char                  name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
   logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID output streams. */
 } logger_control_t;
+
 
 static logger_bool_t    logger_initialized           = logger_false; /**< logger is initialized. */
 static logger_bool_t    logger_enabled               = logger_false; /**< Logger is enabled. */
@@ -137,6 +145,7 @@ static const char *logger_level_names[] =
   "ALERT",   /**< Name for level "ALERT"   == 7 */
   "EMERG"    /**< Name for level "EMERG"   == 8 */
 };
+
 
 /** level to color translation */
 static logger_color_string_t logger_level_colors[] =
@@ -1597,7 +1606,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
     }
   }
   else {
-    /* clearn prefix */
+    /* clear prefix */
     prefix[0] = '\0';
   }
 
