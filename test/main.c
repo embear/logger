@@ -832,6 +832,92 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- enable/disable output colors per output stream ....\n", test);
+
+  puts("Coloring of messages could be enabled/disabled for each output stream");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_output_register(stderr));
+  assert(LOGGER_OK == logger_output_level_set(stderr, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_color_message_enable());
+  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+
+  puts("Message on STDOUT and STDERR both use color");
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Only message on STDOUT uses color");
+  assert(LOGGER_OK == logger_output_color_enable(stdout));
+  assert(LOGGER_OK == logger_output_color_disable(stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Only message on STDERR uses color");
+  assert(LOGGER_OK == logger_output_color_disable(stdout));
+  assert(LOGGER_OK == logger_output_color_enable(stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Message on STDOUT and STDERR both use color");
+  assert(LOGGER_OK == logger_output_color_enable(stdout));
+  assert(LOGGER_OK == logger_output_color_enable(stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_color_prefix_disable());
+  assert(LOGGER_OK == logger_color_message_disable());
+  assert(LOGGER_OK == logger_output_deregister(stderr));
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- enable/disable output colors per id output stream ....\n", test);
+
+  puts("Coloring of messages could be enabled/disabled for each id specific output stream");
+
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_color_message_enable());
+  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_output_register(id, stdout));
+  assert(LOGGER_OK == logger_id_output_level_set(id, stdout, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_output_register(id, stderr));
+  assert(LOGGER_OK == logger_id_output_level_set(id, stderr, LOGGER_DEBUG));
+
+  puts("Message on STDOUT and STDERR both use color");
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Only message on STDOUT uses color");
+  assert(LOGGER_OK == logger_id_output_color_enable(id, stdout));
+  assert(LOGGER_OK == logger_id_output_color_disable(id, stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Only message on STDERR uses color");
+  assert(LOGGER_OK == logger_id_output_color_disable(id, stdout));
+  assert(LOGGER_OK == logger_id_output_color_enable(id, stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  puts("Message on STDOUT and STDERR both use color");
+  assert(LOGGER_OK == logger_id_output_color_enable(id, stdout));
+  assert(LOGGER_OK == logger_id_output_color_enable(id, stderr));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_color_prefix_disable());
+  assert(LOGGER_OK == logger_color_message_disable());
+  assert(LOGGER_OK == logger_id_output_deregister(id, stderr));
+  assert(LOGGER_OK == logger_id_output_deregister(id, stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- show color combinations\n", test);
 
   puts("Show all possible color combinations");

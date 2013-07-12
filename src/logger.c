@@ -100,9 +100,10 @@
 
 /** Logger output structure */
 typedef struct logger_output_s {
-  int16_t        count;   /**< Number of registrations for this stream. */
-  logger_level_t level;   /**< Level for this stream. */
-  FILE           *stream; /**< File pointer given during registration. */
+  int16_t              count;                     /**< Number of registrations for this output. */
+  logger_level_t       level;                     /**< Level for this output. */
+  logger_bool_t        use_color;                 /**< Use color strings for this output. */
+  FILE                 *stream;                   /**< File pointer given during registration. */
 } logger_output_t;
 
 
@@ -282,9 +283,9 @@ logger_bool_t __logger_is_enabled()
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-static logger_bool_t __logger_output_common_is_registered(logger_output_t *outputs,
-                                                          const uint16_t  size,
-                                                          FILE            *stream)
+static inline logger_bool_t __logger_output_common_is_registered(logger_output_t *outputs,
+                                                                 const uint16_t  size,
+                                                                 FILE            *stream)
 {
   logger_bool_t ret = logger_false;
   int16_t       index;
@@ -320,9 +321,9 @@ static logger_bool_t __logger_output_common_is_registered(logger_output_t *outpu
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_return_t __logger_output_common_register(logger_output_t *outputs,
-                                                       const uint16_t  size,
-                                                       FILE            *stream)
+static inline logger_return_t __logger_output_common_register(logger_output_t *outputs,
+                                                              const uint16_t  size,
+                                                              FILE            *stream)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -363,6 +364,15 @@ static logger_return_t __logger_output_common_register(logger_output_t *outputs,
           outputs[index].level  = LOGGER_UNKNOWN;
           outputs[index].stream = stream;
 
+          /* only stdout and stderr use color by default */
+          if ((stream == stdout) ||
+              (stream == stderr)) {
+            outputs[index].use_color = logger_true;
+          }
+          else {
+            outputs[index].use_color = logger_false;
+          }
+
           /* make a nonblocking stream */
           /*fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);*/
         }
@@ -394,9 +404,9 @@ static logger_return_t __logger_output_common_register(logger_output_t *outputs,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_return_t __logger_output_common_deregister(logger_output_t *outputs,
-                                                         const uint16_t  size,
-                                                         FILE            *stream)
+static inline logger_return_t __logger_output_common_deregister(logger_output_t *outputs,
+                                                                const uint16_t  size,
+                                                                FILE            *stream)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -459,10 +469,10 @@ static logger_return_t __logger_output_common_deregister(logger_output_t *output
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_return_t __logger_output_common_level_set(logger_output_t      *outputs,
-                                                        const uint16_t       size,
-                                                        FILE                 *stream,
-                                                        const logger_level_t level)
+static inline logger_return_t __logger_output_common_level_set(logger_output_t      *outputs,
+                                                               const uint16_t       size,
+                                                               FILE                 *stream,
+                                                               const logger_level_t level)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -520,7 +530,7 @@ static logger_return_t __logger_output_common_level_set(logger_output_t      *ou
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static logger_level_t __logger_output_common_level_get(logger_output_t *outputs,
+static inline logger_level_t __logger_output_common_level_get(logger_output_t *outputs,
                                                        const uint16_t  size,
                                                        FILE            *stream)
 {
@@ -553,6 +563,58 @@ static logger_level_t __logger_output_common_level_get(logger_output_t *outputs,
   }
   else {
     ret = LOGGER_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Modify the output stream color setting.
+ *
+ * Set the color setting for a given output stream to the given state.
+ *
+ * \param[inout]  outputs List of logger file stream.
+ * \param[in]     size    Number of elements in list.
+ * \param[in]     stream  Opened file stream.
+ * \param[in]     flag    State of color setting.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+static inline logger_return_t __logger_output_common_color(logger_output_t *outputs,
+                                                           const uint16_t  size,
+                                                           FILE            *stream,
+                                                           logger_bool_t   flag)
+{
+  logger_return_t ret = LOGGER_OK;
+  int16_t         index;
+  logger_bool_t   found;
+
+  /* check if stream valid */
+  if (stream != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output is already registered */
+      found = logger_false;
+      for (index = 0 ; index < size ; index++) {
+        if (outputs[index].stream == stream) {
+          found = logger_true;
+          break;
+        }
+      }
+
+      /* found given stream in a slot */
+      if (found == logger_true) {
+        /* set color flag */
+        outputs[index].use_color = flag;
+      }
+    }
+    else {
+      ret = LOGGER_ERR_OUTPUT_INVALID;
+    }
+  }
+  else {
+    ret = LOGGER_ERR_STREAM_INVALID;
   }
 
   return(ret);
@@ -659,6 +721,46 @@ logger_level_t __logger_output_level_get(FILE *stream)
 
   /* get stream output level to global output streams */
   ret = __logger_output_common_level_get(logger_outputs, LOGGER_OUTPUTS_MAX, stream);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Enable the global output stream color setting.
+ *
+ * Enable the color setting for a given output stream.
+ *
+ * \param[in]     stream  Opened file stream.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_output_color_enable(FILE *stream)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* set stream output level to global output streams */
+  ret = __logger_output_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, stream, logger_true);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Disable the global output stream color setting.
+ *
+ * Disable the color setting for a given output stream.
+ *
+ * \param[in]     stream  Opened file stream.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_output_color_disable(FILE *stream)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* set stream output level to global output streams */
+  ret = __logger_output_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, stream, logger_false);
 
   return(ret);
 }
@@ -1172,6 +1274,64 @@ logger_return_t __logger_id_output_level_set(const logger_id_t    id,
       (logger_control[id].used == logger_true)) {
     /* set stream output level to global output streams */
     ret = __logger_output_common_level_set(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, level);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Enable the id specific output stream color setting.
+ *
+ * Enable the color setting for a given output stream.
+ *
+ * \param[in]     stream  Opened file stream.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_id_output_color_enable(const logger_id_t id,
+                                                FILE              *stream)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* set stream output level to global output streams */
+    ret = __logger_output_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, logger_true);
+  }
+  else {
+    ret = LOGGER_ERR_ID_UNKNOWN;
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Disable the id specific output stream color setting.
+ *
+ * Disable the color setting for a given output stream.
+ *
+ * \param[in]     stream  Opened file stream.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t __logger_id_output_color_disable(const logger_id_t id,
+                                                 FILE              *stream)
+{
+  logger_return_t ret = LOGGER_OK;
+
+  /* check if ID is valid */
+  if ((id >= 0) &&
+      (id < LOGGER_IDS_MAX) &&
+      (logger_control[id].used == logger_true)) {
+    /* set stream output level to global output streams */
+    ret = __logger_output_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, logger_false);
   }
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
@@ -1764,8 +1924,7 @@ static inline logger_return_t __logger_output(logger_id_t     id,
         (outputs[index].level < LOGGER_MAX) &&
         (outputs[index].level <= level)) {
       /* set colors */
-      if ((outputs[index].stream == stdout) ||
-          (outputs[index].stream == stderr)) {
+      if (outputs[index].use_color == logger_true) {
         /* message color */
         if ((logger_color_prefix_enabled == logger_false) &&
             (logger_color_message_enabled == logger_false)) {
