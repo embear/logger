@@ -164,6 +164,7 @@ typedef const void (*logger_output_function_t)(const char *);
 #define logger_output_level_get(__stream)                               __logger_output_level_get(__stream)
 #define logger_output_color_enable(__stream)                            __logger_output_color_enable(__stream)
 #define logger_output_color_disable(__stream)                           __logger_output_color_disable(__stream)
+#define logger_output_color_is_enabled(__stream)                        __logger_output_color_is_enabled(__stream)
 #define logger_output_flush()                                           __logger_output_flush()
 #define logger_output_function_register(__function)                     __logger_output_function_register(__function)
 #define logger_output_function_deregister(__function)                   __logger_output_function_deregister(__function)
@@ -172,6 +173,7 @@ typedef const void (*logger_output_function_t)(const char *);
 #define logger_output_function_level_get(__function)                    __logger_output_function_level_get(__function)
 #define logger_output_function_color_enable(__function)                 __logger_output_function_color_enable(__function)
 #define logger_output_function_color_disable(__function)                __logger_output_function_color_disable(__function)
+#define logger_output_function_color_is_enabled(__function)             __logger_output_function_color_is_enabled(__function)
 #define logger_id_request(__name)                                       __logger_id_request(__name)
 #define logger_id_release(__id)                                         __logger_id_release(__id)
 #define logger_id_enable(__id)                                          __logger_id_enable(__id)
@@ -189,6 +191,7 @@ typedef const void (*logger_output_function_t)(const char *);
 #define logger_id_output_level_get(__id, __stream)                      __logger_id_output_level_get(__id, __stream)
 #define logger_id_output_color_enable(__id, __stream)                   __logger_id_output_color_enable(__id, __stream)
 #define logger_id_output_color_disable(__id, __stream)                  __logger_id_output_color_disable(__id, __stream)
+#define logger_id_output_color_is_enabled(__id, __stream)               __logger_id_output_color_is_enabled(__id, __stream)
 #define logger_id_output_function_register(__id, __function)            __logger_id_output_function_register(__id, __function)
 #define logger_id_output_function_deregister(__id, __function)          __logger_id_output_function_deregister(__id, __function)
 #define logger_id_output_function_is_registered(__id, __function)       __logger_id_output_function_is_registered(__id, __function)
@@ -196,6 +199,7 @@ typedef const void (*logger_output_function_t)(const char *);
 #define logger_id_output_function_level_get(__id, __function)           __logger_id_output_function_level_get(__id, __function)
 #define logger_id_output_function_color_enable(__id, __function)        __logger_id_output_function_color_enable(__id, __function)
 #define logger_id_output_function_color_disable(__id, __function)       __logger_id_output_function_color_disable(__id, __function)
+#define logger_id_output_function_color_is_enabled(__id, __function)    __logger_id_output_function_color_is_enabled(__id, __function)
 #define logger_color_prefix_enable()                                    __logger_color_prefix_enable()
 #define logger_color_prefix_disable()                                   __logger_color_prefix_disable()
 #define logger_color_prefix_is_enabled()                                __logger_color_prefix_is_enabled()
@@ -221,6 +225,7 @@ logger_return_t __logger_output_level_set(FILE                 *stream,
 logger_level_t __logger_output_level_get(FILE *stream);
 logger_return_t __logger_output_color_enable(FILE *stream);
 logger_return_t __logger_output_color_disable(FILE *stream);
+logger_bool_t __logger_output_color_is_enabled(FILE *stream);
 logger_return_t __logger_output_flush(void);
 logger_return_t __logger_output_function_register(logger_output_function_t function);
 logger_return_t __logger_output_function_deregister(logger_output_function_t function);
@@ -230,6 +235,7 @@ logger_return_t __logger_output_function_level_set(logger_output_function_t func
 logger_level_t __logger_output_function_level_get(logger_output_function_t function);
 logger_return_t __logger_output_function_color_enable(logger_output_function_t function);
 logger_return_t __logger_output_function_color_disable(logger_output_function_t function);
+logger_bool_t __logger_output_function_color_is_enabled(logger_output_function_t function);
 logger_id_t __logger_id_request(const char *name);
 logger_return_t __logger_id_release(const logger_id_t id);
 logger_return_t __logger_id_enable(const logger_id_t id);
@@ -257,6 +263,8 @@ logger_return_t __logger_id_output_color_enable(const logger_id_t id,
                                                 FILE              *stream);
 logger_return_t __logger_id_output_color_disable(const logger_id_t id,
                                                  FILE              *stream);
+logger_bool_t __logger_id_output_color_is_enabled(const logger_id_t id,
+                                                  FILE              *stream);
 logger_return_t __logger_id_output_function_register(const logger_id_t        id,
                                                      logger_output_function_t function);
 logger_return_t __logger_id_output_function_deregister(const logger_id_t        id,
@@ -272,6 +280,8 @@ logger_return_t __logger_id_output_function_color_enable(const logger_id_t      
                                                          logger_output_function_t function);
 logger_return_t __logger_id_output_function_color_disable(const logger_id_t        id,
                                                           logger_output_function_t function);
+logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t        id,
+                                                           logger_output_function_t function);
 logger_return_t __logger_color_prefix_enable(void);
 logger_return_t __logger_color_prefix_disable(void);
 logger_bool_t __logger_color_prefix_is_enabled(void);

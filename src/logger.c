@@ -642,6 +642,43 @@ static inline logger_return_t __logger_output_stream_common_color(logger_output_
 
 
 /** ************************************************************************//**
+ * \brief  Query the output stream color setting.
+ *
+ * Query the color setting for a given output stream.
+ *
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     stream    Opened file stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+static inline logger_bool_t __logger_output_stream_common_color_is_enabled(logger_output_t *outputs,
+                                                                           const uint16_t  size,
+                                                                           FILE            *stream)
+{
+  logger_bool_t ret = logger_false;
+  int16_t       index;
+
+  /* check if stream valid */
+  if (stream != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output is already registered */
+      for (index = 0 ; index < size ; index++) {
+        if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+            (outputs[index].stream == stream)) {
+          ret = outputs[index].use_color;
+          break;
+        }
+      }
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Register an output function to a list of outputs.
  *
  * The user provided function must take a single string argument. The default
@@ -986,6 +1023,43 @@ static inline logger_return_t __logger_output_function_common_color(logger_outpu
 
 
 /** ************************************************************************//**
+ * \brief  Query the output function color setting.
+ *
+ * Query the color setting for a given output function.
+ *
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     function  User provided output function.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+static inline logger_bool_t __logger_output_function_common_color_is_enabled(logger_output_t          *outputs,
+                                                                             const uint16_t           size,
+                                                                             logger_output_function_t function)
+{
+  logger_bool_t ret = logger_false;
+  int16_t       index;
+
+  /* check if function valid */
+  if (function != NULL) {
+    /* check if outputs valid */
+    if (outputs != NULL) {
+      /* check if this output is already registered */
+      for (index = 0 ; index < size ; index++) {
+        if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+            (outputs[index].function == function)) {
+          ret = outputs[index].use_color;
+          break;
+        }
+      }
+    }
+  }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Register a global output stream.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -1125,6 +1199,26 @@ logger_return_t __logger_output_color_disable(FILE *stream)
 
   /* set stream output level to global outputs */
   ret = __logger_output_stream_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, stream, logger_false);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the global output stream color setting.
+ *
+ * Query the color setting for a given output stream.
+ *
+ * \param[in]     stream    Opened file stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_output_color_is_enabled(FILE *stream)
+{
+  logger_bool_t ret = logger_false;
+
+  /* check if color for this stream is enabled */
+  ret = __logger_output_stream_common_color_is_enabled(logger_outputs, LOGGER_OUTPUTS_MAX, stream);
 
   return(ret);
 }
@@ -1303,6 +1397,26 @@ logger_return_t __logger_output_function_color_disable(logger_output_function_t 
 
   /* set function output level to global outputs */
   ret = __logger_output_function_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, function, logger_false);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the global output function color setting.
+ *
+ * Query the color setting for a given output function.
+ *
+ * \param[in]     function  User provided output function.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_output_function_color_is_enabled(logger_output_function_t function)
+{
+  logger_bool_t ret = logger_false;
+
+  /* check if color for this function is enabled */
+  ret = __logger_output_function_common_color_is_enabled(logger_outputs, LOGGER_OUTPUTS_MAX, function);
 
   return(ret);
 }
@@ -1881,6 +1995,27 @@ logger_return_t __logger_id_output_color_disable(const logger_id_t id,
 
 
 /** ************************************************************************//**
+ * \brief  Query the id specific output stream color setting.
+ *
+ * Query the color setting for a given output stream.
+ *
+ * \param[in]     stream    Opened file stream.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_id_output_color_is_enabled(const logger_id_t id,
+                                                  FILE              *stream)
+{
+  logger_bool_t ret = logger_false;
+
+  /* check if color for this stream is enabled */
+  ret = __logger_output_stream_common_color_is_enabled(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
  * \brief  Register an id specific output stream.
  *
  * The user provided function must take a single string argument. The default
@@ -2087,6 +2222,27 @@ logger_return_t __logger_id_output_function_color_disable(const logger_id_t     
   else {
     ret = LOGGER_ERR_ID_UNKNOWN;
   }
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query the id specific output function color setting.
+ *
+ * Query the color setting for a given output function.
+ *
+ * \param[in]     function  User provided output function.
+ *
+ * \return        \c logger_true if logger is found, logger_false otherwise
+ ******************************************************************************/
+logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t        id,
+                                                           logger_output_function_t function)
+{
+  logger_bool_t ret = logger_false;
+
+  /* check if color for this function is enabled */
+  ret = __logger_output_function_common_color_is_enabled(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function);
 
   return(ret);
 }
