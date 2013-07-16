@@ -184,7 +184,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_disable());
   assert(logger_false == logger_is_enabled());
   puts("Logging disabled");
-  assert(LOGGER_ERR_ID_UNKNOWN == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   assert(logger_false == logger_is_enabled());
   assert(LOGGER_OK == logger_enable());
   assert(logger_true == logger_is_enabled());
@@ -473,7 +473,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_enable(id));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_ERR_ID_UNKNOWN == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
