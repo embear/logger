@@ -247,7 +247,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_enable(id));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
@@ -337,7 +337,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_prefix_set(id2, LOGGER_PREFIX_FUNCTION_LINE));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
@@ -417,7 +417,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
 
   assert(LOGGER_OK == logger_id_output_deregister(id, stdout));
   assert(LOGGER_OK == logger_id_release(id));
