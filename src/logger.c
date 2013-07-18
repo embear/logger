@@ -278,32 +278,50 @@ logger_bool_t __logger_is_enabled()
 
 
 /** ************************************************************************//**
- * \brief  Register an output stream to a list of outputs.
+ * \brief  Register an output to a list of outputs.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
- * opened by the user. The default logging level is set to \c LOGGER_UNKNOWN thus
- * no messages will appear on this stream.
+ * opened by the user. The user provided function must take a single string
+ * argument. The default logging level is set to \c LOGGER_UNKNOWN thus no
+ * messages will appear on this stream.
  *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
+ * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_stream_common_register(logger_output_t *outputs,
-                                                                     const uint16_t  size,
-                                                                     FILE            *stream)
+static inline logger_return_t __logger_output_common_register(logger_output_t          *outputs,
+                                                              const uint16_t           size,
+                                                              logger_output_type_t     type,
+                                                              FILE                     *stream,
+                                                              logger_output_function_t function)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
   logger_bool_t   found;
 
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
+  }
+
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
     return(LOGGER_ERR_STREAM_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
+    return(LOGGER_ERR_FUNCTION_INVALID);
+  }
+
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(LOGGER_ERR_OUTPUT_INVALID);
   }
@@ -311,19 +329,21 @@ static inline logger_return_t __logger_output_stream_common_register(logger_outp
   /* check if this output stream is already registered */
   found = logger_false;
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       found = logger_true;
       break;
     }
   }
 
-  /* stream is already registered */
+  /* output is already registered */
   if (found == logger_true) {
     outputs[index].count++;
     ret = LOGGER_ERR_OUTPUT_REGISTERED;
   }
-  /* stream is not registered */
+  /* output is not registered */
   else {
     /* search for an empty slot */
     found = logger_false;
@@ -338,20 +358,32 @@ static inline logger_return_t __logger_output_stream_common_register(logger_outp
     if (found == logger_true) {
       outputs[index].count++;
       outputs[index].level  = LOGGER_UNKNOWN;
-      outputs[index].type   = LOGGER_OUTPUT_TYPE_FILESTREAM;
-      outputs[index].stream = stream;
+      outputs[index].use_color = logger_false;
+      outputs[index].type   = type;
 
-      /* only stdout and stderr use color by default */
-      if ((stream == stdout) ||
-          (stream == stderr)) {
-        outputs[index].use_color = logger_true;
-      }
-      else {
-        outputs[index].use_color = logger_false;
-      }
+      switch (type) {
+        case LOGGER_OUTPUT_TYPE_UNKNOWN:
+          /* nothing */
+          break;
 
-      /* make a nonblocking stream */
-      /*fcntl(fileno(stream), F_SETFL, fcntl(fileno(stream), F_GETFL) | O_NONBLOCK);*/
+        case LOGGER_OUTPUT_TYPE_FILESTREAM:
+          outputs[index].stream = stream;
+
+          /* only stdout and stderr use color by default */
+          if ((stream == stdout) ||
+              (stream == stderr)) {
+            outputs[index].use_color = logger_true;
+          }
+          break;
+
+        case LOGGER_OUTPUT_TYPE_FUNCTION:
+          outputs[index].function = function;
+          break;
+
+        case LOGGER_OUTPUT_TYPE_MAX:
+          /* nothing */
+          break;
+      }
     }
     else {
       ret = LOGGER_ERR_OUTPUTS_FULL;
@@ -363,57 +395,79 @@ static inline logger_return_t __logger_output_stream_common_register(logger_outp
 
 
 /** ************************************************************************//**
- * \brief  Deregister an output stream from a list of outputs.
+ * \brief  Deregister an output from a list of outputs.
  *
- * Remove given file stream from list of outputs.
+ * Remove given output from list of outputs.
  *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
+ * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_stream_common_deregister(logger_output_t *outputs,
-                                                                       const uint16_t  size,
-                                                                       FILE            *stream)
+static inline logger_return_t __logger_output_common_deregister(logger_output_t          *outputs,
+                                                                const uint16_t           size,
+                                                                logger_output_type_t     type,
+                                                                FILE                     *stream,
+                                                                logger_output_function_t function)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
   logger_bool_t   found;
 
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
+  }
+
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
     return(LOGGER_ERR_STREAM_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
+    return(LOGGER_ERR_FUNCTION_INVALID);
+  }
+
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(LOGGER_ERR_OUTPUT_INVALID);
   }
 
-  /* check if this output is already registered */
+  /* check if this output is registered */
   found = logger_false;
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       found = logger_true;
       break;
     }
   }
 
-  /* found given stream in a slot */
+  /* found given output in a slot */
   if (found == logger_true) {
     outputs[index].count--;
 
-    /* remove this stream if this was the last reference */
+    /* remove this output if this was the last reference */
     if (outputs[index].count <= 0) {
       /* flush everything in this stream */
-      fflush(outputs[index].stream);
+      if (type == LOGGER_OUTPUT_TYPE_FILESTREAM) {
+        fflush(outputs[index].stream);
+      }
 
       /* reset output to default values */
       outputs[index].count     = 0;
       outputs[index].level     = LOGGER_UNKNOWN;
       outputs[index].use_color = logger_false;
+      outputs[index].type      = LOGGER_OUTPUT_TYPE_UNKNOWN;
       outputs[index].stream    = (FILE *)NULL;
       outputs[index].function  = (logger_output_function_t)NULL;
     }
@@ -427,37 +481,56 @@ static inline logger_return_t __logger_output_stream_common_deregister(logger_ou
 
 
 /** ************************************************************************//**
- * \brief  Search an output stream in a list of outputs.
+ * \brief  Search an output in a list of outputs.
  *
- * The given file stream is searched in the given list of outputs.
+ * The given output is searched in the given list of outputs.
  *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
+ * \param[in]     function  User provided output function.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-static inline logger_bool_t __logger_output_stream_common_is_registered(logger_output_t *outputs,
-                                                                        const uint16_t  size,
-                                                                        FILE            *stream)
+static inline logger_bool_t __logger_output_common_is_registered(logger_output_t          *outputs,
+                                                                 const uint16_t           size,
+                                                                 logger_output_type_t     type,
+                                                                 FILE                     *stream,
+                                                                 logger_output_function_t function)
 {
   logger_bool_t ret = logger_false;
   int16_t       index;
 
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
-    return(logger_false);
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
+    return(LOGGER_ERR_STREAM_INVALID);
+  }
+
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
+    return(LOGGER_ERR_FUNCTION_INVALID);
+  }
+
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(logger_false);
   }
 
-  /* check if this output stream is already registered */
+  /* check if this output stream is registered */
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       ret = logger_true;
       break;
     }
@@ -468,33 +541,50 @@ static inline logger_bool_t __logger_output_stream_common_is_registered(logger_o
 
 
 /** ************************************************************************//**
- * \brief  Set logging level for output stream in a list of outputs.
+ * \brief  Set logging level for output in a list of outputs.
  *
- * Set the minimum logging level for given output stream. Only log messages
- * equal or above the given level will be printed to the given stream.
+ * Set the minimum logging level for given output. Only log messages
+ * equal or above the given level will be printed to the given output.
  *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
- * \param[in]     level   Level to set.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
+ * \param[in]     function  User provided output function.
+ * \param[in]     level     Level to set.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_stream_common_level_set(logger_output_t      *outputs,
-                                                                      const uint16_t       size,
-                                                                      FILE                 *stream,
-                                                                      const logger_level_t level)
+static inline logger_return_t __logger_output_common_level_set(logger_output_t          *outputs,
+                                                               const uint16_t           size,
+                                                               logger_output_type_t     type,
+                                                               FILE                     *stream,
+                                                               logger_output_function_t function,
+                                                               const logger_level_t     level)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
   logger_bool_t   found;
 
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
+  }
+
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
     return(LOGGER_ERR_STREAM_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
+    return(LOGGER_ERR_FUNCTION_INVALID);
+  }
+
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(LOGGER_ERR_OUTPUT_INVALID);
   }
@@ -505,17 +595,19 @@ static inline logger_return_t __logger_output_stream_common_level_set(logger_out
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  /* check if this output is already registered */
+  /* check if this output is registered */
   found = logger_false;
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       found = logger_true;
       break;
     }
   }
 
-  /* found given stream in a slot */
+  /* found given output in a slot */
   if (found == logger_true) {
     /* set log level */
     outputs[index].level = level;
@@ -533,396 +625,52 @@ static inline logger_return_t __logger_output_stream_common_level_set(logger_out
  *
  * Query the currently set minimum level for the given logging output stream.
  *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
+ * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_level_t __logger_output_stream_common_level_get(logger_output_t *outputs,
-                                                                     const uint16_t  size,
-                                                                     FILE            *stream)
+static inline logger_level_t __logger_output_common_level_get(logger_output_t          *outputs,
+                                                              const uint16_t           size,
+                                                              logger_output_type_t     type,
+                                                              FILE                     *stream,
+                                                              logger_output_function_t function)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
   int16_t        index;
 
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
-    return(LOGGER_UNKNOWN);
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(LOGGER_UNKNOWN);
-  }
-
-  /* check if this output is already registered */
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
-      ret = outputs[index].level;
-      break;
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Modify the output stream color setting.
- *
- * Set the color setting for a given output stream to the given state.
- *
- * \param[inout]  outputs List of logger outputs.
- * \param[in]     size    Number of elements in list.
- * \param[in]     stream  Opened file stream.
- * \param[in]     flag    State of color setting.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-static inline logger_return_t __logger_output_stream_common_color(logger_output_t *outputs,
-                                                                  const uint16_t  size,
-                                                                  FILE            *stream,
-                                                                  logger_bool_t   flag)
-{
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
-
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
     return(LOGGER_ERR_STREAM_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(LOGGER_ERR_OUTPUT_INVALID);
-  }
-
-  /* check if this output is already registered */
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
-      /* set color flag */
-      outputs[index].use_color = flag;
-      break;
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Query the output stream color setting.
- *
- * Query the color setting for a given output stream.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     stream    Opened file stream.
- *
- * \return        \c logger_true if logger is found, logger_false otherwise
- ******************************************************************************/
-static inline logger_bool_t __logger_output_stream_common_color_is_enabled(logger_output_t *outputs,
-                                                                           const uint16_t  size,
-                                                                           FILE            *stream)
-{
-  logger_bool_t ret = logger_false;
-  int16_t       index;
-
-  /* GUARD: check if stream valid */
-  if (stream == NULL) {
-    return(logger_false);
-  }
-
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(logger_false);
-  }
-
-  /* check if this output is already registered */
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
-        (outputs[index].stream == stream)) {
-      ret = outputs[index].use_color;
-      break;
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Register an output function to a list of outputs.
- *
- * The user provided function must take a single string argument. The default
- * logging level is set to \c LOGGER_UNKNOWN thus this function will not be
- * called for any message.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     function  User provided output function.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-static inline logger_return_t __logger_output_function_common_register(logger_output_t          *outputs,
-                                                                       const uint16_t           size,
-                                                                       logger_output_function_t function)
-{
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
-  logger_bool_t   found;
-
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
     return(LOGGER_ERR_FUNCTION_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(LOGGER_ERR_OUTPUT_INVALID);
-  }
-
-  found = logger_false;
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
-      found = logger_true;
-      break;
-    }
-  }
-
-  /* function is already registered */
-  if (found == logger_true) {
-    outputs[index].count++;
-    ret = LOGGER_ERR_OUTPUT_REGISTERED;
-  }
-  /* function is not registered */
-  else {
-    /* search for an empty slot */
-    found = logger_false;
-    for (index = 0 ; index < size ; index++) {
-      if (outputs[index].count == 0) {
-        found = logger_true;
-        break;
-      }
-    }
-
-    /* found an empty slot */
-    if (found == logger_true) {
-      outputs[index].count++;
-      outputs[index].level     = LOGGER_UNKNOWN;
-      outputs[index].use_color = logger_false;
-      outputs[index].type      = LOGGER_OUTPUT_TYPE_FUNCTION;
-      outputs[index].function  = function;
-    }
-    else {
-      ret = LOGGER_ERR_OUTPUTS_FULL;
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Deregister an output function from a list of outputs.
- *
- * Remove given output function from list of outputs.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     function  User provided output function.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-static inline logger_return_t __logger_output_function_common_deregister(logger_output_t          *outputs,
-                                                                         const uint16_t           size,
-                                                                         logger_output_function_t function)
-{
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
-  logger_bool_t   found;
-
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
-    return(LOGGER_ERR_FUNCTION_INVALID);
-  }
-
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(LOGGER_ERR_OUTPUT_INVALID);
-  }
-
-  /* check if this output is already registered */
-  found = logger_false;
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
-      found = logger_true;
-      break;
-    }
-  }
-
-  /* found given function in a slot */
-  if (found == logger_true) {
-    outputs[index].count--;
-
-    /* remove this function if this was the last reference */
-    if (outputs[index].count <= 0) {
-      /* reset output to default values */
-      outputs[index].count     = 0;
-      outputs[index].level     = LOGGER_UNKNOWN;
-      outputs[index].use_color = logger_false;
-      outputs[index].stream    = (FILE *)NULL;
-      outputs[index].function  = (logger_output_function_t)NULL;
-    }
-  }
-  else {
-    ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Search an output function in a list of outputs.
- *
- * The given file function is searched in the given list of outputs.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     function  User provided output function.
- *
- * \return        \c logger_true if logger is found, logger_false otherwise
- ******************************************************************************/
-static inline logger_return_t __logger_output_function_common_is_registered(logger_output_t          *outputs,
-                                                                            const uint16_t           size,
-                                                                            logger_output_function_t function)
-{
-  logger_bool_t ret = logger_false;
-  int16_t       index;
-
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
-    return(logger_false);
-  }
-
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(logger_false);
-  }
-
-  /* check if this output function is already registered */
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
-      ret = logger_true;
-      break;
-    }
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Set logging level for output function in a list of outputs.
- *
- * Set the minimum logging level for given output function. Only log messages
- * equal or above the given level the function will be called.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     function  User provided output function.
- * \param[in]     level     Level to set.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-static inline logger_return_t __logger_output_function_common_level_set(logger_output_t           *outputs,
-                                                                         const uint16_t           size,
-                                                                         logger_output_function_t function,
-                                                                         const logger_level_t     level)
-{
-  logger_return_t ret = LOGGER_OK;
-  int16_t         index;
-  logger_bool_t   found;
-
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
-    return(LOGGER_ERR_FUNCTION_INVALID);
-  }
-
-  /* GUARD: check if outputs valid */
-  if (outputs == NULL) {
-    return(LOGGER_ERR_OUTPUT_INVALID);
-  }
-
-  /* GUARD: check for valid level */
-  if ((level <= LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
-    return(LOGGER_ERR_LEVEL_UNKNOWN);
-  }
-
-  /* check if this output is already registered */
-  found = logger_false;
-  for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
-      found = logger_true;
-      break;
-    }
-  }
-
-  /* found given function in a slot */
-  if (found == logger_true) {
-    /* set log level */
-    outputs[index].level = level;
-  }
-  else {
-    ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
-  }
-
-  return(ret);
-}
-
-
-/** ************************************************************************//**
- * \brief  Query logging level for output function in a list of outputs.
- *
- * Query the currently set minimum level for the given logging output function.
- *
- * \param[inout]  outputs   List of logger outputs.
- * \param[in]     size      Number of elements in list.
- * \param[in]     function  User provided output function.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-static inline logger_level_t __logger_output_function_common_level_get(logger_output_t          *outputs,
-                                                                       const uint16_t           size,
-                                                                       logger_output_function_t function)
-{
-  logger_level_t ret = LOGGER_UNKNOWN;
-  int16_t        index;
-
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
-    return(LOGGER_UNKNOWN);
-  }
-
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(LOGGER_UNKNOWN);
   }
 
-  /* check if this output is already registered */
+  /* check if this output is registered */
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
-      /* get log level */
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+         (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))) {
       ret = outputs[index].level;
       break;
     }
@@ -933,39 +681,58 @@ static inline logger_level_t __logger_output_function_common_level_get(logger_ou
 
 
 /** ************************************************************************//**
- * \brief  Modify the output function color setting.
+ * \brief  Modify the output color setting.
  *
- * Set the color setting for a given output function to the given state.
+ * Set the color setting for a given output to the given state.
  *
  * \param[inout]  outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
  * \param[in]     function  User provided output function.
  * \param[in]     flag      State of color setting.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_function_common_color(logger_output_t          *outputs,
-                                                                    const uint16_t           size,
-                                                                    logger_output_function_t function,
-                                                                    logger_bool_t            flag)
+static inline logger_return_t __logger_output_common_color(logger_output_t          *outputs,
+                                                           const uint16_t           size,
+                                                           logger_output_type_t     type,
+                                                           FILE                     *stream,
+                                                           logger_output_function_t function,
+                                                           logger_bool_t            flag)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
 
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
+  }
+
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
+    return(LOGGER_ERR_STREAM_INVALID);
+  }
+
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
     return(LOGGER_ERR_FUNCTION_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
     return(LOGGER_ERR_OUTPUT_INVALID);
   }
 
-  /* check if this output is already registered */
+  /* check if this output is registered */
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       /* set color flag */
       outputs[index].use_color = flag;
       break;
@@ -977,37 +744,58 @@ static inline logger_return_t __logger_output_function_common_color(logger_outpu
 
 
 /** ************************************************************************//**
- * \brief  Query the output function color setting.
+ * \brief  Query the output color setting.
  *
- * Query the color setting for a given output function.
+ * Query the color setting for a given output.
  *
  * \param[inout]  outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
+ * \param[inout]  outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in list.
+ * \param[in]     type      Type of output.
+ * \param[in]     stream    Opened file stream.
  * \param[in]     function  User provided output function.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-static inline logger_bool_t __logger_output_function_common_color_is_enabled(logger_output_t          *outputs,
-                                                                             const uint16_t           size,
-                                                                             logger_output_function_t function)
+static inline logger_bool_t __logger_output_common_color_is_enabled(logger_output_t          *outputs,
+                                                                    const uint16_t           size,
+                                                                    logger_output_type_t     type,
+                                                                    FILE                     *stream,
+                                                                    logger_output_function_t function)
 {
   logger_bool_t ret = logger_false;
   int16_t       index;
 
-  /* GUARD: check if function pointer valid */
-  if (function == NULL) {
+  /* GUARD: check for valid type */
+  if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
+      (type >= LOGGER_OUTPUT_TYPE_MAX)) {
+    return(LOGGER_ERR_TYPE_INVALID);
+  }
+
+  /* GUARD: check for valid stream */
+  if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+      (stream == NULL)) {
+    return(LOGGER_ERR_STREAM_INVALID);
+  }
+
+  /* GUARD: check for valid function */
+  if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+      (function == NULL)) {
     return(LOGGER_ERR_FUNCTION_INVALID);
   }
 
-  /* GUARD: check if outputs valid */
+  /* GUARD: check for valid output */
   if (outputs == NULL) {
-    return(LOGGER_ERR_OUTPUT_INVALID);
+    return(logger_false);
   }
 
-  /* check if this output is already registered */
+  /* check if this output is registered */
   for (index = 0 ; index < size ; index++) {
-    if ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
-        (outputs[index].function == function)) {
+    if (((outputs[index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+        (outputs[index].stream == stream)) ||
+        ((outputs[index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+         (outputs[index].function == function))){
       ret = outputs[index].use_color;
       break;
     }
@@ -1031,7 +819,11 @@ static inline logger_bool_t __logger_output_function_common_color_is_enabled(log
 logger_return_t __logger_output_register(FILE *stream)
 {
   /* add stream to global outputs */
-  return(__logger_output_stream_common_register(logger_outputs, LOGGER_OUTPUTS_MAX, stream));
+  return(__logger_output_common_register(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL));
 }
 
 
@@ -1047,7 +839,11 @@ logger_return_t __logger_output_register(FILE *stream)
 logger_return_t __logger_output_deregister(FILE *stream)
 {
   /* delete stream to global outputs */
-  return(__logger_output_stream_common_deregister(logger_outputs, LOGGER_OUTPUTS_MAX, stream));
+  return(__logger_output_common_deregister(logger_outputs,
+                                           LOGGER_OUTPUTS_MAX,
+                                           LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                           stream,
+                                           (logger_output_function_t)NULL));
 }
 
 
@@ -1063,7 +859,11 @@ logger_return_t __logger_output_deregister(FILE *stream)
 logger_bool_t __logger_output_is_registered(FILE *stream)
 {
   /* search stream in global outputs */
-  return(__logger_output_stream_common_is_registered(logger_outputs, LOGGER_OUTPUTS_MAX, stream));
+  return(__logger_output_common_is_registered(logger_outputs,
+                                              LOGGER_OUTPUTS_MAX,
+                                              LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                              stream,
+                                              (logger_output_function_t)NULL));
 }
 
 
@@ -1082,7 +882,12 @@ logger_return_t __logger_output_level_set(FILE                 *stream,
                                           const logger_level_t level)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_stream_common_level_set(logger_outputs, LOGGER_OUTPUTS_MAX, stream, level));
+  return(__logger_output_common_level_set(logger_outputs,
+                                          LOGGER_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                          stream,
+                                          (logger_output_function_t)NULL,
+                                          level));
 }
 
 
@@ -1098,7 +903,11 @@ logger_return_t __logger_output_level_set(FILE                 *stream,
 logger_level_t __logger_output_level_get(FILE *stream)
 {
   /* get stream output level to global outputs */
-  return(__logger_output_stream_common_level_get(logger_outputs, LOGGER_OUTPUTS_MAX, stream));
+  return(__logger_output_common_level_get(logger_outputs,
+                                          LOGGER_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                          stream,
+                                          (logger_output_function_t)NULL));
 }
 
 
@@ -1114,7 +923,12 @@ logger_level_t __logger_output_level_get(FILE *stream)
 logger_return_t __logger_output_color_enable(FILE *stream)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_stream_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, stream, logger_true));
+  return(__logger_output_common_color(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL,
+                                      logger_true));
 }
 
 
@@ -1130,7 +944,12 @@ logger_return_t __logger_output_color_enable(FILE *stream)
 logger_return_t __logger_output_color_disable(FILE *stream)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_stream_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, stream, logger_false));
+  return(__logger_output_common_color(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL,
+                                      logger_false));
 }
 
 
@@ -1146,7 +965,11 @@ logger_return_t __logger_output_color_disable(FILE *stream)
 logger_bool_t __logger_output_color_is_enabled(FILE *stream)
 {
   /* check if color for this stream is enabled */
-  return(__logger_output_stream_common_color_is_enabled(logger_outputs, LOGGER_OUTPUTS_MAX, stream));
+  return(__logger_output_common_color_is_enabled(logger_outputs,
+                                                 LOGGER_OUTPUTS_MAX,
+                                                 LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                                 stream,
+                                                 (logger_output_function_t)NULL));
 }
 
 
@@ -1196,7 +1019,11 @@ logger_return_t __logger_output_flush(void)
 logger_return_t __logger_output_function_register(logger_output_function_t function)
 {
   /* add function to global outputs */
-  return(__logger_output_function_common_register(logger_outputs, LOGGER_OUTPUTS_MAX, function));
+  return(__logger_output_common_register(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function));
 }
 
 
@@ -1212,7 +1039,11 @@ logger_return_t __logger_output_function_register(logger_output_function_t funct
 logger_return_t __logger_output_function_deregister(logger_output_function_t function)
 {
   /* delete function to global outputs */
-  return(__logger_output_function_common_deregister(logger_outputs, LOGGER_OUTPUTS_MAX, function));
+  return(__logger_output_common_deregister(logger_outputs,
+                                           LOGGER_OUTPUTS_MAX,
+                                           LOGGER_OUTPUT_TYPE_FUNCTION,
+                                           (FILE *)NULL,
+                                           function));
 }
 
 
@@ -1228,7 +1059,11 @@ logger_return_t __logger_output_function_deregister(logger_output_function_t fun
 logger_bool_t __logger_output_function_is_registered(logger_output_function_t function)
 {
   /* search function in global outputs */
-  return(__logger_output_function_common_is_registered(logger_outputs, LOGGER_OUTPUTS_MAX, function));
+  return(__logger_output_common_is_registered(logger_outputs,
+                                              LOGGER_OUTPUTS_MAX,
+                                              LOGGER_OUTPUT_TYPE_FUNCTION,
+                                              (FILE *)NULL,
+                                              function));
 }
 
 
@@ -1247,7 +1082,12 @@ logger_return_t __logger_output_function_level_set(logger_output_function_t func
                                                    const logger_level_t     level)
 {
   /* set function output level to global outputs */
-  return(__logger_output_function_common_level_set(logger_outputs, LOGGER_OUTPUTS_MAX, function, level));
+  return(__logger_output_common_level_set(logger_outputs,
+                                          LOGGER_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FUNCTION,
+                                          (FILE *)NULL,
+                                          function,
+                                          level));
 }
 
 
@@ -1263,7 +1103,11 @@ logger_return_t __logger_output_function_level_set(logger_output_function_t func
 logger_level_t __logger_output_function_level_get(logger_output_function_t function)
 {
   /* get function output level to global outputs */
-  return(__logger_output_function_common_level_get(logger_outputs, LOGGER_OUTPUTS_MAX, function));
+  return(__logger_output_common_level_get(logger_outputs,
+                                          LOGGER_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FUNCTION,
+                                          (FILE *)NULL,
+                                          function));
 }
 
 
@@ -1279,7 +1123,12 @@ logger_level_t __logger_output_function_level_get(logger_output_function_t funct
 logger_return_t __logger_output_function_color_enable(logger_output_function_t function)
 {
   /* set function output level to global outputs */
-  return(__logger_output_function_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, function, logger_true));
+  return(__logger_output_common_color(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function,
+                                      logger_true));
 }
 
 
@@ -1295,7 +1144,12 @@ logger_return_t __logger_output_function_color_enable(logger_output_function_t f
 logger_return_t __logger_output_function_color_disable(logger_output_function_t function)
 {
   /* set function output level to global outputs */
-  return(__logger_output_function_common_color(logger_outputs, LOGGER_OUTPUTS_MAX, function, logger_false));
+  return(__logger_output_common_color(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function,
+                                      logger_false));
 }
 
 
@@ -1311,7 +1165,11 @@ logger_return_t __logger_output_function_color_disable(logger_output_function_t 
 logger_bool_t __logger_output_function_color_is_enabled(logger_output_function_t function)
 {
   /* check if color for this function is enabled */
-  return(__logger_output_function_common_color_is_enabled(logger_outputs, LOGGER_OUTPUTS_MAX, function));
+  return(__logger_output_common_color_is_enabled(logger_outputs,
+                                                 LOGGER_OUTPUTS_MAX,
+                                                 LOGGER_OUTPUT_TYPE_FUNCTION,
+                                                 (FILE *)NULL,
+                                                 function));
 }
 
 
@@ -1678,7 +1536,11 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
   }
 
   /* add stream to id specific outputs */
-  return(__logger_output_stream_common_register(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream));
+  return(__logger_output_common_register(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL));
 }
 
 
@@ -1703,7 +1565,11 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
   }
 
   /* delete stream to id specific outputs */
-  return(__logger_output_stream_common_deregister(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream));
+  return(__logger_output_common_deregister(logger_control[id].outputs,
+                                           LOGGER_ID_OUTPUTS_MAX,
+                                           LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                           stream,
+                                           (logger_output_function_t)NULL));
 }
 
 
@@ -1727,7 +1593,11 @@ logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
   }
 
   /* search stream in id specific outputs */
-  return(__logger_output_stream_common_is_registered(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream));
+  return(__logger_output_common_is_registered(logger_control[id].outputs,
+                                              LOGGER_ID_OUTPUTS_MAX,
+                                              LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                              stream,
+                                              (logger_output_function_t)NULL));
 }
 
 
@@ -1755,7 +1625,12 @@ logger_return_t __logger_id_output_level_set(const logger_id_t    id,
   }
 
   /* set stream output level to id specific outputs */
-  return(__logger_output_stream_common_level_set(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, level));
+  return(__logger_output_common_level_set(logger_control[id].outputs,
+                                          LOGGER_ID_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                          stream,
+                                          (logger_output_function_t)NULL,
+                                          level));
 }
 
 
@@ -1780,7 +1655,11 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
   }
 
   /* get stream output level from id specific outputs */
-  return(__logger_output_stream_common_level_get(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream));
+  return(__logger_output_common_level_get(logger_control[id].outputs,
+                                          LOGGER_ID_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                          stream,
+                                          (logger_output_function_t)NULL));
 }
 
 
@@ -1804,7 +1683,12 @@ logger_return_t __logger_id_output_color_enable(const logger_id_t id,
   }
 
   /* enable stream output color in id specific outputs */
-  return(__logger_output_stream_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, logger_true));
+  return(__logger_output_common_color(logger_control[id].outputs,
+                                      LOGGER_ID_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL,
+                                      logger_true));
 }
 
 
@@ -1828,7 +1712,12 @@ logger_return_t __logger_id_output_color_disable(const logger_id_t id,
   }
 
   /* disable stream output color in id specific outputs */
-  return(__logger_output_stream_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream, logger_false));
+  return(__logger_output_common_color(logger_control[id].outputs,
+                                      LOGGER_ID_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL,
+                                      logger_false));
 }
 
 
@@ -1845,7 +1734,11 @@ logger_bool_t __logger_id_output_color_is_enabled(const logger_id_t id,
                                                   FILE              *stream)
 {
   /* check if color for this stream is enabled */
-  return(__logger_output_stream_common_color_is_enabled(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, stream));
+  return(__logger_output_common_color_is_enabled(logger_control[id].outputs,
+                                                 LOGGER_ID_OUTPUTS_MAX,
+                                                 LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                                 stream,
+                                                 (logger_output_function_t)NULL));
 }
 
 
@@ -1872,7 +1765,11 @@ logger_return_t __logger_id_output_function_register(const logger_id_t        id
   }
 
   /* add function to global outputs */
-  return(__logger_output_function_common_register(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function));
+  return(__logger_output_common_register(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function));
 }
 
 
@@ -1897,7 +1794,11 @@ logger_return_t __logger_id_output_function_deregister(const logger_id_t        
   }
 
   /* delete function to global outputs */
-  return(__logger_output_function_common_deregister(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function));
+  return(__logger_output_common_deregister(logger_control[id].outputs,
+                                           LOGGER_ID_OUTPUTS_MAX,
+                                           LOGGER_OUTPUT_TYPE_FUNCTION,
+                                           (FILE *)NULL,
+                                           function));
 }
 
 
@@ -1921,7 +1822,11 @@ logger_bool_t __logger_id_output_function_is_registered(const logger_id_t       
   }
 
   /* search function in global outputs */
-  return(__logger_output_function_common_is_registered(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function));
+  return(__logger_output_common_is_registered(logger_control[id].outputs,
+                                              LOGGER_ID_OUTPUTS_MAX,
+                                              LOGGER_OUTPUT_TYPE_FUNCTION,
+                                              (FILE *)NULL,
+                                              function));
 }
 
 
@@ -1949,7 +1854,12 @@ logger_return_t __logger_id_output_function_level_set(const logger_id_t        i
   }
 
   /* set function output level to id specific outputs */
-  return(__logger_output_function_common_level_set(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function, level));
+  return(__logger_output_common_level_set(logger_control[id].outputs,
+                                          LOGGER_ID_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FUNCTION,
+                                          (FILE *)NULL,
+                                          function,
+                                          level));
 }
 
 
@@ -1974,7 +1884,11 @@ logger_level_t __logger_id_output_function_level_get(const logger_id_t        id
   }
 
   /* get function output level from id specific outputs */
-  return(__logger_output_function_common_level_get(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function));
+  return(__logger_output_common_level_get(logger_control[id].outputs,
+                                          LOGGER_ID_OUTPUTS_MAX,
+                                          LOGGER_OUTPUT_TYPE_FUNCTION,
+                                          (FILE *)NULL,
+                                          function));
 }
 
 
@@ -1998,7 +1912,12 @@ logger_return_t __logger_id_output_function_color_enable(const logger_id_t      
   }
 
   /* enable function output enable to id specific outputs */
-  return(__logger_output_function_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function, logger_true));
+  return(__logger_output_common_color(logger_control[id].outputs,
+                                      LOGGER_ID_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function,
+                                      logger_true));
 }
 
 
@@ -2022,7 +1941,12 @@ logger_return_t __logger_id_output_function_color_disable(const logger_id_t     
   }
 
   /* disable function output color in id specific outputs */
-  return(__logger_output_function_common_color(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function, logger_false));
+  return(__logger_output_common_color(logger_control[id].outputs,
+                                      LOGGER_ID_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function,
+                                      logger_false));
 }
 
 
@@ -2046,7 +1970,11 @@ logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t    
   }
 
   /* check if color for this function is enabled */
-  return(__logger_output_function_common_color_is_enabled(logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, function));
+  return(__logger_output_common_color_is_enabled(logger_control[id].outputs,
+                                                 LOGGER_ID_OUTPUTS_MAX,
+                                                 LOGGER_OUTPUT_TYPE_FUNCTION,
+                                                 (FILE *)NULL,
+                                                 function));
 }
 
 

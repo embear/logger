@@ -100,11 +100,12 @@ typedef enum logger_return_e {
   LOGGER_ERR_LEVEL_UNKNOWN     =  -8,   /**< Level is unknown. */
   LOGGER_ERR_PREFIX_UNKNOWN    =  -9,   /**< Prefix is unknown. */
   LOGGER_ERR_OUT_OF_MEMORY     = -10,   /**< Memory allocation error. */
-  LOGGER_ERR_STREAM_INVALID    = -11,   /**< File stream is invalid. */
-  LOGGER_ERR_FUNCTION_INVALID  = -12,   /**< File stream is invalid. */
-  LOGGER_ERR_NAME_INVALID      = -13,   /**< Name string is invalid. */
-  LOGGER_ERR_FORMAT_INVALID    = -14,   /**< Format string is invalid. */
-  LOGGER_ERR_FILE_INVALID      = -15    /**< File string is invalid. */
+  LOGGER_ERR_TYPE_INVALID      = -11,   /**< Output type is invalid. */
+  LOGGER_ERR_STREAM_INVALID    = -12,   /**< File stream is invalid. */
+  LOGGER_ERR_FUNCTION_INVALID  = -13,   /**< Function is invalid. */
+  LOGGER_ERR_NAME_INVALID      = -14,   /**< Name string is invalid. */
+  LOGGER_ERR_FORMAT_INVALID    = -15,   /**< Format string is invalid. */
+  LOGGER_ERR_FILE_INVALID      = -16    /**< File string is invalid. */
 } logger_return_t;
 
 
