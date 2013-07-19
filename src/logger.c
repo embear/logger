@@ -190,7 +190,7 @@ static logger_color_string_t logger_level_colors[] =
  *
  * \return        Version of logger
  ******************************************************************************/
-logger_version_t __logger_version(void)
+logger_version_t logger_version(void)
 {
   return(LOGGER_VERSION);
 }
@@ -204,7 +204,7 @@ logger_version_t __logger_version(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_init(void)
+logger_return_t logger_init(void)
 {
   if (logger_initialized == logger_false) {
     logger_initialized           = logger_true;
@@ -228,7 +228,7 @@ logger_return_t __logger_init(void)
  *
  * \return        \c logger_true if logger is initialized, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_is_initialized(void)
+logger_bool_t logger_is_initialized(void)
 {
   return(logger_initialized);
 }
@@ -241,7 +241,7 @@ logger_bool_t __logger_is_initialized(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_enable(void)
+logger_return_t logger_enable(void)
 {
   logger_enabled = logger_true;
 
@@ -256,7 +256,7 @@ logger_return_t __logger_enable(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_disable(void)
+logger_return_t logger_disable(void)
 {
   logger_enabled = logger_false;
 
@@ -271,7 +271,7 @@ logger_return_t __logger_disable(void)
  *
  * \return        \c logger_true if logger is enabled, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_is_enabled()
+logger_bool_t logger_is_enabled()
 {
   return(logger_enabled);
 }
@@ -293,11 +293,11 @@ logger_bool_t __logger_is_enabled()
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_common_register(logger_output_t          *outputs,
-                                                              const uint16_t           size,
-                                                              logger_output_type_t     type,
-                                                              FILE                     *stream,
-                                                              logger_output_function_t function)
+static inline logger_return_t logger_output_common_register(logger_output_t          *outputs,
+                                                            const uint16_t           size,
+                                                            logger_output_type_t     type,
+                                                            FILE                     *stream,
+                                                            logger_output_function_t function)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -407,11 +407,11 @@ static inline logger_return_t __logger_output_common_register(logger_output_t   
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_common_deregister(logger_output_t          *outputs,
-                                                                const uint16_t           size,
-                                                                logger_output_type_t     type,
-                                                                FILE                     *stream,
-                                                                logger_output_function_t function)
+static inline logger_return_t logger_output_common_deregister(logger_output_t          *outputs,
+                                                              const uint16_t           size,
+                                                              logger_output_type_t     type,
+                                                              FILE                     *stream,
+                                                              logger_output_function_t function)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -493,11 +493,11 @@ static inline logger_return_t __logger_output_common_deregister(logger_output_t 
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-static inline logger_bool_t __logger_output_common_is_registered(logger_output_t          *outputs,
-                                                                 const uint16_t           size,
-                                                                 logger_output_type_t     type,
-                                                                 FILE                     *stream,
-                                                                 logger_output_function_t function)
+static inline logger_bool_t logger_output_common_is_registered(logger_output_t          *outputs,
+                                                               const uint16_t           size,
+                                                               logger_output_type_t     type,
+                                                               FILE                     *stream,
+                                                               logger_output_function_t function)
 {
   logger_bool_t ret = logger_false;
   int16_t       index;
@@ -555,12 +555,12 @@ static inline logger_bool_t __logger_output_common_is_registered(logger_output_t
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_common_level_set(logger_output_t          *outputs,
-                                                               const uint16_t           size,
-                                                               logger_output_type_t     type,
-                                                               FILE                     *stream,
-                                                               logger_output_function_t function,
-                                                               const logger_level_t     level)
+static inline logger_return_t logger_output_common_level_set(logger_output_t          *outputs,
+                                                             const uint16_t           size,
+                                                             logger_output_type_t     type,
+                                                             FILE                     *stream,
+                                                             logger_output_function_t function,
+                                                             const logger_level_t     level)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -633,11 +633,11 @@ static inline logger_return_t __logger_output_common_level_set(logger_output_t  
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_level_t __logger_output_common_level_get(logger_output_t          *outputs,
-                                                              const uint16_t           size,
-                                                              logger_output_type_t     type,
-                                                              FILE                     *stream,
-                                                              logger_output_function_t function)
+static inline logger_level_t logger_output_common_level_get(logger_output_t          *outputs,
+                                                            const uint16_t           size,
+                                                            logger_output_type_t     type,
+                                                            FILE                     *stream,
+                                                            logger_output_function_t function)
 {
   logger_level_t ret = LOGGER_UNKNOWN;
   int16_t        index;
@@ -694,12 +694,12 @@ static inline logger_level_t __logger_output_common_level_get(logger_output_t   
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output_common_color(logger_output_t          *outputs,
-                                                           const uint16_t           size,
-                                                           logger_output_type_t     type,
-                                                           FILE                     *stream,
-                                                           logger_output_function_t function,
-                                                           logger_bool_t            flag)
+static inline logger_return_t logger_output_common_color(logger_output_t          *outputs,
+                                                         const uint16_t           size,
+                                                         logger_output_type_t     type,
+                                                         FILE                     *stream,
+                                                         logger_output_function_t function,
+                                                         logger_bool_t            flag)
 {
   logger_return_t ret = LOGGER_OK;
   int16_t         index;
@@ -758,11 +758,11 @@ static inline logger_return_t __logger_output_common_color(logger_output_t      
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-static inline logger_bool_t __logger_output_common_color_is_enabled(logger_output_t          *outputs,
-                                                                    const uint16_t           size,
-                                                                    logger_output_type_t     type,
-                                                                    FILE                     *stream,
-                                                                    logger_output_function_t function)
+static inline logger_bool_t logger_output_common_color_is_enabled(logger_output_t          *outputs,
+                                                                  const uint16_t           size,
+                                                                  logger_output_type_t     type,
+                                                                  FILE                     *stream,
+                                                                  logger_output_function_t function)
 {
   logger_bool_t ret = logger_false;
   int16_t       index;
@@ -816,14 +816,14 @@ static inline logger_bool_t __logger_output_common_color_is_enabled(logger_outpu
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_register(FILE *stream)
+logger_return_t logger_output_register(FILE *stream)
 {
   /* add stream to global outputs */
-  return(__logger_output_common_register(logger_outputs,
-                                         LOGGER_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                         stream,
-                                         (logger_output_function_t)NULL));
+  return(logger_output_common_register(logger_outputs,
+                                       LOGGER_OUTPUTS_MAX,
+                                       LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                       stream,
+                                       (logger_output_function_t)NULL));
 }
 
 
@@ -836,14 +836,14 @@ logger_return_t __logger_output_register(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_deregister(FILE *stream)
+logger_return_t logger_output_deregister(FILE *stream)
 {
   /* delete stream to global outputs */
-  return(__logger_output_common_deregister(logger_outputs,
-                                           LOGGER_OUTPUTS_MAX,
-                                           LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                           stream,
-                                           (logger_output_function_t)NULL));
+  return(logger_output_common_deregister(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL));
 }
 
 
@@ -856,14 +856,14 @@ logger_return_t __logger_output_deregister(FILE *stream)
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_output_is_registered(FILE *stream)
+logger_bool_t logger_output_is_registered(FILE *stream)
 {
   /* search stream in global outputs */
-  return(__logger_output_common_is_registered(logger_outputs,
-                                              LOGGER_OUTPUTS_MAX,
-                                              LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                              stream,
-                                              (logger_output_function_t)NULL));
+  return(logger_output_common_is_registered(logger_outputs,
+                                            LOGGER_OUTPUTS_MAX,
+                                            LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                            stream,
+                                            (logger_output_function_t)NULL));
 }
 
 
@@ -878,16 +878,16 @@ logger_bool_t __logger_output_is_registered(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_level_set(FILE                 *stream,
-                                          const logger_level_t level)
+logger_return_t logger_output_level_set(FILE                 *stream,
+                                        const logger_level_t level)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_common_level_set(logger_outputs,
-                                          LOGGER_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                          stream,
-                                          (logger_output_function_t)NULL,
-                                          level));
+  return(logger_output_common_level_set(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL,
+                                        level));
 }
 
 
@@ -900,14 +900,14 @@ logger_return_t __logger_output_level_set(FILE                 *stream,
  *
  * \return        Currently set logging level.
  ******************************************************************************/
-logger_level_t __logger_output_level_get(FILE *stream)
+logger_level_t logger_output_level_get(FILE *stream)
 {
   /* get stream output level to global outputs */
-  return(__logger_output_common_level_get(logger_outputs,
-                                          LOGGER_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                          stream,
-                                          (logger_output_function_t)NULL));
+  return(logger_output_common_level_get(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL));
 }
 
 
@@ -920,15 +920,15 @@ logger_level_t __logger_output_level_get(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_color_enable(FILE *stream)
+logger_return_t logger_output_color_enable(FILE *stream)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_common_color(logger_outputs,
-                                      LOGGER_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                      stream,
-                                      (logger_output_function_t)NULL,
-                                      logger_true));
+  return(logger_output_common_color(logger_outputs,
+                                    LOGGER_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                    stream,
+                                    (logger_output_function_t)NULL,
+                                    logger_true));
 }
 
 
@@ -941,15 +941,15 @@ logger_return_t __logger_output_color_enable(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_color_disable(FILE *stream)
+logger_return_t logger_output_color_disable(FILE *stream)
 {
   /* set stream output level to global outputs */
-  return(__logger_output_common_color(logger_outputs,
-                                      LOGGER_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                      stream,
-                                      (logger_output_function_t)NULL,
-                                      logger_false));
+  return(logger_output_common_color(logger_outputs,
+                                    LOGGER_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                    stream,
+                                    (logger_output_function_t)NULL,
+                                    logger_false));
 }
 
 
@@ -962,14 +962,14 @@ logger_return_t __logger_output_color_disable(FILE *stream)
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_output_color_is_enabled(FILE *stream)
+logger_bool_t logger_output_color_is_enabled(FILE *stream)
 {
   /* check if color for this stream is enabled */
-  return(__logger_output_common_color_is_enabled(logger_outputs,
-                                                 LOGGER_OUTPUTS_MAX,
-                                                 LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                                 stream,
-                                                 (logger_output_function_t)NULL));
+  return(logger_output_common_color_is_enabled(logger_outputs,
+                                               LOGGER_OUTPUTS_MAX,
+                                               LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                               stream,
+                                               (logger_output_function_t)NULL));
 }
 
 
@@ -980,7 +980,7 @@ logger_bool_t __logger_output_color_is_enabled(FILE *stream)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_flush(void)
+logger_return_t logger_output_flush(void)
 {
   int16_t index;
   int16_t id;
@@ -1016,14 +1016,14 @@ logger_return_t __logger_output_flush(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_function_register(logger_output_function_t function)
+logger_return_t logger_output_function_register(logger_output_function_t function)
 {
   /* add function to global outputs */
-  return(__logger_output_common_register(logger_outputs,
-                                         LOGGER_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FUNCTION,
-                                         (FILE *)NULL,
-                                         function));
+  return(logger_output_common_register(logger_outputs,
+                                       LOGGER_OUTPUTS_MAX,
+                                       LOGGER_OUTPUT_TYPE_FUNCTION,
+                                       (FILE *)NULL,
+                                       function));
 }
 
 
@@ -1036,14 +1036,14 @@ logger_return_t __logger_output_function_register(logger_output_function_t funct
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_function_deregister(logger_output_function_t function)
+logger_return_t logger_output_function_deregister(logger_output_function_t function)
 {
   /* delete function to global outputs */
-  return(__logger_output_common_deregister(logger_outputs,
-                                           LOGGER_OUTPUTS_MAX,
-                                           LOGGER_OUTPUT_TYPE_FUNCTION,
-                                           (FILE *)NULL,
-                                           function));
+  return(logger_output_common_deregister(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function));
 }
 
 
@@ -1056,14 +1056,14 @@ logger_return_t __logger_output_function_deregister(logger_output_function_t fun
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_output_function_is_registered(logger_output_function_t function)
+logger_bool_t logger_output_function_is_registered(logger_output_function_t function)
 {
   /* search function in global outputs */
-  return(__logger_output_common_is_registered(logger_outputs,
-                                              LOGGER_OUTPUTS_MAX,
-                                              LOGGER_OUTPUT_TYPE_FUNCTION,
-                                              (FILE *)NULL,
-                                              function));
+  return(logger_output_common_is_registered(logger_outputs,
+                                            LOGGER_OUTPUTS_MAX,
+                                            LOGGER_OUTPUT_TYPE_FUNCTION,
+                                            (FILE *)NULL,
+                                            function));
 }
 
 
@@ -1078,16 +1078,16 @@ logger_bool_t __logger_output_function_is_registered(logger_output_function_t fu
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_function_level_set(logger_output_function_t function,
-                                                   const logger_level_t     level)
+logger_return_t logger_output_function_level_set(logger_output_function_t function,
+                                                 const logger_level_t     level)
 {
   /* set function output level to global outputs */
-  return(__logger_output_common_level_set(logger_outputs,
-                                          LOGGER_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FUNCTION,
-                                          (FILE *)NULL,
-                                          function,
-                                          level));
+  return(logger_output_common_level_set(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function,
+                                        level));
 }
 
 
@@ -1100,14 +1100,14 @@ logger_return_t __logger_output_function_level_set(logger_output_function_t func
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_level_t __logger_output_function_level_get(logger_output_function_t function)
+logger_level_t logger_output_function_level_get(logger_output_function_t function)
 {
   /* get function output level to global outputs */
-  return(__logger_output_common_level_get(logger_outputs,
-                                          LOGGER_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FUNCTION,
-                                          (FILE *)NULL,
-                                          function));
+  return(logger_output_common_level_get(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function));
 }
 
 
@@ -1120,15 +1120,15 @@ logger_level_t __logger_output_function_level_get(logger_output_function_t funct
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_function_color_enable(logger_output_function_t function)
+logger_return_t logger_output_function_color_enable(logger_output_function_t function)
 {
   /* set function output level to global outputs */
-  return(__logger_output_common_color(logger_outputs,
-                                      LOGGER_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FUNCTION,
-                                      (FILE *)NULL,
-                                      function,
-                                      logger_true));
+  return(logger_output_common_color(logger_outputs,
+                                    LOGGER_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FUNCTION,
+                                    (FILE *)NULL,
+                                    function,
+                                    logger_true));
 }
 
 
@@ -1141,15 +1141,15 @@ logger_return_t __logger_output_function_color_enable(logger_output_function_t f
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_output_function_color_disable(logger_output_function_t function)
+logger_return_t logger_output_function_color_disable(logger_output_function_t function)
 {
   /* set function output level to global outputs */
-  return(__logger_output_common_color(logger_outputs,
-                                      LOGGER_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FUNCTION,
-                                      (FILE *)NULL,
-                                      function,
-                                      logger_false));
+  return(logger_output_common_color(logger_outputs,
+                                    LOGGER_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FUNCTION,
+                                    (FILE *)NULL,
+                                    function,
+                                    logger_false));
 }
 
 
@@ -1162,14 +1162,14 @@ logger_return_t __logger_output_function_color_disable(logger_output_function_t 
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_output_function_color_is_enabled(logger_output_function_t function)
+logger_bool_t logger_output_function_color_is_enabled(logger_output_function_t function)
 {
   /* check if color for this function is enabled */
-  return(__logger_output_common_color_is_enabled(logger_outputs,
-                                                 LOGGER_OUTPUTS_MAX,
-                                                 LOGGER_OUTPUT_TYPE_FUNCTION,
-                                                 (FILE *)NULL,
-                                                 function));
+  return(logger_output_common_color_is_enabled(logger_outputs,
+                                               LOGGER_OUTPUTS_MAX,
+                                               LOGGER_OUTPUT_TYPE_FUNCTION,
+                                               (FILE *)NULL,
+                                               function));
 }
 
 
@@ -1184,7 +1184,7 @@ logger_bool_t __logger_output_function_color_is_enabled(logger_output_function_t
  *
  * \return        ID number if ID is available, error code otherwise.
  ******************************************************************************/
-logger_id_t __logger_id_request(const char *name)
+logger_id_t logger_id_request(const char *name)
 {
   logger_id_t   id = logger_id_unknown;
   int16_t       index;
@@ -1258,7 +1258,7 @@ logger_id_t __logger_id_request(const char *name)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_release(const logger_id_t id)
+logger_return_t logger_id_release(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1278,7 +1278,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
   /* if this was the last ID */
   if (logger_control[id].count <= 0) {
     /* flush all streams */
-    __logger_output_flush();
+    logger_output_flush();
 
     /* reset the ID */
     memset(&logger_control[id], 0, sizeof(logger_control[id]));
@@ -1312,7 +1312,7 @@ logger_return_t __logger_id_release(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_enable(const logger_id_t id)
+logger_return_t logger_id_enable(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1337,7 +1337,7 @@ logger_return_t __logger_id_enable(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
-logger_return_t __logger_id_disable(const logger_id_t id)
+logger_return_t logger_id_disable(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1362,7 +1362,7 @@ logger_return_t __logger_id_disable(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_bool_t __logger_id_is_enabled(const logger_id_t id)
+logger_bool_t logger_id_is_enabled(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1387,8 +1387,8 @@ logger_bool_t __logger_id_is_enabled(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_level_set(const logger_id_t    id,
-                                      const logger_level_t level)
+logger_return_t logger_id_level_set(const logger_id_t    id,
+                                    const logger_level_t level)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1419,7 +1419,7 @@ logger_return_t __logger_id_level_set(const logger_id_t    id,
  *
  * \return        Currently set level
  ******************************************************************************/
-logger_level_t __logger_id_level_get(const logger_id_t id)
+logger_level_t logger_id_level_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1444,8 +1444,8 @@ logger_level_t __logger_id_level_get(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_prefix_set(const logger_id_t     id,
-                                       const logger_prefix_t prefix)
+logger_return_t logger_id_prefix_set(const logger_id_t     id,
+                                     const logger_prefix_t prefix)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1476,7 +1476,7 @@ logger_return_t __logger_id_prefix_set(const logger_id_t     id,
  *
  * \return        Currently set level
  ******************************************************************************/
-logger_prefix_t __logger_id_prefix_get(const logger_id_t id)
+logger_prefix_t logger_id_prefix_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1499,7 +1499,7 @@ logger_prefix_t __logger_id_prefix_get(const logger_id_t id)
  *
  * \return        Symbolic name of the ID
  ******************************************************************************/
-const char *__logger_id_name_get(const logger_id_t id)
+const char *logger_id_name_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1525,8 +1525,8 @@ const char *__logger_id_name_get(const logger_id_t id)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_register(const logger_id_t id,
-                                            FILE              *stream)
+logger_return_t logger_id_output_register(const logger_id_t id,
+                                          FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1536,11 +1536,11 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
   }
 
   /* add stream to id specific outputs */
-  return(__logger_output_common_register(logger_control[id].outputs,
-                                         LOGGER_ID_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                         stream,
-                                         (logger_output_function_t)NULL));
+  return(logger_output_common_register(logger_control[id].outputs,
+                                       LOGGER_ID_OUTPUTS_MAX,
+                                       LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                       stream,
+                                       (logger_output_function_t)NULL));
 }
 
 
@@ -1554,8 +1554,8 @@ logger_return_t __logger_id_output_register(const logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_deregister(const logger_id_t id,
-                                              FILE              *stream)
+logger_return_t logger_id_output_deregister(const logger_id_t id,
+                                            FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1565,11 +1565,11 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
   }
 
   /* delete stream to id specific outputs */
-  return(__logger_output_common_deregister(logger_control[id].outputs,
-                                           LOGGER_ID_OUTPUTS_MAX,
-                                           LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                           stream,
-                                           (logger_output_function_t)NULL));
+  return(logger_output_common_deregister(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL));
 }
 
 
@@ -1582,8 +1582,8 @@ logger_return_t __logger_id_output_deregister(const logger_id_t id,
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
-                                                 FILE              *stream)
+logger_bool_t logger_id_output_is_registered(const logger_id_t id,
+                                             FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1593,11 +1593,11 @@ logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
   }
 
   /* search stream in id specific outputs */
-  return(__logger_output_common_is_registered(logger_control[id].outputs,
-                                              LOGGER_ID_OUTPUTS_MAX,
-                                              LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                              stream,
-                                              (logger_output_function_t)NULL));
+  return(logger_output_common_is_registered(logger_control[id].outputs,
+                                            LOGGER_ID_OUTPUTS_MAX,
+                                            LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                            stream,
+                                            (logger_output_function_t)NULL));
 }
 
 
@@ -1613,9 +1613,9 @@ logger_bool_t __logger_id_output_is_registered(const logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_level_set(const logger_id_t    id,
-                                             FILE                 *stream,
-                                             const logger_level_t level)
+logger_return_t logger_id_output_level_set(const logger_id_t    id,
+                                           FILE                 *stream,
+                                           const logger_level_t level)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1625,12 +1625,12 @@ logger_return_t __logger_id_output_level_set(const logger_id_t    id,
   }
 
   /* set stream output level to id specific outputs */
-  return(__logger_output_common_level_set(logger_control[id].outputs,
-                                          LOGGER_ID_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                          stream,
-                                          (logger_output_function_t)NULL,
-                                          level));
+  return(logger_output_common_level_set(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL,
+                                        level));
 }
 
 
@@ -1644,8 +1644,8 @@ logger_return_t __logger_id_output_level_set(const logger_id_t    id,
  *
  * \return        Currently set logging level.
  ******************************************************************************/
-logger_level_t __logger_id_output_level_get(const logger_id_t id,
-                                            FILE              *stream)
+logger_level_t logger_id_output_level_get(const logger_id_t id,
+                                          FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1655,11 +1655,11 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
   }
 
   /* get stream output level from id specific outputs */
-  return(__logger_output_common_level_get(logger_control[id].outputs,
-                                          LOGGER_ID_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                          stream,
-                                          (logger_output_function_t)NULL));
+  return(logger_output_common_level_get(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL));
 }
 
 
@@ -1672,8 +1672,8 @@ logger_level_t __logger_id_output_level_get(const logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_color_enable(const logger_id_t id,
-                                                FILE              *stream)
+logger_return_t logger_id_output_color_enable(const logger_id_t id,
+                                              FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1683,12 +1683,12 @@ logger_return_t __logger_id_output_color_enable(const logger_id_t id,
   }
 
   /* enable stream output color in id specific outputs */
-  return(__logger_output_common_color(logger_control[id].outputs,
-                                      LOGGER_ID_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                      stream,
-                                      (logger_output_function_t)NULL,
-                                      logger_true));
+  return(logger_output_common_color(logger_control[id].outputs,
+                                    LOGGER_ID_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                    stream,
+                                    (logger_output_function_t)NULL,
+                                    logger_true));
 }
 
 
@@ -1701,8 +1701,8 @@ logger_return_t __logger_id_output_color_enable(const logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_color_disable(const logger_id_t id,
-                                                 FILE              *stream)
+logger_return_t logger_id_output_color_disable(const logger_id_t id,
+                                               FILE              *stream)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1712,12 +1712,12 @@ logger_return_t __logger_id_output_color_disable(const logger_id_t id,
   }
 
   /* disable stream output color in id specific outputs */
-  return(__logger_output_common_color(logger_control[id].outputs,
-                                      LOGGER_ID_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                      stream,
-                                      (logger_output_function_t)NULL,
-                                      logger_false));
+  return(logger_output_common_color(logger_control[id].outputs,
+                                    LOGGER_ID_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                    stream,
+                                    (logger_output_function_t)NULL,
+                                    logger_false));
 }
 
 
@@ -1730,15 +1730,15 @@ logger_return_t __logger_id_output_color_disable(const logger_id_t id,
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_id_output_color_is_enabled(const logger_id_t id,
-                                                  FILE              *stream)
+logger_bool_t logger_id_output_color_is_enabled(const logger_id_t id,
+                                                FILE              *stream)
 {
   /* check if color for this stream is enabled */
-  return(__logger_output_common_color_is_enabled(logger_control[id].outputs,
-                                                 LOGGER_ID_OUTPUTS_MAX,
-                                                 LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                                 stream,
-                                                 (logger_output_function_t)NULL));
+  return(logger_output_common_color_is_enabled(logger_control[id].outputs,
+                                               LOGGER_ID_OUTPUTS_MAX,
+                                               LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                               stream,
+                                               (logger_output_function_t)NULL));
 }
 
 
@@ -1754,8 +1754,8 @@ logger_bool_t __logger_id_output_color_is_enabled(const logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_function_register(const logger_id_t        id,
-                                                     logger_output_function_t function)
+logger_return_t logger_id_output_function_register(const logger_id_t        id,
+                                                   logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1765,11 +1765,11 @@ logger_return_t __logger_id_output_function_register(const logger_id_t        id
   }
 
   /* add function to global outputs */
-  return(__logger_output_common_register(logger_control[id].outputs,
-                                         LOGGER_ID_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FUNCTION,
-                                         (FILE *)NULL,
-                                         function));
+  return(logger_output_common_register(logger_control[id].outputs,
+                                       LOGGER_ID_OUTPUTS_MAX,
+                                       LOGGER_OUTPUT_TYPE_FUNCTION,
+                                       (FILE *)NULL,
+                                       function));
 }
 
 
@@ -1783,8 +1783,8 @@ logger_return_t __logger_id_output_function_register(const logger_id_t        id
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_function_deregister(const logger_id_t        id,
-                                                       logger_output_function_t function)
+logger_return_t logger_id_output_function_deregister(const logger_id_t        id,
+                                                     logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1794,11 +1794,11 @@ logger_return_t __logger_id_output_function_deregister(const logger_id_t        
   }
 
   /* delete function to global outputs */
-  return(__logger_output_common_deregister(logger_control[id].outputs,
-                                           LOGGER_ID_OUTPUTS_MAX,
-                                           LOGGER_OUTPUT_TYPE_FUNCTION,
-                                           (FILE *)NULL,
-                                           function));
+  return(logger_output_common_deregister(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function));
 }
 
 
@@ -1811,8 +1811,8 @@ logger_return_t __logger_id_output_function_deregister(const logger_id_t        
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_id_output_function_is_registered(const logger_id_t        id,
-                                                        logger_output_function_t function)
+logger_bool_t logger_id_output_function_is_registered(const logger_id_t        id,
+                                                      logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1822,11 +1822,11 @@ logger_bool_t __logger_id_output_function_is_registered(const logger_id_t       
   }
 
   /* search function in global outputs */
-  return(__logger_output_common_is_registered(logger_control[id].outputs,
-                                              LOGGER_ID_OUTPUTS_MAX,
-                                              LOGGER_OUTPUT_TYPE_FUNCTION,
-                                              (FILE *)NULL,
-                                              function));
+  return(logger_output_common_is_registered(logger_control[id].outputs,
+                                            LOGGER_ID_OUTPUTS_MAX,
+                                            LOGGER_OUTPUT_TYPE_FUNCTION,
+                                            (FILE *)NULL,
+                                            function));
 }
 
 
@@ -1842,9 +1842,9 @@ logger_bool_t __logger_id_output_function_is_registered(const logger_id_t       
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_function_level_set(const logger_id_t        id,
-                                                      logger_output_function_t function,
-                                                      const logger_level_t     level)
+logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
+                                                    logger_output_function_t function,
+                                                    const logger_level_t     level)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1854,12 +1854,12 @@ logger_return_t __logger_id_output_function_level_set(const logger_id_t        i
   }
 
   /* set function output level to id specific outputs */
-  return(__logger_output_common_level_set(logger_control[id].outputs,
-                                          LOGGER_ID_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FUNCTION,
-                                          (FILE *)NULL,
-                                          function,
-                                          level));
+  return(logger_output_common_level_set(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function,
+                                        level));
 }
 
 
@@ -1873,8 +1873,8 @@ logger_return_t __logger_id_output_function_level_set(const logger_id_t        i
  *
  * \return        Currently set logging level.
  ******************************************************************************/
-logger_level_t __logger_id_output_function_level_get(const logger_id_t        id,
-                                                     logger_output_function_t function)
+logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
+                                                   logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1884,11 +1884,11 @@ logger_level_t __logger_id_output_function_level_get(const logger_id_t        id
   }
 
   /* get function output level from id specific outputs */
-  return(__logger_output_common_level_get(logger_control[id].outputs,
-                                          LOGGER_ID_OUTPUTS_MAX,
-                                          LOGGER_OUTPUT_TYPE_FUNCTION,
-                                          (FILE *)NULL,
-                                          function));
+  return(logger_output_common_level_get(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function));
 }
 
 
@@ -1901,8 +1901,8 @@ logger_level_t __logger_id_output_function_level_get(const logger_id_t        id
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_function_color_enable(const logger_id_t        id,
-                                                         logger_output_function_t function)
+logger_return_t logger_id_output_function_color_enable(const logger_id_t        id,
+                                                       logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1912,12 +1912,12 @@ logger_return_t __logger_id_output_function_color_enable(const logger_id_t      
   }
 
   /* enable function output enable to id specific outputs */
-  return(__logger_output_common_color(logger_control[id].outputs,
-                                      LOGGER_ID_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FUNCTION,
-                                      (FILE *)NULL,
-                                      function,
-                                      logger_true));
+  return(logger_output_common_color(logger_control[id].outputs,
+                                    LOGGER_ID_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FUNCTION,
+                                    (FILE *)NULL,
+                                    function,
+                                    logger_true));
 }
 
 
@@ -1930,8 +1930,8 @@ logger_return_t __logger_id_output_function_color_enable(const logger_id_t      
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_id_output_function_color_disable(const logger_id_t        id,
-                                                          logger_output_function_t function)
+logger_return_t logger_id_output_function_color_disable(const logger_id_t        id,
+                                                        logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1941,12 +1941,12 @@ logger_return_t __logger_id_output_function_color_disable(const logger_id_t     
   }
 
   /* disable function output color in id specific outputs */
-  return(__logger_output_common_color(logger_control[id].outputs,
-                                      LOGGER_ID_OUTPUTS_MAX,
-                                      LOGGER_OUTPUT_TYPE_FUNCTION,
-                                      (FILE *)NULL,
-                                      function,
-                                      logger_false));
+  return(logger_output_common_color(logger_control[id].outputs,
+                                    LOGGER_ID_OUTPUTS_MAX,
+                                    LOGGER_OUTPUT_TYPE_FUNCTION,
+                                    (FILE *)NULL,
+                                    function,
+                                    logger_false));
 }
 
 
@@ -1959,8 +1959,8 @@ logger_return_t __logger_id_output_function_color_disable(const logger_id_t     
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t        id,
-                                                           logger_output_function_t function)
+logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t        id,
+                                                         logger_output_function_t function)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -1970,11 +1970,11 @@ logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t    
   }
 
   /* check if color for this function is enabled */
-  return(__logger_output_common_color_is_enabled(logger_control[id].outputs,
-                                                 LOGGER_ID_OUTPUTS_MAX,
-                                                 LOGGER_OUTPUT_TYPE_FUNCTION,
-                                                 (FILE *)NULL,
-                                                 function));
+  return(logger_output_common_color_is_enabled(logger_control[id].outputs,
+                                               LOGGER_ID_OUTPUTS_MAX,
+                                               LOGGER_OUTPUT_TYPE_FUNCTION,
+                                               (FILE *)NULL,
+                                               function));
 }
 
 
@@ -1985,7 +1985,7 @@ logger_bool_t __logger_id_output_function_color_is_enabled(const logger_id_t    
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_prefix_enable(void)
+logger_return_t logger_color_prefix_enable(void)
 {
   logger_color_prefix_enabled = logger_true;
 
@@ -2000,7 +2000,7 @@ logger_return_t __logger_color_prefix_enable(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_prefix_disable(void)
+logger_return_t logger_color_prefix_disable(void)
 {
   logger_color_prefix_enabled = logger_false;
 
@@ -2015,7 +2015,7 @@ logger_return_t __logger_color_prefix_disable(void)
  *
  * \return        \c logger_true if logger prefix color is enabled, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_color_prefix_is_enabled(void)
+logger_bool_t logger_color_prefix_is_enabled(void)
 {
   return(logger_color_prefix_enabled);
 }
@@ -2028,7 +2028,7 @@ logger_bool_t __logger_color_prefix_is_enabled(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_message_enable(void)
+logger_return_t logger_color_message_enable(void)
 {
   logger_color_message_enabled = logger_true;
 
@@ -2043,7 +2043,7 @@ logger_return_t __logger_color_message_enable(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_message_disable(void)
+logger_return_t logger_color_message_disable(void)
 {
   logger_color_message_enabled = logger_false;
 
@@ -2058,7 +2058,7 @@ logger_return_t __logger_color_message_disable(void)
  *
  * \return        \c logger_true if logger color is enabled, logger_false otherwise
  ******************************************************************************/
-logger_bool_t __logger_color_message_is_enabled(void)
+logger_bool_t logger_color_message_is_enabled(void)
 {
   return(logger_color_message_enabled);
 }
@@ -2079,10 +2079,10 @@ logger_bool_t __logger_color_message_is_enabled(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_set(const logger_id_t        id,
-                                   const logger_text_fg_t   fg,
-                                   const logger_text_bg_t   bg,
-                                   const logger_text_attr_t attr)
+logger_return_t logger_color_set(const logger_id_t        id,
+                                 const logger_text_fg_t   fg,
+                                 const logger_text_bg_t   bg,
+                                 const logger_text_attr_t attr)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -2111,7 +2111,7 @@ logger_return_t __logger_color_set(const logger_id_t        id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger_color_reset(const logger_id_t id)
+logger_return_t logger_color_reset(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -2138,7 +2138,7 @@ logger_return_t __logger_color_reset(const logger_id_t id)
  *
  * \return        Symbolic name of the level
  ******************************************************************************/
-const char *__logger_level_name_get(const logger_level_t level)
+const char *logger_level_name_get(const logger_level_t level)
 {
   /* GUARD: check for valid level */
   if ((level <= LOGGER_UNKNOWN) ||
@@ -2161,7 +2161,7 @@ const char *__logger_level_name_get(const logger_level_t level)
  *
  * \return        Pointer to file name.
  ******************************************************************************/
-static inline const char *__logger_strip_path(const char *file)
+static inline const char *logger_strip_path(const char *file)
 {
   const char *basename;
 
@@ -2197,13 +2197,13 @@ static inline const char *__logger_strip_path(const char *file)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_format_prefix(logger_id_t    id,
-                                                     char           *prefix,
-                                                     uint16_t       prefix_size,
-                                                     logger_level_t level,
-                                                     const char     *file,
-                                                     const char     *function,
-                                                     uint32_t       line)
+static inline logger_return_t logger_format_prefix(logger_id_t    id,
+                                                   char           *prefix,
+                                                   uint16_t       prefix_size,
+                                                   logger_level_t level,
+                                                   const char     *file,
+                                                   const char     *function,
+                                                   uint32_t       line)
 {
   int16_t  characters = 0;
   uint16_t rev_idx;
@@ -2229,7 +2229,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FUNCTION ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_strip_path(file),
+                              logger_strip_path(file),
                               function,
                               line);
         break;
@@ -2239,7 +2239,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FILE ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_strip_path(file),
+                              logger_strip_path(file),
                               line);
         break;
 
@@ -2256,7 +2256,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
         characters = snprintf(prefix, prefix_size,
                               LOGGER_FORMAT_STRING_NAME ":"
                               " ",
-                              __logger_id_name_get(id));
+                              logger_id_name_get(id));
         break;
 
       case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
@@ -2266,8 +2266,8 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FUNCTION ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_strip_path(file),
+                              logger_id_name_get(id),
+                              logger_strip_path(file),
                               function,
                               line);
         break;
@@ -2278,8 +2278,8 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FILE ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_strip_path(file),
+                              logger_id_name_get(id),
+                              logger_strip_path(file),
                               line);
         break;
 
@@ -2289,7 +2289,7 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FUNCTION ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
+                              logger_id_name_get(id),
                               function,
                               line);
         break;
@@ -2299,8 +2299,8 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_NAME ":"
                               LOGGER_FORMAT_STRING_LEVEL ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_level_name_get(level));
+                              logger_id_name_get(id),
+                              logger_level_name_get(level));
         break;
 
       case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
@@ -2311,9 +2311,9 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FUNCTION ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_level_name_get(level),
-                              __logger_strip_path(file),
+                              logger_id_name_get(id),
+                              logger_level_name_get(level),
+                              logger_strip_path(file),
                               function,
                               line);
         break;
@@ -2325,9 +2325,9 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FILE ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_level_name_get(level),
-                              __logger_strip_path(file),
+                              logger_id_name_get(id),
+                              logger_level_name_get(level),
+                              logger_strip_path(file),
                               line);
         break;
 
@@ -2338,8 +2338,8 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
                               LOGGER_FORMAT_STRING_FUNCTION ":"
                               LOGGER_FORMAT_STRING_LINE ":"
                               " ",
-                              __logger_id_name_get(id),
-                              __logger_level_name_get(level),
+                              logger_id_name_get(id),
+                              logger_level_name_get(level),
                               function,
                               line);
         break;
@@ -2389,7 +2389,9 @@ static inline logger_return_t __logger_format_prefix(logger_id_t    id,
  *
  * \return     Number of characters written to destination string
  ******************************************************************************/
-static inline size_t __logger_string_copy(char *dest, const char *src, size_t n)
+static inline size_t logger_string_copy(char       *dest,
+                                        const char *src,
+                                        size_t     n)
 {
   size_t idx;
 
@@ -2421,11 +2423,11 @@ static inline size_t __logger_string_copy(char *dest, const char *src, size_t n)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_format_message(logger_id_t id,
-                                                      char        *message,
-                                                      uint16_t    message_size,
-                                                      const char  *format,
-                                                      va_list     argp)
+static inline logger_return_t logger_format_message(logger_id_t id,
+                                                    char        *message,
+                                                    uint16_t    message_size,
+                                                    const char  *format,
+                                                    va_list     argp)
 {
   int16_t  characters = 0;
   uint16_t rev_idx;
@@ -2489,12 +2491,12 @@ static inline logger_return_t __logger_format_message(logger_id_t id,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t __logger_output(logger_id_t     id,
-                                              logger_level_t  level,
-                                              logger_output_t *outputs,
-                                              uint16_t        size,
-                                              const char      *prefix,
-                                              const char      *message)
+static inline logger_return_t logger_output(logger_id_t     id,
+                                            logger_level_t  level,
+                                            logger_output_t *outputs,
+                                            uint16_t        size,
+                                            const char      *prefix,
+                                            const char      *message)
 {
   int16_t               index;
   logger_bool_t         prefix_color_print_begin;
@@ -2617,42 +2619,42 @@ static inline logger_return_t __logger_output(logger_id_t     id,
       line_size = sizeof(logger_line);
 
       if (prefix_color_print_begin == logger_true) {
-        line_characters = __logger_string_copy(line, prefix_color->begin, line_size);
+        line_characters = logger_string_copy(line, prefix_color->begin, line_size);
         line           += line_characters;
         line_size      -= line_characters;
       }
 
       /* actually output prefix */
-      line_characters = __logger_string_copy(line, prefix, line_size);
+      line_characters = logger_string_copy(line, prefix, line_size);
       line           += line_characters;
       line_size      -= line_characters;
 
       if (prefix_color_print_end == logger_true) {
-        line_characters = __logger_string_copy(line, prefix_color->end, line_size);
+        line_characters = logger_string_copy(line, prefix_color->end, line_size);
         line           += line_characters;
         line_size      -= line_characters;
       }
 
       if (message_color_print_begin == logger_true) {
-        line_characters = __logger_string_copy(line, message_color->begin, line_size);
+        line_characters = logger_string_copy(line, message_color->begin, line_size);
         line           += line_characters;
         line_size      -= line_characters;
       }
 
       /* actually output message */
-      line_characters = __logger_string_copy(line, message, line_size);
+      line_characters = logger_string_copy(line, message, line_size);
       line           += line_characters;
       line_size      -= line_characters;
 
       if (message_color_print_end == logger_true) {
-        line_characters = __logger_string_copy(line, message_color->end, line_size);
+        line_characters = logger_string_copy(line, message_color->end, line_size);
         line           += line_characters;
         line_size      -= line_characters;
       }
 
       /* print '\n' if needed. color reset needs to be printed before '\n', otherwise some terminals show wrong colors in next line */
       if (logger_control[id].append == logger_false) {
-        line_characters = __logger_string_copy(line, "\n", line_size);
+        line_characters = logger_string_copy(line, "\n", line_size);
         line           += line_characters;
         line_size      -= line_characters;
       }
@@ -2695,14 +2697,15 @@ static inline logger_return_t __logger_output(logger_id_t     id,
 /** ************************************************************************//**
  * \brief  Print log message.
  *
- * Print the log message to all outputs registered. It is possible to do
- * repeated prints to the same line by omitting '\n' in the log message format
- * sting. In this case a subsequent call will be appended without prefix. Only
- * print the message if
+ * Print the log message to all outputs registered using a printf()-like format
+ * string and variable argument list. It is possible to do repeated prints to
+ * the same line by omitting '\n' in the log message format sting. In this case
+ * a subsequent call will be appended without prefix. Only print the message if
  *
  *   - logging is globally enabled.
  *   - logging ID is enabled.
- *   - logging level is high enough.
+ *   - logging level is higher or equal to the logging level of the ID.
+ *   - logging level is higher or equal to the logging level of a output.
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
@@ -2710,17 +2713,16 @@ static inline logger_return_t __logger_output(logger_id_t     id,
  * \param[in]     function  Name of function where this call happend.
  * \param[in]     line      Line where this call happend.
  * \param[in]     format    \c printf() like format string.
- * \param[in]     va_args   Argument list.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t __logger(logger_id_t    id,
-                         logger_level_t level,
-                         const char     *file,
-                         const char     *function,
-                         uint32_t       line,
-                         const char     *format,
-                         ...)
+logger_return_t logger_implementation(logger_id_t    id,
+                                      logger_level_t level,
+                                      const char     *file,
+                                      const char     *function,
+                                      uint32_t       line,
+                                      const char     *format,
+                                      ...)
 {
   va_list         argp;
   char            *message_part;
@@ -2761,11 +2763,11 @@ logger_return_t __logger(logger_id_t    id,
       (logger_control[id].level < LOGGER_MAX) &&
       (logger_control[id].level <= level)) {
     /* format prefix */
-    __logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
+    logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
 
     /* format message */
     va_start(argp, format);
-    __logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
+    logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
     va_end(argp);
 
     /* initialize message pointer */
@@ -2785,10 +2787,10 @@ logger_return_t __logger(logger_id_t    id,
       }
 
       /* output message to global streams */
-      __logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
+      logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
 
       /* output message to id streams */
-      __logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
+      logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
 
       /* update message part for next loop */
       message_part = message_end;

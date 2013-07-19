@@ -16,7 +16,7 @@
 #include <assert.h>
 #include "logger.h"
 
-const void test_printer(const char * string)
+void test_printer(const char * string)
 {
   printf("test_printer: %s", string);
 }
