@@ -67,36 +67,44 @@ typedef enum logger_level_e {
   LOGGER_MAX     = 9   /**< Last entry, always! */
 } logger_level_t;
 
+/** Logger prefix type */
+typedef uint16_t logger_prefix_t;
 
-/** Logger prefix types */
-typedef enum logger_prefix_e {
-  LOGGER_PREFIX_UNKNOWN                       =  0, /**< Unknown prefix. */
-  LOGGER_PREFIX_EMPTY                         =  1, /**< Prefix "" */
-  LOGGER_PREFIX_FILE_FUNCTION_LINE            =  2, /**< Prefix "FILE:FUNCTION:LINE:" */
-  LOGGER_PREFIX_FILE_LINE                     =  3, /**< Prefix "FILE:LINE:" */
-  LOGGER_PREFIX_FUNCTION_LINE                 =  4, /**< Prefix "FUNCTION:LINE:" */
-  LOGGER_PREFIX_NAME                          =  5, /**< Prefix "LOGGER_ID_NAME:" */
-  LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE       =  6, /**< Prefix "LOGGER_ID_NAME:FILE:FUNCTION:LINE:" */
-  LOGGER_PREFIX_NAME_FILE_LINE                =  7, /**< Prefix "LOGGER_ID_NAME:FILE:LINE:" */
-  LOGGER_PREFIX_NAME_FUNCTION_LINE            =  8, /**< Prefix "LOGGER_ID_NAME:FUNCTION:LINE:" */
-  LOGGER_PREFIX_NAME_LEVEL                    =  9, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:" */
-  LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE = 10, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE": */
-  LOGGER_PREFIX_NAME_LEVEL_FILE_LINE          = 11, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:" */
-  LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE      = 12, /**< Prefix "LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:" */
-  LOGGER_PREFIX_MAX                           = 13  /**< Last entry, always! */
-} logger_prefix_t;
+/** Empty prefix */
+#define LOGGER_PFX_EMPTY            (0)
 
-/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL instead */
-#define LOGGER_PREFIX_SHORT       LOGGER_PREFIX_NAME_LEVEL
+/** Prefix date string */
+#define LOGGER_PFX_DATE             ((1 << 0))
 
-/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE instead */
-#define LOGGER_PREFIX_FUNCTION    LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
+/** Prefix loger ID name */
+#define LOGGER_PFX_NAME             ((1 << 1))
 
-/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FILE_LINE instead */
-#define LOGGER_PREFIX_FILE        LOGGER_PREFIX_NAME_LEVEL_FILE_LINE
+/** Prefix logger level */
+#define LOGGER_PFX_LEVEL            ((1 << 2))
 
-/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE instead */
-#define LOGGER_PREFIX_FULL        LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE
+/** Prefix file name */
+#define LOGGER_PFX_FILE             ((1 << 3))
+
+/** Prefix function name */
+#define LOGGER_PFX_FUNCTION         ((1 << 4))
+
+/** Prefix function name */
+#define LOGGER_PFX_LINE             ((1 << 5))
+
+/** All prefixes */
+#define LOGGER_PFX_ALL              ((1 << 6) - 1)
+
+/** Legacy define, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL) instead */
+//#define LOGGER_PREFIX_SHORT       (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL)
+
+/** Legacy define, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE) instead */
+//#define LOGGER_PREFIX_FUNCTION    (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)
+
+/** Legacy define, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_LINE) instead */
+//#define LOGGER_PREFIX_FILE        (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_LINE)
+
+/** Legacy define, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE) instead */
+//#define LOGGER_PREFIX_FULL        (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)
 
 /** Logger ID type. */
 typedef int16_t  logger_id_t;

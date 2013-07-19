@@ -30,37 +30,32 @@ afterwards.
 a level is defined using `logger_id_level_set()`.**
 
 Each ID has its own prefix assigned. By default each ID prints the prefix
-`LOGGER_PREFIX_FULL`. The prefix is changed by `logger_id_prefix_set()` and it
-is possible to get the current value for later restore with
-`logger_id_prefix_get()`. All available prefixes are:
+`"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`. The prefix is changed by
+`logger_id_prefix_set()` and it is possible to get the current value for later
+restore with `logger_id_prefix_get()`. The prefix elements could be combined
+using `|`. Available prefix elements are:
 
-  Prefix enum                                   Generated prefix
-  --------------------------------------------- ---------------------------------------------------
-  `LOGGER_PREFIX_EMPTY`                         `""`
-  `LOGGER_PREFIX_FILE_FUNCTION_LINE`            `"FILE:FUNCTION:LINE:"`
-  `LOGGER_PREFIX_FILE_LINE`                     `"FILE:LINE:"`
-  `LOGGER_PREFIX_FUNCTION_LINE`                 `"FUNCTION:LINE:"`
-  `LOGGER_PREFIX_NAME`                          `"LOGGER_ID_NAME:"`
-  `LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE`       `"LOGGER_ID_NAME:FILE:FUNCTION:LINE:"`
-  `LOGGER_PREFIX_NAME_FILE_LINE`                `"LOGGER_ID_NAME:FILE:LINE:"`
-  `LOGGER_PREFIX_NAME_FUNCTION_LINE`            `"LOGGER_ID_NAME:FUNCTION:LINE:"`
-  `LOGGER_PREFIX_NAME_LEVEL`                    `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
-  `LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE` `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE":`
-  `LOGGER_PREFIX_NAME_LEVEL_FILE_LINE`          `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
-  `LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE`      `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
-  --------------------------------------------- ---------------------------------------------------
+  Prefix element        | Description
+  --------------------- | --------------------------------------------------------
+  `LOGGER_PFX_EMPTY`    | `""`
+  `LOGGER_PFX_DATE`     | `"DATE"`
+  `LOGGER_PFX_NAME`     | `"LOGGER_ID_NAME:"`
+  `LOGGER_PFX_LEVEL`    | `"LOGGER_LEVEL:"`
+  `LOGGER_PFX_FILE`     | `"FILE_NAME:"`
+  `LOGGER_PFX_FUNCTION` | `"FUNCTION_NAME:"`
+  `LOGGER_PFX_LINE`     | `"LINE:"`
+  `LOGGER_PFX_ALL`      | `"DATE:LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"`
 
 For backward compatibility the following prefix enums are also supported:
 
-  Prefix enum              Generated prefix
-  ------------------------ ---------------------------------------------------
-  `LOGGER_PREFIX_EMPTY`    `""`
-  `LOGGER_PREFIX_NAME`     `"LOGGER_ID_NAME:"`
-  `LOGGER_PREFIX_SHORT`    `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
-  `LOGGER_PREFIX_FUNCTION` `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
-  `LOGGER_PREFIX_FILE`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
-  `LOGGER_PREFIX_FULL`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"`
-  ------------------------ ---------------------------------------------------
+  Prefix enum              | Generated prefix
+  ------------------------ | ---------------------------------------------------
+  `LOGGER_PREFIX_EMPTY`    | `""`
+  `LOGGER_PREFIX_NAME`     | `"LOGGER_ID_NAME:"`
+  `LOGGER_PREFIX_SHORT`    | `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
+  `LOGGER_PREFIX_FUNCTION` | `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
+  `LOGGER_PREFIX_FILE`     | `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
+  `LOGGER_PREFIX_FULL`     | `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"`
 
 It is possible to give each logger ID different foreground and background color
 as well as text attributes with `logger_id_color_set()` and reset them with
@@ -176,6 +171,7 @@ int main(void)
   id = logger_id_request("logger_test_id");
   logger_id_enable(id);
   logger_id_level_set(id, LOGGER_INFO);
+  logger_id_prefix_set(id, (LOGGER_PFX_DATE | LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE));
   logger_color_prefix_enable();
   logger_color_message_enable();
   logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);

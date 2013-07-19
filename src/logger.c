@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <stddef.h>
-#include <fcntl.h>
+#include <time.h>
 
 /** Number of possible simultaneous outputs. */
 #ifndef LOGGER_OUTPUTS_MAX
@@ -53,6 +53,14 @@
 #error "LOGGER_COLOR_STRING_MAX must be at least 1"
 #endif /* (LOGGER_COLOR_STRING_MAX < 1) */
 
+/** Length of logger date string including '\0' */
+#ifndef LOGGER_DATE_STRING_MAX
+#define LOGGER_DATE_STRING_MAX       (32)
+#endif /* LOGGER_DATE_STRING_MAX */
+#if (LOGGER_DATE_STRING_MAX < 4)
+#error "LOGGER_DATE_STRING_MAX must be at least 4"
+#endif /* (LOGGER_DATE_STRING_MAX < 4) */
+
 /** Length of logger prefix string including '\0' */
 #ifndef LOGGER_PREFIX_STRING_MAX
 #define LOGGER_PREFIX_STRING_MAX       (256)
@@ -79,22 +87,28 @@
 
 /** Standard prefix */
 #ifndef LOGGER_PREFIX_STANDARD
-#define LOGGER_PREFIX_STANDARD       LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
+#define LOGGER_PREFIX_STANDARD       (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)
 #endif /* LOGGER_PREFIX_STANDARD */
 
-/** Format sting for prefix file name */
+/** Format string for strftime */
+#define LOGGER_FORMAT_STRFTIME         "%Y-%m-%d %H:%M:%S"
+
+/** Format string for prefix date string */
+#define LOGGER_FORMAT_STRING_DATE      "%19s"
+
+/** Format string for prefix file name */
 #define LOGGER_FORMAT_STRING_FILE      "%30s"
 
-/** Format sting for prefix function name */
+/** Format string for prefix function name */
 #define LOGGER_FORMAT_STRING_FUNCTION  "%30s()"
 
-/** Format sting for prefix line number */
+/** Format string for prefix line number */
 #define LOGGER_FORMAT_STRING_LINE      "%5d"
 
-/** Format sting for prefix logger id name */
+/** Format string for prefix logger id name */
 #define LOGGER_FORMAT_STRING_NAME      "%15s"
 
-/** Format sting for prefix logger id level name */
+/** Format string for prefix logger id level name */
 #define LOGGER_FORMAT_STRING_LEVEL     "%7s"
 
 
@@ -147,6 +161,7 @@ static logger_bool_t    logger_color_prefix_enabled  = logger_false; /**< Logger
 static logger_bool_t    logger_color_message_enabled = logger_false; /**< Logger message color is enabled. */
 static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Control storage for possible IDs. */
 static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible outputs. */
+static char             logger_date[LOGGER_DATE_STRING_MAX];         /**< Storage for date string */
 static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];     /**< Storage for prefix string */
 static char             logger_message[LOGGER_MESSAGE_STRING_MAX];   /**< Storage for message string */
 static char             logger_line[LOGGER_LINE_STRING_MAX];         /**< Storage for whole output line */
@@ -1455,8 +1470,8 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
   }
 
   /* GUARD: check for valid prefix */
-  if ((prefix <= LOGGER_PREFIX_UNKNOWN) ||
-      (prefix >= LOGGER_PREFIX_MAX)) {
+  if ((prefix < LOGGER_PFX_EMPTY) ||
+      (prefix > LOGGER_PFX_ALL)) {
     return(LOGGER_ERR_PREFIX_UNKNOWN);
   }
 
@@ -1482,7 +1497,7 @@ logger_prefix_t logger_id_prefix_get(const logger_id_t id)
   if ((id < 0) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
-    return(LOGGER_PREFIX_UNKNOWN);
+    return(LOGGER_PFX_EMPTY);
   }
 
   /* get ID prefix */
@@ -2189,11 +2204,61 @@ static inline const char *logger_strip_path(const char *file)
 
 
 /** ************************************************************************//**
+ * \brief  Format date string
+ *
+ * Print date string into provided memory.
+ * \param[out]    date       Formatted date string.
+ * \param[in]     date_size  String length of formatted date string.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+static inline logger_return_t logger_format_date(char     *date,
+                                                 uint16_t date_size)
+{
+  time_t        current_time;
+  static time_t previous_time = 0;
+
+  /* get current time */
+  current_time = time(NULL);
+
+  /* do the expensive stuff only if needed */
+  if (current_time != previous_time) {
+    uint16_t  idx;
+    struct tm *tmp;
+
+    /* update previous time */
+    previous_time = current_time;
+
+    /* convert to local time */
+    tmp = localtime(&current_time);
+
+    /* if localtime returned a valid time */
+    if (tmp != NULL) {
+      if (strftime(date, date_size, LOGGER_FORMAT_STRFTIME, tmp) == 0) {
+        for (idx = 0 ; idx < 8 && idx < date_size - 2 ; idx++) {
+          date[idx] = '#';
+        }
+        date[idx] = '\0';
+      }
+    }
+    else {
+      for (idx = 0 ; idx < 8 && idx < date_size - 2 ; idx++) {
+        date[idx] = '#';
+      }
+      date[idx] = '\0';
+    }
+  }
+
+  return(LOGGER_OK);
+}
+
+
+
+
+/** ************************************************************************//**
  * \brief  Format message prefix
  *
- * Allocate memory for prefix and print prefix to allocated memory.
- *
- * Memory needs to be deallocated using free() when the sting is not needed anymore.
+ * Print the prefix into provided memory.
  *
  * \param[in]     id           ID outputting this message.
  * \param[out]    prefix       Formatted message prefix.
@@ -2217,147 +2282,63 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
   uint16_t rev_idx;
 
   /* do prefix stuff only if needed */
-  if (logger_control[id].append == logger_false) {
-    switch (logger_control[id].prefix) {
-      case LOGGER_PREFIX_UNKNOWN:
-        /* empty */
-        prefix[0] = '\0';
-        characters = 0;
-        break;
+  if ((logger_control[id].append == logger_false) &&
+      (logger_control[id].prefix != LOGGER_PFX_EMPTY)) {
 
-      case LOGGER_PREFIX_EMPTY:
-        /* empty */
-        prefix[0] = '\0';
-        characters = 0;
-        break;
-
-      case LOGGER_PREFIX_FILE_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_strip_path(file),
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_FILE_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_strip_path(file),
-                              line);
-        break;
-
-      case LOGGER_PREFIX_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              " ",
-                              logger_id_name_get(id));
-        break;
-
-      case LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_strip_path(file),
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME_FILE_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_strip_path(file),
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME_LEVEL:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_LEVEL ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_level_name_get(level));
-        break;
-
-      case LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_LEVEL ":"
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_level_name_get(level),
-                              logger_strip_path(file),
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME_LEVEL_FILE_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_LEVEL ":"
-                              LOGGER_FORMAT_STRING_FILE ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_level_name_get(level),
-                              logger_strip_path(file),
-                              line);
-        break;
-
-      case LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE:
-        characters = snprintf(prefix, prefix_size,
-                              LOGGER_FORMAT_STRING_NAME ":"
-                              LOGGER_FORMAT_STRING_LEVEL ":"
-                              LOGGER_FORMAT_STRING_FUNCTION ":"
-                              LOGGER_FORMAT_STRING_LINE ":"
-                              " ",
-                              logger_id_name_get(id),
-                              logger_level_name_get(level),
-                              function,
-                              line);
-        break;
-
-      case LOGGER_PREFIX_MAX:
-        /* empty */
-        prefix[0] = '\0';
-        characters = 0;
-        break;
+    /* prefix date */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_DATE) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_DATE ": ",
+                             logger_date);
     }
+
+    /* prefix id name */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_NAME) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_NAME ": ",
+                             logger_id_name_get(id));
+    }
+
+    /* prefix level */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_LEVEL) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_LEVEL ": ",
+                             logger_level_name_get(level));
+    }
+
+    /* prefix file name */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_FILE) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_FILE ": ",
+                             logger_strip_path(file));
+    }
+
+    /* prefix function name */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_FUNCTION) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_DATE ": ",
+                             function);
+    }
+
+    /* prefix line number */
+    if ((characters < prefix_size) &&
+        ((logger_control[id].prefix & LOGGER_PFX_LINE) != 0)) {
+      characters += snprintf(prefix + characters,
+                             prefix_size - characters,
+                             LOGGER_FORMAT_STRING_LINE ": ",
+                             line);
+    }
+
 
     /* set rev_idx to the last valid character in string */
     rev_idx = prefix_size - 1;
@@ -2366,7 +2347,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
     prefix[rev_idx--] = '\0';
 
     /* check if there was enough space in storage */
-    if ((characters < 0) || (characters >= prefix_size)) {
+    if (characters >= prefix_size) {
       prefix[rev_idx--] = ' ';
       prefix[rev_idx--] = '.';
       prefix[rev_idx--] = '.';
@@ -2418,10 +2399,7 @@ static inline size_t logger_string_copy(char       *dest,
 /** ************************************************************************//**
  * \brief  Format log message.
  *
- * Allocate memory for message and print message to allocated memory.
- *
- * Memory needs to be deallocated using free() when the sting is not needed
- * anymore.
+ * Print message into provides memory.
  *
  * \param[in]     id            ID outputting this message.
  * \param[out]    message       Formatted message.
@@ -2770,6 +2748,9 @@ logger_return_t logger_implementation(logger_id_t    id,
       (logger_control[id].level > LOGGER_UNKNOWN) &&
       (logger_control[id].level < LOGGER_MAX) &&
       (logger_control[id].level <= level)) {
+    /* format date */
+    logger_format_date(logger_date, sizeof(logger_date));
+
     /* format prefix */
     logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
 
