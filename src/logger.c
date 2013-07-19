@@ -1190,7 +1190,7 @@ logger_id_t logger_id_request(const char *name)
   int16_t       index;
   logger_bool_t found;
 
-  /* GUARD: check validity of name */
+  /* GUARD: check for valid name */
   if (name == NULL) {
     return(logger_id_unknown);
   }
@@ -1254,7 +1254,7 @@ logger_id_t logger_id_request(const char *name)
  *
  * Release a ID. After this call logging to this ID is not possible anymore.
  *
- * \param[in]     id      ID to enable.
+ * \param[in]     id      Logger ID.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -1308,7 +1308,7 @@ logger_return_t logger_id_release(const logger_id_t id)
  *
  * Enable given logging ID for all outputs.
  *
- * \param[in]     id      ID to enable.
+ * \param[in]     id      Logger ID.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -1333,7 +1333,7 @@ logger_return_t logger_id_enable(const logger_id_t id)
  *
  * Disable given logging ID for all outputs.
  *
- * \param[in]     id      ID to disable.
+ * \param[in]     id      Logger ID.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise
  ******************************************************************************/
@@ -1358,7 +1358,7 @@ logger_return_t logger_id_disable(const logger_id_t id)
  *
  * Query the current enable state of given logging ID.
  *
- * \param[in]     id      ID to check enable state.
+ * \param[in]     id      Logger ID.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
@@ -1382,7 +1382,7 @@ logger_bool_t logger_id_is_enabled(const logger_id_t id)
  * Set the minimum logging level for given ID. Only log messages equal or above
  * the given level will be printed to outputs.
  *
- * \param[in]     id      ID for setting level.
+ * \param[in]     id      Logger ID.
  * \param[in]     level   Level to set.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1415,7 +1415,7 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
  *
  * Query the currently set minimum level for the given logging ID.
  *
- * \param[in]     id      ID for querying level
+ * \param[in]     id      Logger ID.
  *
  * \return        Currently set level
  ******************************************************************************/
@@ -1439,7 +1439,7 @@ logger_level_t logger_id_level_get(const logger_id_t id)
  * Set the prefix for given ID. All messages for this ID will get this prefix
  * from now on.
  *
- * \param[in]     id      ID for setting prefix.
+ * \param[in]     id      Logger ID.
  * \param[in]     prefix  Prefix to set.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1472,7 +1472,7 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
  *
  * Query the currently set prefix for the given logging ID.
  *
- * \param[in]     id      ID for querying prefix
+ * \param[in]     id      Logger ID.
  *
  * \return        Currently set level
  ******************************************************************************/
@@ -1495,7 +1495,7 @@ logger_prefix_t logger_id_prefix_get(const logger_id_t id)
  *
  * Query the name for the given logging ID.
  *
- * \param[in]     id      ID for querying name
+ * \param[in]     id      Logger ID.
  *
  * \return        Symbolic name of the ID
  ******************************************************************************/
@@ -1520,7 +1520,7 @@ const char *logger_id_name_get(const logger_id_t id)
  * opened by the user. The default logging level is set to \c LOGGER_UNKNOWN thus
  * no messages will appear on this stream.
  *
- * \param[in]     id      ID for querying name
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Opened file stream.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1549,7 +1549,7 @@ logger_return_t logger_id_output_register(const logger_id_t id,
  *
  * Remove given file stream from list of outputs.
  *
- * \param[in]     id      ID for querying name
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Previous registered file stream.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1578,6 +1578,7 @@ logger_return_t logger_id_output_deregister(const logger_id_t id,
  *
  * The given file stream is searched in of id specific outputs.
  *
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  File stream.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
@@ -1607,7 +1608,7 @@ logger_bool_t logger_id_output_is_registered(const logger_id_t id,
  * Set the minimum logging level for given output stream. Only log messages
  * equal or above the given level will be printed to the given stream.
  *
- * \param[in]     id      ID for setting the logging level.
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Previous registered file stream.
  * \param[in]     level   Level to set.
  *
@@ -1639,7 +1640,7 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
  *
  * Query the currently set minimum level for the given logging output stream.
  *
- * \param[in]     id      ID for getting the logging level.
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Previous registered file stream.
  *
  * \return        Currently set logging level.
@@ -1668,6 +1669,7 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
  *
  * Enable the color setting for a given output stream.
  *
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Opened file stream.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1697,6 +1699,7 @@ logger_return_t logger_id_output_color_enable(const logger_id_t id,
  *
  * Disable the color setting for a given output stream.
  *
+ * \param[in]     id      Logger ID.
  * \param[in]     stream  Opened file stream.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1726,7 +1729,8 @@ logger_return_t logger_id_output_color_disable(const logger_id_t id,
  *
  * Query the color setting for a given output stream.
  *
- * \param[in]     stream    Opened file stream.
+ * \param[in]     id      Logger ID.
+ * \param[in]     stream  Opened file stream.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
  ******************************************************************************/
@@ -1749,7 +1753,7 @@ logger_bool_t logger_id_output_color_is_enabled(const logger_id_t id,
  * logging level is set to \c LOGGER_UNKNOWN thus this function will not be
  * called for any message.
  *
- * \param[in]     id        ID for querying name
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1778,7 +1782,7 @@ logger_return_t logger_id_output_function_register(const logger_id_t        id,
  *
  * Remove given file function from list of outputs.
  *
- * \param[in]     id        ID for querying name
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1807,6 +1811,7 @@ logger_return_t logger_id_output_function_deregister(const logger_id_t        id
  *
  * The given output function is searched in of id specific outputs.
  *
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
@@ -1836,7 +1841,7 @@ logger_bool_t logger_id_output_function_is_registered(const logger_id_t        i
  * Set the minimum logging level for given output function. Only log messages
  * equal or above the given level will be printed to the given function.
  *
- * \param[in]     id        ID for setting the logging level.
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  * \param[in]     level     Level to set.
  *
@@ -1868,7 +1873,7 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
  *
  * Query the currently set minimum level for the given logging output function.
  *
- * \param[in]     id        ID for getting the logging level.
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        Currently set logging level.
@@ -1897,6 +1902,7 @@ logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
  *
  * Enable the color setting for a given output function.
  *
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1926,6 +1932,7 @@ logger_return_t logger_id_output_function_color_enable(const logger_id_t        
  *
  * Disable the color setting for a given output function.
  *
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
@@ -1955,6 +1962,7 @@ logger_return_t logger_id_output_function_color_disable(const logger_id_t       
  *
  * Query the color setting for a given output function.
  *
+ * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
  * \return        \c logger_true if logger is found, logger_false otherwise
@@ -2741,17 +2749,17 @@ logger_return_t logger_implementation(logger_id_t    id,
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  /* GUARD: check if file valid */
+  /* GUARD: check for valid file */
   if (file == NULL) {
     return(LOGGER_ERR_FILE_INVALID);
   }
 
-  /* GUARD: check if function valid */
+  /* GUARD: check for valid function */
   if (function == NULL) {
     return(LOGGER_ERR_FUNCTION_INVALID);
   }
 
-  /* GUARD: check if format valid */
+  /* GUARD: check for valid format */
   if (format == NULL) {
     return(LOGGER_ERR_FORMAT_INVALID);
   }

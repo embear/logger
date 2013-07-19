@@ -21,13 +21,25 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/** Preprocessor sting conversion helper */
 #define LOGGER_STRINGIFY_(x)    # x
+
+/** Preprocessor sting conversion helper */
 #define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
 
+/** Logger major version number */
 #define LOGGER_VERSION_MAJOR    255
+
+/** Logger minor version number */
 #define LOGGER_VERSION_MINOR    255
+
+/** Logger patch level */
 #define LOGGER_VERSION_PATCH    255
+
+/** Logger version number as integer */
 #define LOGGER_VERSION          ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
+
+/** Logger version number as string */
 #define LOGGER_VERSION_STRING   LOGGER_STRINGIFY(LOGGER_VERSION_MAJOR) "." LOGGER_STRINGIFY(LOGGER_VERSION_MINOR) "." LOGGER_STRINGIFY(LOGGER_VERSION_PATCH)
 
 typedef uint32_t logger_version_t; /**< Logger version type. */
@@ -74,11 +86,17 @@ typedef enum logger_prefix_e {
   LOGGER_PREFIX_MAX                           = 13  /**< Last entry, always! */
 } logger_prefix_t;
 
-/* legacy defines */
-#define LOGGER_PREFIX_SHORT    LOGGER_PREFIX_NAME_LEVEL
-#define LOGGER_PREFIX_FUNCTION LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
-#define LOGGER_PREFIX_FILE     LOGGER_PREFIX_NAME_LEVEL_FILE_LINE
-#define LOGGER_PREFIX_FULL     LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE
+/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL instead */
+#define LOGGER_PREFIX_SHORT       LOGGER_PREFIX_NAME_LEVEL
+
+/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE instead */
+#define LOGGER_PREFIX_FUNCTION    LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE
+
+/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FILE_LINE instead */
+#define LOGGER_PREFIX_FILE        LOGGER_PREFIX_NAME_LEVEL_FILE_LINE
+
+/** Legacy define, please use LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE instead */
+#define LOGGER_PREFIX_FULL        LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE
 
 /** Logger ID type. */
 typedef int16_t  logger_id_t;
