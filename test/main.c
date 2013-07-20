@@ -273,41 +273,32 @@ int main(int  argc,
   assert(LOGGER_OK == logger_color_prefix_enable());
 
 
-  puts("Format: LOGGER_PREFIX_EMPTY");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_EMPTY));
+  puts("Format: \"\"");
+  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PFX_EMPTY));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_FILE_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE_FUNCTION_LINE));
+
+  puts("Format: FUNCTION");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_FUNCTION)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_FILE_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE_LINE));
+
+  puts("Format: FUNCTION:LINE");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION_LINE));
+
+  puts("Format: FILE:FUNCTION:LINE");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME));
+
+  puts("Format: LEVEL:FILE:FUNCTION:LINE");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE));
+
+  puts("Format: NAME:LEVEL:FILE:FUNCTION:LINE");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_FILE_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FILE_LINE));
-  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FUNCTION_LINE));
-  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_LEVEL");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL));
-  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE));
-  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_LEVEL_FILE_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FILE_LINE));
-  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
-  puts("Format: LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE");
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE));
+
+  puts("Format: DATE:NAME:LEVEL:FILE:FUNCTION:LINE");
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_DATE | LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
   assert(LOGGER_OK == logger_color_prefix_disable());
@@ -334,7 +325,7 @@ int main(int  argc,
   id2 = logger_id_request("logger_test_id2");
   assert(LOGGER_OK == logger_id_enable(id2));
   assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
-  assert(LOGGER_OK == logger_id_prefix_set(id2, LOGGER_PREFIX_FUNCTION_LINE));
+  assert(LOGGER_OK == logger_id_prefix_set(id2, (LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
   assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
@@ -444,7 +435,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
   prefix = logger_id_prefix_get(id);
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION_LINE));
+  assert(LOGGER_OK == logger_id_prefix_set(id, (LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)));
 
   assert(LOGGER_OK == logger(id, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
 
