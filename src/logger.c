@@ -111,6 +111,9 @@
 /** Format string for prefix logger id level name */
 #define LOGGER_FORMAT_STRING_LEVEL     "%7s"
 
+/** Format string for field separator */
+#define LOGGER_FORMAT_STRING_SEPARATOR ":"
+
 
 /** Logger output type */
 typedef enum logger_output_type_e {
@@ -2290,7 +2293,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_DATE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_DATE ": ",
+                             LOGGER_FORMAT_STRING_DATE LOGGER_FORMAT_STRING_SEPARATOR,
                              logger_date);
     }
 
@@ -2299,7 +2302,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_NAME) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_NAME ": ",
+                             LOGGER_FORMAT_STRING_NAME LOGGER_FORMAT_STRING_SEPARATOR,
                              logger_id_name_get(id));
     }
 
@@ -2308,7 +2311,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_LEVEL) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_LEVEL ": ",
+                             LOGGER_FORMAT_STRING_LEVEL LOGGER_FORMAT_STRING_SEPARATOR,
                              logger_level_name_get(level));
     }
 
@@ -2317,7 +2320,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_FILE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_FILE ": ",
+                             LOGGER_FORMAT_STRING_FILE LOGGER_FORMAT_STRING_SEPARATOR,
                              logger_strip_path(file));
     }
 
@@ -2326,7 +2329,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_FUNCTION) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_DATE ": ",
+                             LOGGER_FORMAT_STRING_FUNCTION LOGGER_FORMAT_STRING_SEPARATOR,
                              function);
     }
 
@@ -2335,10 +2338,15 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
         ((logger_control[id].prefix & LOGGER_PFX_LINE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
-                             LOGGER_FORMAT_STRING_LINE ": ",
+                             LOGGER_FORMAT_STRING_LINE LOGGER_FORMAT_STRING_SEPARATOR,
                              line);
     }
 
+    /* append ' ' to prefix string */
+    if (characters + 1 < prefix_size) {
+      prefix[characters++] = ' ';
+      prefix[characters++] = '\0';
+    }
 
     /* set rev_idx to the last valid character in string */
     rev_idx = prefix_size - 1;
