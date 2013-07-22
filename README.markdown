@@ -61,8 +61,14 @@ For backward compatibility the following prefix enums are also supported:
 
 It is possible to give each logger ID different foreground and background color
 as well as text attributes with `logger_id_color_set()` and reset them with
-`logger_id_color_reset()`. Colors are changed by escape sequences and only
-work on `STDOUT` and `STDOUT`. File output does not contain any escape sequences by default.
+`logger_id_color_reset()`. Colors are changed by escape sequences and only work
+on `STDOUT` and `STDOUT`. File output does not contain any escape sequences by
+default.
+
+The standard prefix can be changed using the function `logger_prefix_set()` and
+the current setting can be retrieved with `logger_prefix_get()` for later
+restore. The standard prefix is used for all IDs but the ones explicitly
+changed.
 
 To get any messages an output needs to be registered to logger. Any stream of
 type `FILE` is supported and multiple outputs can be registered. Registration
