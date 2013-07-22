@@ -207,7 +207,7 @@ static logger_color_string_t logger_level_colors[] =
  * Get the version of logger for which it was compiled. Needed to check for
  * correct version of logger when linking against a precompiled library.
  *
- * \return        Version of logger
+ * \return        Version of logger.
  ******************************************************************************/
 logger_version_t logger_version(void)
 {
@@ -245,7 +245,7 @@ logger_return_t logger_init(void)
  *
  * Query the current initialization state of logger.
  *
- * \return        \c logger_true if logger is initialized, logger_false otherwise
+ * \return        \c logger_true if logger is initialized, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_is_initialized(void)
 {
@@ -288,7 +288,7 @@ logger_return_t logger_disable(void)
  *
  * Query the current global enable state of logger.
  *
- * \return        \c logger_true if logger is enabled, logger_false otherwise
+ * \return        \c logger_true if logger is enabled, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_is_enabled()
 {
@@ -554,7 +554,7 @@ static inline logger_return_t logger_output_common_deregister(logger_output_t   
  * \param[in]     stream    Opened file stream.
  * \param[in]     function  User provided output function.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 static inline logger_bool_t logger_output_common_is_registered(logger_output_t          *outputs,
                                                                const uint16_t           size,
@@ -819,7 +819,7 @@ static inline logger_return_t logger_output_common_color(logger_output_t        
  * \param[in]     stream    Opened file stream.
  * \param[in]     function  User provided output function.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 static inline logger_bool_t logger_output_common_color_is_enabled(logger_output_t          *outputs,
                                                                   const uint16_t           size,
@@ -917,7 +917,7 @@ logger_return_t logger_output_deregister(FILE *stream)
  *
  * \param[in]     stream  File stream.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_output_is_registered(FILE *stream)
 {
@@ -1117,7 +1117,7 @@ logger_return_t logger_output_function_deregister(logger_output_function_t funct
  *
  * \param[in]     function  User provided output function.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_output_function_is_registered(logger_output_function_t function)
 {
@@ -1223,7 +1223,7 @@ logger_return_t logger_output_function_color_disable(logger_output_function_t fu
  *
  * \param[in]     function  User provided output function.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_output_function_color_is_enabled(logger_output_function_t function)
 {
@@ -1398,7 +1398,7 @@ logger_return_t logger_id_enable(const logger_id_t id)
  *
  * \param[in]     id      Logger ID.
  *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t logger_id_disable(const logger_id_t id)
 {
@@ -1480,7 +1480,7 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
  *
  * \param[in]     id      Logger ID.
  *
- * \return        Currently set level
+ * \return        Currently set level.
  ******************************************************************************/
 logger_level_t logger_id_level_get(const logger_id_t id)
 {
@@ -1537,7 +1537,7 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
  *
  * \param[in]     id      Logger ID.
  *
- * \return        Currently set level
+ * \return        Currently set prefix.
  ******************************************************************************/
 logger_prefix_t logger_id_prefix_get(const logger_id_t id)
 {
@@ -1560,7 +1560,7 @@ logger_prefix_t logger_id_prefix_get(const logger_id_t id)
  *
  * \param[in]     id      Logger ID.
  *
- * \return        Symbolic name of the ID
+ * \return        Symbolic name of the ID.
  ******************************************************************************/
 const char *logger_id_name_get(const logger_id_t id)
 {
@@ -1644,7 +1644,7 @@ logger_return_t logger_id_output_deregister(const logger_id_t id,
  * \param[in]     id      Logger ID.
  * \param[in]     stream  File stream.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_id_output_is_registered(const logger_id_t id,
                                              FILE              *stream)
@@ -1795,7 +1795,7 @@ logger_return_t logger_id_output_color_disable(const logger_id_t id,
  * \param[in]     id      Logger ID.
  * \param[in]     stream  Opened file stream.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_id_output_color_is_enabled(const logger_id_t id,
                                                 FILE              *stream)
@@ -1877,7 +1877,7 @@ logger_return_t logger_id_output_function_deregister(const logger_id_t        id
  * \param[in]     id        Logger ID.
  * \param[in]     function  User provided output function.
  *
- * \return        \c logger_true if logger is found, logger_false otherwise
+ * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_id_output_function_is_registered(const logger_id_t        id,
                                                       logger_output_function_t function)
@@ -2084,7 +2084,7 @@ logger_return_t logger_color_prefix_disable(void)
  *
  * Query the current prefix color enable state of logger.
  *
- * \return        \c logger_true if logger prefix color is enabled, logger_false otherwise
+ * \return        \c logger_true if logger prefix color is enabled, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_color_prefix_is_enabled(void)
 {
@@ -2127,7 +2127,7 @@ logger_return_t logger_color_message_disable(void)
  *
  * Query the current color message enable state of logger.
  *
- * \return        \c logger_true if logger color is enabled, logger_false otherwise
+ * \return        \c logger_true if logger color is enabled, logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_color_message_is_enabled(void)
 {
@@ -2207,7 +2207,7 @@ logger_return_t logger_color_reset(const logger_id_t id)
  *
  * \param[in]     level   Level for querying name
  *
- * \return        Symbolic name of the level
+ * \return        Symbolic name of the level.
  ******************************************************************************/
 const char *logger_level_name_get(const logger_level_t level)
 {
@@ -2437,7 +2437,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
  * \param[in]     src   Source string.
  * \param[in]     n     Maximum amount of characters available in destination string.
  *
- * \return     Number of characters written to destination string
+ * \return     Number of characters written to destination string.
  ******************************************************************************/
 static inline size_t logger_string_copy(char       *dest,
                                         const char *src,
