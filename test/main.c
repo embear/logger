@@ -979,6 +979,44 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- modify standard prefix ....\n", test);
+
+  puts("Change the standard prefix and revert back");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  id2 = logger_id_request("logger_test_id2");
+  assert(LOGGER_OK == logger_id_enable(id2));
+  assert(LOGGER_OK == logger_id_level_set(id2, LOGGER_DEBUG));
+
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
+
+  prefix = logger_prefix_get();
+  assert (LOGGER_OK == logger_prefix_set(LOGGER_PFX_DATE | LOGGER_PFX_FILE | LOGGER_PFX_LINE));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
+
+  assert(LOGGER_OK == logger_prefix_set(LOGGER_PFX_UNSET));
+  assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
+  assert(prefix == logger_prefix_get());
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+  assert(LOGGER_OK == logger_id_release(id2));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- show color combinations\n", test);
 
   puts("Show all possible color combinations");
