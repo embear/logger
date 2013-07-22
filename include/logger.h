@@ -74,25 +74,28 @@ typedef uint16_t logger_prefix_t;
 #define LOGGER_PFX_EMPTY            (0)
 
 /** Prefix date string */
-#define LOGGER_PFX_DATE             ((1 << 0))
+#define LOGGER_PFX_DATE             (1 << 0)
 
 /** Prefix loger ID name */
-#define LOGGER_PFX_NAME             ((1 << 1))
+#define LOGGER_PFX_NAME             (1 << 1)
 
 /** Prefix logger level */
-#define LOGGER_PFX_LEVEL            ((1 << 2))
+#define LOGGER_PFX_LEVEL            (1 << 2)
 
 /** Prefix file name */
-#define LOGGER_PFX_FILE             ((1 << 3))
+#define LOGGER_PFX_FILE             (1 << 3)
 
 /** Prefix function name */
-#define LOGGER_PFX_FUNCTION         ((1 << 4))
+#define LOGGER_PFX_FUNCTION         (1 << 4)
 
 /** Prefix function name */
-#define LOGGER_PFX_LINE             ((1 << 5))
+#define LOGGER_PFX_LINE             (1 << 5)
+
+/** Unset prefix */
+#define LOGGER_PFX_UNSET            (1 << 6)
 
 /** All prefixes */
-#define LOGGER_PFX_ALL              ((1 << 6) - 1)
+#define LOGGER_PFX_ALL              (LOGGER_PFX_UNSET - 1)
 
 /** Legacy define, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL) instead */
 #define LOGGER_PREFIX_SHORT       (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL)
@@ -184,6 +187,8 @@ logger_bool_t logger_is_initialized(void);
 logger_return_t logger_enable(void);
 logger_return_t logger_disable(void);
 logger_bool_t logger_is_enabled(void);
+logger_return_t logger_prefix_set(const logger_prefix_t prefix);
+logger_prefix_t logger_prefix_get(void);
 logger_return_t logger_output_register(FILE *stream);
 logger_return_t logger_output_deregister(FILE *stream);
 logger_bool_t logger_output_is_registered(FILE *stream);
@@ -303,12 +308,20 @@ static inline logger_bool_t logger_ignore_false(void)
 }
 
 
+static inline logger_prefix_t logger_ignore_unset(void)
+{
+  return(LOGGER_PFX_UNSET);
+}
+
+
 #define logger_version()                                                (LOGGER_VERSION)
 #define logger_init()                                                   logger_ignore_ok()
 #define logger_is_initialized()                                         logger_ignore_ok()
 #define logger_enable()                                                 logger_ignore_ok()
 #define logger_disable()                                                logger_ignore_ok()
 #define logger_is_enabled(__id)                                         logger_ignore_false()
+#define logger_prefix_set(__prefix)                                     logger_ignore_ok()
+#define logger_prefix_get()                                             logger_ignore_unset()
 #define logger_output_register(__stream)                                logger_ignore_ok()
 #define logger_output_deregister(__stream)                              logger_ignore_ok()
 #define logger_output_is_registered(__stream)                           logger_ignore_ok()
@@ -332,7 +345,7 @@ static inline logger_bool_t logger_ignore_false(void)
 #define logger_id_level_set(__id, __level)                              logger_ignore_ok()
 #define logger_id_level_get(__id)                                       logger_ignore_err()
 #define logger_id_prefix_set(__id, __prefix)                            logger_ignore_ok()
-#define logger_id_prefix_get(__id)                                      logger_ignore_err()
+#define logger_id_prefix_get(__id)                                      logger_ignore_unset()
 #define logger_id_name_get(__id)                                        ""
 #define logger_id_output_register(__id, __stream)                       logger_ignore_ok()
 #define logger_id_output_deregister(__id, __stream)                     logger_ignore_ok()

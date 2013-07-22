@@ -158,16 +158,17 @@ typedef struct  logger_control_s {
 } logger_control_t;
 
 
-static logger_bool_t    logger_initialized           = logger_false; /**< logger is initialized. */
-static logger_bool_t    logger_enabled               = logger_false; /**< Logger is enabled. */
-static logger_bool_t    logger_color_prefix_enabled  = logger_false; /**< Logger prefix color is enabled. */
-static logger_bool_t    logger_color_message_enabled = logger_false; /**< Logger message color is enabled. */
-static logger_control_t logger_control[LOGGER_IDS_MAX];              /**< Control storage for possible IDs. */
-static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];          /**< Storage for possible outputs. */
-static char             logger_date[LOGGER_DATE_STRING_MAX];         /**< Storage for date string */
-static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];     /**< Storage for prefix string */
-static char             logger_message[LOGGER_MESSAGE_STRING_MAX];   /**< Storage for message string */
-static char             logger_line[LOGGER_LINE_STRING_MAX];         /**< Storage for whole output line */
+static logger_bool_t    logger_initialized           = logger_false;           /**< Logger is initialized. */
+static logger_bool_t    logger_enabled               = logger_false;           /**< Logger is enabled. */
+static logger_prefix_t  logger_prefix_standard       = LOGGER_PREFIX_STANDARD; /**< Logger standard prefix */
+static logger_bool_t    logger_color_prefix_enabled  = logger_false;           /**< Logger prefix color is enabled. */
+static logger_bool_t    logger_color_message_enabled = logger_false;           /**< Logger message color is enabled. */
+static logger_control_t logger_control[LOGGER_IDS_MAX];                        /**< Control storage for possible IDs. */
+static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];                    /**< Storage for possible outputs. */
+static char             logger_date[LOGGER_DATE_STRING_MAX];                   /**< Storage for date string */
+static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];               /**< Storage for prefix string */
+static char             logger_message[LOGGER_MESSAGE_STRING_MAX];             /**< Storage for message string */
+static char             logger_line[LOGGER_LINE_STRING_MAX];                   /**< Storage for whole output line */
 
 
 /** level to name translation */
@@ -292,6 +293,50 @@ logger_return_t logger_disable(void)
 logger_bool_t logger_is_enabled()
 {
   return(logger_enabled);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Set global logging prefix.
+ *
+ * Set the global default prefix. This prefix is used for all IDs without
+ * specific prefix.
+ *
+ * \param[in]     prefix  Prefix to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_prefix_set(const logger_prefix_t prefix)
+{
+  /* GUARD: check for valid prefix */
+  if ((prefix < LOGGER_PFX_EMPTY) ||
+      (prefix > LOGGER_PFX_UNSET)) {
+    return(LOGGER_ERR_PREFIX_UNKNOWN);
+  }
+
+  /* set prefix */
+  if (prefix & LOGGER_PFX_UNSET) {
+    logger_prefix_standard = LOGGER_PREFIX_STANDARD;
+  }
+  else {
+    logger_prefix_standard = prefix;
+  }
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query global logging prefix,
+ *
+ * Query the currently set prefix for the given logging ID.
+ *
+ * \return        Currently set prefix.
+ ******************************************************************************/
+logger_prefix_t logger_prefix_get(void)
+{
+  /* get global prefix */
+  return(logger_prefix_standard);
 }
 
 
@@ -1240,7 +1285,7 @@ logger_id_t logger_id_request(const char *name)
         logger_control[index].count                 = 1;
         logger_control[index].enabled               = logger_false;
         logger_control[index].level                 = LOGGER_UNKNOWN;
-        logger_control[index].prefix                = LOGGER_PREFIX_STANDARD;
+        logger_control[index].prefix                = LOGGER_PFX_UNSET;
         logger_control[index].color                 = logger_false;
         logger_control[index].color_string.begin[0] = '\0';
         logger_control[index].color_string.end[0]   = '\0';
@@ -1306,7 +1351,7 @@ logger_return_t logger_id_release(const logger_id_t id)
     logger_control[id].count                 = 0;
     logger_control[id].enabled               = logger_false;
     logger_control[id].level                 = LOGGER_UNKNOWN;
-    logger_control[id].prefix                = LOGGER_PREFIX_STANDARD;
+    logger_control[id].prefix                = LOGGER_PFX_UNSET;
     logger_control[id].color                 = logger_false;
     logger_control[id].color_string.begin[0] = '\0';
     logger_control[id].color_string.end[0]   = '\0';
@@ -1474,7 +1519,7 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
 
   /* GUARD: check for valid prefix */
   if ((prefix < LOGGER_PFX_EMPTY) ||
-      (prefix > LOGGER_PFX_ALL)) {
+      (prefix > LOGGER_PFX_UNSET)) {
     return(LOGGER_ERR_PREFIX_UNKNOWN);
   }
 
@@ -2287,10 +2332,18 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
   /* do prefix stuff only if needed */
   if ((logger_control[id].append == logger_false) &&
       (logger_control[id].prefix != LOGGER_PFX_EMPTY)) {
+    logger_prefix_t local_prefix;
+
+    if (logger_control[id].prefix & LOGGER_PFX_UNSET) {
+      local_prefix = logger_prefix_standard;
+    }
+    else {
+      local_prefix = logger_control[id].prefix;
+    }
 
     /* prefix date */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_DATE) != 0)) {
+        ((local_prefix & LOGGER_PFX_DATE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_DATE LOGGER_FORMAT_STRING_SEPARATOR,
@@ -2299,7 +2352,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
 
     /* prefix id name */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_NAME) != 0)) {
+        ((local_prefix & LOGGER_PFX_NAME) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_NAME LOGGER_FORMAT_STRING_SEPARATOR,
@@ -2308,7 +2361,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
 
     /* prefix level */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_LEVEL) != 0)) {
+        ((local_prefix & LOGGER_PFX_LEVEL) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_LEVEL LOGGER_FORMAT_STRING_SEPARATOR,
@@ -2317,7 +2370,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
 
     /* prefix file name */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_FILE) != 0)) {
+        ((local_prefix & LOGGER_PFX_FILE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_FILE LOGGER_FORMAT_STRING_SEPARATOR,
@@ -2326,7 +2379,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
 
     /* prefix function name */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_FUNCTION) != 0)) {
+        ((local_prefix & LOGGER_PFX_FUNCTION) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_FUNCTION LOGGER_FORMAT_STRING_SEPARATOR,
@@ -2335,7 +2388,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
 
     /* prefix line number */
     if ((characters < prefix_size) &&
-        ((logger_control[id].prefix & LOGGER_PFX_LINE) != 0)) {
+        ((local_prefix & LOGGER_PFX_LINE) != 0)) {
       characters += snprintf(prefix + characters,
                              prefix_size - characters,
                              LOGGER_FORMAT_STRING_LINE LOGGER_FORMAT_STRING_SEPARATOR,
