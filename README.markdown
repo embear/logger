@@ -35,33 +35,31 @@ Each ID has its own prefix assigned. By default each ID prints the prefix
 restore with `logger_id_prefix_get()`. The prefix elements could be combined
 using `|`. Available prefix elements are:
 
-  Prefix element        Description
-  --------------------- ----------------------------------
-  `LOGGER_PFX_EMPTY`    Empty prefix.
-  `LOGGER_PFX_DATE`     `"DATE"`
-  `LOGGER_PFX_NAME`     `"LOGGER_ID_NAME:"`
-  `LOGGER_PFX_LEVEL`    `"LOGGER_LEVEL:"`
-  `LOGGER_PFX_FILE`     `"FILE_NAME:"`
-  `LOGGER_PFX_FUNCTION` `"FUNCTION_NAME:"`
-  `LOGGER_PFX_LINE`     `"LINE:"`
-  `LOGGER_PFX_ALL`      All above prefixes in above order.
-  --------------------- ----------------------------------
+| Prefix element        | Description                        |
+| --------------------- | ---------------------------------- |
+| `LOGGER_PFX_EMPTY`    | Empty prefix.                      |
+| `LOGGER_PFX_DATE`     | `"DATE:"`                          |
+| `LOGGER_PFX_NAME`     | `"LOGGER_ID_NAME:"`                |
+| `LOGGER_PFX_LEVEL`    | `"LOGGER_LEVEL:"`                  |
+| `LOGGER_PFX_FILE`     | `"FILE_NAME:"`                     |
+| `LOGGER_PFX_FUNCTION` | `"FUNCTION_NAME:"`                 |
+| `LOGGER_PFX_LINE`     | `"LINE:"`                          |
+| `LOGGER_PFX_ALL`      | All above prefixes in above order. |
 
 For backward compatibility the following prefix enums are also supported:
 
-  Prefix enum              Generated prefix
-  ------------------------ ---------------------------------------------------
-  `LOGGER_PREFIX_EMPTY`    `""`
-  `LOGGER_PREFIX_NAME`     `"LOGGER_ID_NAME:"`
-  `LOGGER_PREFIX_SHORT`    `"LOGGER_ID_NAME:LOGGER_LEVEL:"`
-  `LOGGER_PREFIX_FUNCTION` `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`
-  `LOGGER_PREFIX_FILE`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`
-  `LOGGER_PREFIX_FULL`     `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"`
-  ------------------------ ---------------------------------------------------
+| Prefix enum              | Generated prefix                                    |
+| ------------------------ | --------------------------------------------------- |
+| `LOGGER_PREFIX_EMPTY`    | `""`                                                |
+| `LOGGER_PREFIX_NAME`     | `"LOGGER_ID_NAME:"`                                 |
+| `LOGGER_PREFIX_SHORT`    | `"LOGGER_ID_NAME:LOGGER_LEVEL:"`                    |
+| `LOGGER_PREFIX_FUNCTION` | `"LOGGER_ID_NAME:LOGGER_LEVEL:FUNCTION:LINE:"`      |
+| `LOGGER_PREFIX_FILE`     | `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:LINE:"`          |
+| `LOGGER_PREFIX_FULL`     | `"LOGGER_ID_NAME:LOGGER_LEVEL:FILE:FUNCTION:LINE:"` |
 
 It is possible to give each logger ID different foreground and background color
-as well as text attributes with `logger_id_color_set()` and reset them with
-`logger_id_color_reset()`. Colors are changed by escape sequences and only work
+as well as text attributes with `logger_color_set()` and reset them with
+`logger_color_reset()`. Colors are changed by escape sequences and only work
 on `STDOUT` and `STDOUT`. File output does not contain any escape sequences by
 default.
 
@@ -109,7 +107,7 @@ stream outputs. There are also the user specific callback functions
 `logger_id_output_function_level_set()`,
 `logger_id_output_function_level_get()`,
 `logger_id_output_function_color_enable()`,
-`logger_id_output_function_disable()` and
+`logger_id_output_function_color_disable()` and
 `logger_id_output_function_color_is_enabled()` available. This way it is
 possible to write output of a specific subsystem to a separate file.
 
@@ -133,7 +131,7 @@ with:
 `gcc -DLOGGER_ENABLE -Iinclude -o main main.c src/logger.c`
 
 
-```c
+~~~~~~~~~~~~~~~~~~~~ {.c}
 #include "logger.h"
 #include <time.h>
 #include <stdio.h>
@@ -211,4 +209,4 @@ int main(void)
 
   return(0);
 }
-```
+~~~~~~~~~~~~~~~~~~~~
