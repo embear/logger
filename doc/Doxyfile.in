@@ -654,6 +654,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
+INPUT                 += @PROJECT_SOURCE_DIR@/README.markdown
 INPUT                 += @PROJECT_SOURCE_DIR@/include
 INPUT                 += @PROJECT_SOURCE_DIR@/src
 
@@ -780,7 +781,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = README.markdown
 
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
