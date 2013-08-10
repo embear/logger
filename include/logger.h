@@ -21,11 +21,14 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/** Preprocessor sting conversion helper */
+/** Preprocessor string conversion helper */
 #define LOGGER_STRINGIFY_(x)    # x
 
-/** Preprocessor sting conversion helper */
+/** Preprocessor string conversion helper */
 #define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
+
+/** Deprecation macro */
+#define LOGGER_DEPRECATED(__new) __attribute__((__deprecated__("Use '" #__new "' instead")))
 
 /** Logger major version number */
 #define LOGGER_VERSION_MAJOR    255
@@ -290,17 +293,17 @@ logger_return_t logger_id_output_function_color_disable(const logger_id_t       
                                                         logger_output_function_t function);
 logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t        id,
                                                          logger_output_function_t function);
+logger_return_t logger_id_color_set(const logger_id_t        id,
+                                    const logger_text_fg_t   fg,
+                                    const logger_text_bg_t   bg,
+                                    const logger_text_attr_t attr);
+logger_return_t logger_id_color_reset(const logger_id_t id);
 logger_return_t logger_color_prefix_enable(void);
 logger_return_t logger_color_prefix_disable(void);
 logger_bool_t logger_color_prefix_is_enabled(void);
 logger_return_t logger_color_message_enable(void);
 logger_return_t logger_color_message_disable(void);
 logger_bool_t logger_color_message_is_enabled(void);
-logger_return_t logger_color_set(const logger_id_t        id,
-                                 const logger_text_fg_t   fg,
-                                 const logger_text_bg_t   bg,
-                                 const logger_text_attr_t attr);
-logger_return_t logger_color_reset(const logger_id_t id);
 const char *logger_level_name_get(const logger_level_t level);
 logger_return_t logger_implementation(logger_id_t    id,
                                       logger_level_t level,
@@ -310,8 +313,31 @@ logger_return_t logger_implementation(logger_id_t    id,
                                       const char     *format,
                                       ...) __attribute__((format(printf, 6, 7)));
 
-/** macro to call the real logger function logger() with the information about the current position in code (file, function and line) */
+/** Macro to call the real logger function logger() with the information about the current position in code (file, function and line) */
 #define logger(__id, __level, ...)   logger_implementation(__id, __level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+/** Legacy function, please use logger_id_color_set() instead */
+static inline logger_return_t logger_color_set(const logger_id_t        id,
+                                               const logger_text_fg_t   fg,
+                                               const logger_text_bg_t   bg,
+                                               const logger_text_attr_t attr)
+  LOGGER_DEPRECATED("logger_id_color_set()");
+
+logger_return_t logger_color_set(const logger_id_t        id,
+                                 const logger_text_fg_t   fg,
+                                 const logger_text_bg_t   bg,
+                                 const logger_text_attr_t attr)
+{
+  return(logger_id_color_set(id, fg, bg, attr));
+}
+
+/** Legacy function, please use logger_id_color_reset() instead */
+static inline logger_return_t logger_color_reset(const logger_id_t id)
+  LOGGER_DEPRECATED("logger_id_color_reset()");
+logger_return_t logger_color_reset(const logger_id_t id)
+{
+  return(logger_id_color_reset(id));
+}
 
 #else  /* LOGGER_ENABLE */
 static inline logger_return_t logger_ignore_ok(void)
@@ -407,6 +433,8 @@ static inline logger_prefix_t logger_ignore_unset(void)
 #define logger_id_output_function_color_enable(__id, __function)        logger_ignore_ok()
 #define logger_id_output_function_color_disable(__id, __function)       logger_ignore_ok()
 #define logger_id_output_function_color_is_enabled(__id, __function)    logger_ignore_false()
+#define logger_id_color_set(__id, __fg, __bg, __attr)                   logger_ignore_ok()
+#define logger_id_color_reset(__id)                                     logger_ignore_ok()
 #define logger_color_prefix_enable()                                    logger_ignore_ok()
 #define logger_color_prefix_disable()                                   logger_ignore_ok()
 #define logger_color_prefix_is_enabled()                                logger_ignore_false()

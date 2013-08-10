@@ -2050,6 +2050,71 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
 
 
 /** ************************************************************************//**
+ * \brief  Change terminal text color and attributes.
+ *
+ * Change text color and attributes for all messages of given ID when they are
+ * printed to \c stdout or \c stdin. Outputs to other streams including files
+ * will have no
+ * color.
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_color_set(const logger_id_t        id,
+                                    const logger_text_fg_t   fg,
+                                    const logger_text_bg_t   bg,
+                                    const logger_text_attr_t attr)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  logger_control[id].color = logger_true;
+  (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
+  (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
+  logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+  logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+  logger_control[id].color_string_changed = logger_true;
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Reset terminal text color and attributes.
+ *
+ * Reset text color and attributes of given ID back to defaults.
+ *
+ * \param[in]     id      ID for setting level.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_color_reset(const logger_id_t id)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  logger_control[id].color                 = logger_false;
+  logger_control[id].color_string.begin[0] = '\0';
+  logger_control[id].color_string.end[0]   = '\0';
+  logger_control[id].color_string_changed  = logger_true;
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
  * \brief  Enable logger prefix colors.
  *
  * Enable logger prefix color output.
@@ -2132,71 +2197,6 @@ logger_return_t logger_color_message_disable(void)
 logger_bool_t logger_color_message_is_enabled(void)
 {
   return(logger_color_message_enabled);
-}
-
-
-/** ************************************************************************//**
- * \brief  Change terminal text color and attributes.
- *
- * Change text color and attributes for all messages of given ID when they are
- * printed to \c stdout or \c stdin. Outputs to other streams including files
- * will have no
- * color.
- *
- * \param[in]     id      ID for setting level.
- * \param[in]     fg      Text foreground.
- * \param[in]     bg      Text background.
- * \param[in]     attr    Text attribute.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_color_set(const logger_id_t        id,
-                                 const logger_text_fg_t   fg,
-                                 const logger_text_bg_t   bg,
-                                 const logger_text_attr_t attr)
-{
-  /* GUARD: check for valid ID */
-  if ((id < 0) ||
-      (id >= LOGGER_IDS_MAX) ||
-      (logger_control[id].used == logger_false)) {
-    return(LOGGER_ERR_ID_UNKNOWN);
-  }
-
-  logger_control[id].color = logger_true;
-  (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
-  (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
-  logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
-  logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
-  logger_control[id].color_string_changed = logger_true;
-
-  return(LOGGER_OK);
-}
-
-
-/** ************************************************************************//**
- * \brief  Reset terminal text color and attributes.
- *
- * Reset text color and attributes of given ID back to defaults.
- *
- * \param[in]     id      ID for setting level.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_color_reset(const logger_id_t id)
-{
-  /* GUARD: check for valid ID */
-  if ((id < 0) ||
-      (id >= LOGGER_IDS_MAX) ||
-      (logger_control[id].used == logger_false)) {
-    return(LOGGER_ERR_ID_UNKNOWN);
-  }
-
-  logger_control[id].color                 = logger_false;
-  logger_control[id].color_string.begin[0] = '\0';
-  logger_control[id].color_string.end[0]   = '\0';
-  logger_control[id].color_string_changed  = logger_true;
-
-  return(LOGGER_OK);
 }
 
 

@@ -665,7 +665,7 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
 
   assert(LOGGER_OK == logger_color_prefix_disable());
   assert(LOGGER_OK == logger_color_message_disable());
@@ -739,35 +739,35 @@ int main(int  argc,
   assert(LOGGER_OK == logger_color_message_enable());
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BLINK));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_BLINK));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_REVERSE));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_RED, LOGGER_BG_BLACK, LOGGER_ATTR_REVERSE));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_BLUE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_BLUE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_YELLOW, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_YELLOW, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
-  assert(LOGGER_OK == logger_color_reset(id));
+  assert(LOGGER_OK == logger_id_color_reset(id));
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG, "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
   puts("Other message");
   puts("Other message");
@@ -793,8 +793,8 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_message_enable());
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
 
   puts("All messages have the same color");
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
@@ -840,8 +840,8 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_message_enable());
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
 
   puts("Message on STDOUT and STDERR both use color");
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
@@ -885,12 +885,12 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
-  assert(LOGGER_OK == logger_color_message_enable());
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_id_output_register(id, stdout));
   assert(LOGGER_OK == logger_id_output_level_set(id, stdout, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_id_output_register(id, stderr));
   assert(LOGGER_OK == logger_id_output_level_set(id, stderr, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_color_message_enable());
 
   puts("Message on STDOUT and STDERR both use color");
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
@@ -934,8 +934,8 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_message_enable());
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_output_function_register(test_printer));
   assert(logger_true == logger_output_function_is_registered(test_printer));
   assert(LOGGER_OK == logger_output_function_level_set(test_printer, LOGGER_DEBUG));
@@ -960,8 +960,8 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_message_enable());
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_id_output_function_register(id, test_printer));
   assert(logger_true == logger_id_output_function_is_registered(id, test_printer));
   assert(LOGGER_OK == logger_id_output_function_level_set(id, test_printer, LOGGER_DEBUG));
@@ -1017,6 +1017,30 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- test deprecated messages\n", test);
+
+  puts("Test all deprecated messages");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+
+  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_reset(id));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- show color combinations\n", test);
 
   puts("Show all possible color combinations");
@@ -1034,11 +1058,11 @@ int main(int  argc,
     {
       for (fg_color = LOGGER_FG_BLACK ; fg_color <= LOGGER_FG_WHITE ; fg_color++)
       {
-        logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
+        logger_id_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
         logger(id, LOGGER_DEBUG, "foreground: %d, background: %d, attr: %d  >>>>", fg_color, bg_color, attr);
-        logger_color_set(id, fg_color, bg_color, attr);
+        logger_id_color_set(id, fg_color, bg_color, attr);
         logger(id, LOGGER_DEBUG, "TEST TEST TEST TEST TEST");
-        logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
+        logger_id_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
         logger(id, LOGGER_DEBUG, "<<<<\n");
       }
     }
