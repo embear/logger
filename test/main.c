@@ -1017,46 +1017,6 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
-  printf("Starting test %d -- test deprecated messages\n", test);
-
-  puts("Test all deprecated messages");
-
-  assert(LOGGER_OK == logger_output_register(stdout));
-  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
-  id = logger_id_request("logger_test_id");
-  assert(LOGGER_OK == logger_id_enable(id));
-  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
-
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_SHORT));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FULL));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_EMPTY));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FILE_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FILE_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FILE_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FILE_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FILE_LINE));
-  assert(LOGGER_OK == logger_id_prefix_set(id, LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE));
-  assert(LOGGER_OK == logger_color_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
-  assert(LOGGER_OK == logger_color_reset(id));
-
-  assert(LOGGER_OK == logger_output_deregister(stdout));
-  assert(LOGGER_OK == logger_id_release(id));
-
-  printf("Ending test %d ....\n", test);
-
-  test++;
-  puts("");
-  puts("****************************************************************************");
-  puts("* TEST *********************************************************************");
-  puts("****************************************************************************");
-  puts("");
   printf("Starting test %d -- show color combinations\n", test);
 
   puts("Show all possible color combinations");

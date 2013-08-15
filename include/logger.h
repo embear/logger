@@ -28,7 +28,32 @@ extern "C" {
 #define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
 
 /** Deprecation macro */
-#define LOGGER_DEPRECATED(__new) __attribute__((__deprecated__("Use '" #__new "' instead")))
+#if __GNUC__
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#define LOGGER_DEPRECATED(__new) __attribute__((__deprecated__("Use " #__new " instead")))
+#else /* __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ >= 5 */
+#define LOGGER_DEPRECATED(__new) __attribute__((__deprecated__))
+#endif /* __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ >= 5 */
+#else /* __GNUC__ */
+#define LOGGER_DEPRECATED(__new)
+#endif /* __GNUC__ */
+
+/** Inline macro */
+#define LOGGER_INLINE static inline
+
+/** Unused macro */
+#if __GNUC__
+#define LOGGER_UNUSED __attribute__((__unused__))
+#else /* __GNUC__ */
+#define LOGGER_UNUSED
+#endif /* __GNUC__ */
+
+/** Format printf macro */
+#if __GNUC__
+#define LOGGER_FORMAT_PRINTF(__format_idx, __variadic_idx) __attribute__((format(printf, __format_idx, __variadic_idx)))
+#else /* __GNUC__ */
+#define LOGGER_FORMAT_PRINTF(__format_idx, __variadic_idx)
+#endif /* __GNUC__ */
 
 /** Logger major version number */
 #define LOGGER_VERSION_MAJOR    255
@@ -54,7 +79,6 @@ typedef uint8_t  logger_bool_t;    /**< Logger boolean type. */
 
 /** Logger boolean false. */
 #define logger_false    ((logger_bool_t)0)
-
 
 /** Logger log level types */
 typedef enum logger_level_e {
@@ -311,72 +335,56 @@ logger_return_t logger_implementation(logger_id_t    id,
                                       const char     *function,
                                       uint32_t       line,
                                       const char     *format,
-                                      ...) __attribute__((format(printf, 6, 7)));
+                                      ...) LOGGER_FORMAT_PRINTF(6, 7);
+logger_return_t logger_color_set(const logger_id_t        id,
+                                 const logger_text_fg_t   fg,
+                                 const logger_text_bg_t   bg,
+                                 const logger_text_attr_t attr) LOGGER_DEPRECATED("logger_id_color_set()");
+logger_return_t logger_color_reset(const logger_id_t id) LOGGER_DEPRECATED("logger_id_color_reset()");
 
 /** Macro to call the real logger function logger() with the information about the current position in code (file, function and line) */
 #define logger(__id, __level, ...)   logger_implementation(__id, __level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
-/** Legacy function, please use logger_id_color_set() instead */
-static inline logger_return_t logger_color_set(const logger_id_t        id,
-                                               const logger_text_fg_t   fg,
-                                               const logger_text_bg_t   bg,
-                                               const logger_text_attr_t attr)
-  LOGGER_DEPRECATED("logger_id_color_set()");
-
-logger_return_t logger_color_set(const logger_id_t        id,
-                                 const logger_text_fg_t   fg,
-                                 const logger_text_bg_t   bg,
-                                 const logger_text_attr_t attr)
-{
-  return(logger_id_color_set(id, fg, bg, attr));
-}
-
-/** Legacy function, please use logger_id_color_reset() instead */
-static inline logger_return_t logger_color_reset(const logger_id_t id)
-  LOGGER_DEPRECATED("logger_id_color_reset()");
-logger_return_t logger_color_reset(const logger_id_t id)
-{
-  return(logger_id_color_reset(id));
-}
 
 #else  /* LOGGER_ENABLE */
-static inline logger_return_t logger_ignore_ok(void)
+
+LOGGER_INLINE logger_return_t logger_ignore_ok(void)
 {
   return(LOGGER_OK);
 }
 
 
-static inline logger_return_t logger_ignore_err(void)
+LOGGER_INLINE logger_return_t logger_ignore_err(void)
 {
   return(LOGGER_ERR_UNKNOWN);
 }
 
 
-static inline logger_id_t logger_ignore_id(void)
+LOGGER_INLINE logger_id_t logger_ignore_id(void)
 {
   return(0);
 }
 
 
-static inline logger_bool_t logger_ignore_true(void)
+LOGGER_INLINE logger_bool_t logger_ignore_true(void)
 {
   return(logger_true);
 }
 
 
-static inline logger_bool_t logger_ignore_false(void)
+LOGGER_INLINE logger_bool_t logger_ignore_false(void)
 {
   return(logger_false);
 }
 
 
-static inline logger_level_t logger_ignore_unknown(void)
+LOGGER_INLINE logger_level_t logger_ignore_unknown(void)
 {
   return(LOGGER_UNKNOWN);
 }
 
 
-static inline logger_prefix_t logger_ignore_unset(void)
+LOGGER_INLINE logger_prefix_t logger_ignore_unset(void)
 {
   return(LOGGER_PFX_UNSET);
 }

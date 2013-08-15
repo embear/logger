@@ -356,7 +356,7 @@ logger_prefix_t logger_prefix_get(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_output_common_register(logger_output_t          *outputs,
+LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t          *outputs,
                                                             const uint16_t           size,
                                                             logger_output_type_t     type,
                                                             FILE                     *stream,
@@ -470,7 +470,7 @@ static inline logger_return_t logger_output_common_register(logger_output_t     
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_output_common_deregister(logger_output_t          *outputs,
+LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t          *outputs,
                                                               const uint16_t           size,
                                                               logger_output_type_t     type,
                                                               FILE                     *stream,
@@ -556,7 +556,7 @@ static inline logger_return_t logger_output_common_deregister(logger_output_t   
  *
  * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
-static inline logger_bool_t logger_output_common_is_registered(logger_output_t          *outputs,
+LOGGER_INLINE logger_bool_t logger_output_common_is_registered(logger_output_t          *outputs,
                                                                const uint16_t           size,
                                                                logger_output_type_t     type,
                                                                FILE                     *stream,
@@ -618,7 +618,7 @@ static inline logger_bool_t logger_output_common_is_registered(logger_output_t  
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_output_common_level_set(logger_output_t          *outputs,
+LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t          *outputs,
                                                              const uint16_t           size,
                                                              logger_output_type_t     type,
                                                              FILE                     *stream,
@@ -696,7 +696,7 @@ static inline logger_return_t logger_output_common_level_set(logger_output_t    
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_level_t logger_output_common_level_get(logger_output_t          *outputs,
+LOGGER_INLINE logger_level_t logger_output_common_level_get(logger_output_t          *outputs,
                                                             const uint16_t           size,
                                                             logger_output_type_t     type,
                                                             FILE                     *stream,
@@ -757,7 +757,7 @@ static inline logger_level_t logger_output_common_level_get(logger_output_t     
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_output_common_color(logger_output_t          *outputs,
+LOGGER_INLINE logger_return_t logger_output_common_color(logger_output_t          *outputs,
                                                          const uint16_t           size,
                                                          logger_output_type_t     type,
                                                          FILE                     *stream,
@@ -821,7 +821,7 @@ static inline logger_return_t logger_output_common_color(logger_output_t        
  *
  * \return        \c logger_true if logger is found, logger_false otherwise.
  ******************************************************************************/
-static inline logger_bool_t logger_output_common_color_is_enabled(logger_output_t          *outputs,
+LOGGER_INLINE logger_bool_t logger_output_common_color_is_enabled(logger_output_t          *outputs,
                                                                   const uint16_t           size,
                                                                   logger_output_type_t     type,
                                                                   FILE                     *stream,
@@ -2054,8 +2054,7 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
  *
  * Change text color and attributes for all messages of given ID when they are
  * printed to \c stdout or \c stdin. Outputs to other streams including files
- * will have no
- * color.
+ * will have no color.
  *
  * \param[in]     id      ID for setting level.
  * \param[in]     fg      Text foreground.
@@ -2088,6 +2087,29 @@ logger_return_t logger_id_color_set(const logger_id_t        id,
 
 
 /** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
+ *
+ * Change text color and attributes for all messages of given ID when they are
+ * printed to \c stdout or \c stdin. Outputs to other streams including files
+ * will have no color. Use logger_id_color_set() instead.
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_set(const logger_id_t        id,
+                                 const logger_text_fg_t   fg,
+                                 const logger_text_bg_t   bg,
+                                 const logger_text_attr_t attr)
+{
+  return(logger_id_color_set(id, fg, bg, attr));
+}
+
+
+/** ************************************************************************//**
  * \brief  Reset terminal text color and attributes.
  *
  * Reset text color and attributes of given ID back to defaults.
@@ -2111,6 +2133,22 @@ logger_return_t logger_id_color_reset(const logger_id_t id)
   logger_control[id].color_string_changed  = logger_true;
 
   return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Reset terminal text color and attributes.
+ *
+ * Reset text color and attributes of given ID back to defaults. Use
+ * logger_id_color_reset() instead!
+ *
+ * \param[in]     id      ID for setting level.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_reset(const logger_id_t id)
+{
+  return(logger_id_color_reset(id));
 }
 
 
@@ -2232,7 +2270,7 @@ const char *logger_level_name_get(const logger_level_t level)
  *
  * \return        Pointer to file name.
  ******************************************************************************/
-static inline const char *logger_strip_path(const char *file)
+LOGGER_INLINE const char *logger_strip_path(const char *file)
 {
   const char *basename;
 
@@ -2260,7 +2298,7 @@ static inline const char *logger_strip_path(const char *file)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_format_date(char     *date,
+LOGGER_INLINE logger_return_t logger_format_date(char     *date,
                                                  uint16_t date_size)
 {
   time_t        current_time;
@@ -2301,8 +2339,6 @@ static inline logger_return_t logger_format_date(char     *date,
 }
 
 
-
-
 /** ************************************************************************//**
  * \brief  Format message prefix
  *
@@ -2318,7 +2354,7 @@ static inline logger_return_t logger_format_date(char     *date,
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_format_prefix(logger_id_t    id,
+LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
                                                    char           *prefix,
                                                    uint16_t       prefix_size,
                                                    logger_level_t level,
@@ -2439,7 +2475,7 @@ static inline logger_return_t logger_format_prefix(logger_id_t    id,
  *
  * \return     Number of characters written to destination string.
  ******************************************************************************/
-static inline size_t logger_string_copy(char       *dest,
+LOGGER_INLINE size_t logger_string_copy(char       *dest,
                                         const char *src,
                                         size_t     n)
 {
@@ -2466,11 +2502,11 @@ static inline size_t logger_string_copy(char       *dest,
  * \param[out]    message       Formatted message.
  * \param[in]     message_size  String length of formatted message.
  * \param[in]     format        \c printf() like format string.
- * \param[in]     va_args       Argument list.
+ * \param[in]     argp          Argument list.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_format_message(logger_id_t id,
+LOGGER_INLINE logger_return_t logger_format_message(logger_id_t id,
                                                     char        *message,
                                                     uint16_t    message_size,
                                                     const char  *format,
@@ -2533,12 +2569,14 @@ static inline logger_return_t logger_format_message(logger_id_t id,
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
+ * \param[in]     outputs   List of logger outputs.
+ * \param[in]     size      Number of elements in output list.
  * \param[in]     prefix    Formatted message prefix.
  * \param[in]     message   Formatted message.
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-static inline logger_return_t logger_output(logger_id_t     id,
+LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
                                             logger_level_t  level,
                                             logger_output_t *outputs,
                                             uint16_t        size,
