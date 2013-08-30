@@ -56,13 +56,13 @@ extern "C" {
 #endif /* __GNUC__ */
 
 /** Logger major version number */
-#define LOGGER_VERSION_MAJOR    255
+#define LOGGER_VERSION_MAJOR    3
 
 /** Logger minor version number */
-#define LOGGER_VERSION_MINOR    255
+#define LOGGER_VERSION_MINOR    0
 
 /** Logger patch level */
-#define LOGGER_VERSION_PATCH    255
+#define LOGGER_VERSION_PATCH    0
 
 /** Logger version number as integer */
 #define LOGGER_VERSION          ((logger_version_t)(((LOGGER_VERSION_MAJOR << 16) & 0x00FF0000) | ((LOGGER_VERSION_MINOR << 8) & 0x0000FF00) | ((LOGGER_VERSION_PATCH) & 0x000000FF)))
