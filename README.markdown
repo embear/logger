@@ -218,6 +218,19 @@ int main(void)
 Version history
 ---------------
 
+* **v3.0.0** *(2013-08-30)*
+
+    * Complete rewrite of prefix generation with backward compatible interface
+    * Add date/time prefix
+    * Add functions to enable/disable colors for each output
+    * Add possibility to register a user callback function as output. This way
+      the user can store the formated messages i.e. in a ring buffer or display
+      them in a gui window.
+    * Performance improvements
+    * Add doxygen to build environment
+    * Deprecate some functions. Provide legacy functions for backward
+      compatibility.
+
 * **v2.1.1** *(2013-07-10)*
 
     * Bugfix release
