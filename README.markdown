@@ -5,6 +5,10 @@ Logger is a simple logging facility for the C language. It is possible to
 output logging information to different output stream and to use different
 logging severities.
 
+**Table of contents**
+
+[TOC]
+
 Introduction
 ------------
 
@@ -210,3 +214,60 @@ int main(void)
   return(0);
 }
 ~~~~~~~~~~~~~~~~~~~~
+
+Version history
+---------------
+
+* **v2.1.1** *(2013-07-10)*
+
+    * Bugfix release
+
+* **v2.1.0** *(2013-07-10)*
+
+    * More compile time defines to configure logger
+    * Strip path from filename in logging prefix
+    * Reduce the number of color strings in output to the necessary ones
+    * Performance improvements
+
+* **v2.0.1** *(2013-02-14)*
+
+    * Bugfix release
+
+* **v2.0.0** *(2012-12-05)*
+
+    * Possibility to change logging prefix for each ID independent
+    * Support for logging strings containing multiple '\n' characters
+    * Add possibility to define logging ID specific outputs
+    * Possibility to flush all outputs after each line
+    * Add functions to check state of logger, logging IDs and streams
+    * Add function to query logging level name as string
+    * Possibility to color prefix depending on logging severity
+    * Make colors configurable at runtime
+    * Performance improvements
+    * Add README
+
+* **v1.1.3** *(2012-07-24)*
+
+    * Bugfix release
+
+* **v1.1.2** *(2012-07-06)*
+
+    * Bugfix release
+
+* **v1.1.1** *(2012-07-05)*
+
+    * Bugfix release
+
+* **v1.1.0** *(2012-07-05)*
+
+    * 32/64 bit portability
+    * Change logger_id_request() to take a symbolic name
+
+* **v1.0.1** *(2011-10-26)*
+
+    * Introduce logger version and access functions / macros
+    * C++ compatibility
+
+* **v1.0.0** *(2011-05-26)*
+
+    * Initial release
