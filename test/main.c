@@ -847,8 +847,8 @@ int main(int  argc,
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_WARNING, LOGGER_FG_YELLOW, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ERR,     LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_CRIT,    LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT));
-  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ALERT,   LOGGER_FG_BLACK,  LOGGER_BG_RED,   LOGGER_ATTR_RESET));
-  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_EMERG,   LOGGER_FG_BLACK,  LOGGER_BG_RED,   LOGGER_ATTR_BLINK));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ALERT,   LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT | LOGGER_ATTR_REVERSE));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_EMERG,   LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT | LOGGER_ATTR_REVERSE | LOGGER_ATTR_BLINK));
 
   puts("All messages have the same color");
   assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
@@ -1138,7 +1138,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_color_message_enable());
 
-  for (attr = LOGGER_ATTR_RESET ; attr <= LOGGER_ATTR_HIDDEN ; attr++)
+  for (attr = LOGGER_ATTR_RESET ; attr <= LOGGER_ATTR_HIDDEN ; attr <<= 1)
   {
     for (bg_color = LOGGER_BG_BLACK ; bg_color <= LOGGER_BG_WHITE ; bg_color++)
     {
