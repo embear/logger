@@ -205,6 +205,71 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
 
 
 /** ************************************************************************//**
+ * \brief  Format escape sequence for unix consoles.
+ *
+ * Create a string containing a escape sequence constructed from given
+ * foreground and background color as well as attributes.
+ *
+ * \param[out]    string  String for escape sequence.
+ * \param[in]     size    Size of string.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+static logger_return_t logger_color_console_format(char                     *string,
+                                                   const size_t             size,
+                                                   const logger_text_fg_t   fg,
+                                                   const logger_text_bg_t   bg,
+                                                   const logger_text_attr_t attr)
+{
+  int used = 0;
+  logger_bool_t separator = logger_false;
+
+  /* GUARD: check for valid ID */
+  if (string == NULL) {
+    return(LOGGER_ERR_STRING_INVALID);
+  }
+
+  /* escape sequence start */
+  used += snprintf(string + used, size - used, "\x1B[");
+
+  /* attribute */
+  if (separator == logger_true) {
+    used += snprintf(string + used, size - used, ";");
+  }
+  used += snprintf(string + used, size - used, "%d", attr);
+  separator = logger_true;
+
+  /* foreground color */
+  if (fg != LOGGER_FG_UNCHANGED) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, "%d", fg);
+    separator = logger_true;
+  }
+
+  /* background color */
+  if (bg != LOGGER_BG_UNCHANGED) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, "%d", bg);
+    separator = logger_true;
+  }
+
+  /* escape sequence end */
+  used += snprintf(string + used, size - used, "m");
+
+  string[size - 1] = '\0';
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
  * \brief  Version of logger.
  *
  * Get the version of logger for which it was compiled. Needed to check for
@@ -2082,10 +2147,8 @@ logger_return_t logger_id_color_console_set(const logger_id_t        id,
   }
 
   logger_control[id].color = logger_true;
-  (void)snprintf(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
-  (void)snprintf(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
-  logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
-  logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+  logger_color_console_format(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
+  logger_color_console_format(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
   logger_control[id].color_string_changed = logger_true;
 
   return(LOGGER_OK);
@@ -2231,10 +2294,8 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  (void)snprintf(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
-  (void)snprintf(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
-  logger_level_colors[level].begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
-  logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+  logger_color_console_format(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
+  logger_color_console_format(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
 
   return(LOGGER_OK);
 }

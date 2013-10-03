@@ -198,7 +198,8 @@ typedef enum logger_return_e {
   LOGGER_ERR_NAME_INVALID      = -14,   /**< Name string is invalid. */
   LOGGER_ERR_FORMAT_INVALID    = -15,   /**< Format string is invalid. */
   LOGGER_ERR_FILE_INVALID      = -16,   /**< File string is invalid. */
-  LOGGER_ERR_STRING_TOO_LONG   = -17    /**< Given string is too long. */
+  LOGGER_ERR_STRING_TOO_LONG   = -17,   /**< Given string is too long. */
+  LOGGER_ERR_STRING_INVALID    = -18    /**< Given string is invalid. */
 } logger_return_t;
 
 
@@ -216,27 +217,29 @@ typedef enum logger_text_attr_e {
 
 /** Logger enum for text background color output. */
 typedef enum logger_text_bg_e {
-  LOGGER_BG_BLACK   = 40, /**< Black background color. */
-  LOGGER_BG_RED     = 41, /**< Red background color. */
-  LOGGER_BG_GREEN   = 42, /**< Green background color. */
-  LOGGER_BG_YELLOW  = 43, /**< Yellow background color. */
-  LOGGER_BG_BLUE    = 44, /**< Blue background color. */
-  LOGGER_BG_MAGENTA = 45, /**< Magenta background color. */
-  LOGGER_BG_CYAN    = 46, /**< Cyan background color. */
-  LOGGER_BG_WHITE   = 47  /**< White background color. */
+  LOGGER_BG_UNCHANGED = 0,  /**< Unchanged background color. */
+  LOGGER_BG_BLACK     = 40, /**< Black background color. */
+  LOGGER_BG_RED       = 41, /**< Red background color. */
+  LOGGER_BG_GREEN     = 42, /**< Green background color. */
+  LOGGER_BG_YELLOW    = 43, /**< Yellow background color. */
+  LOGGER_BG_BLUE      = 44, /**< Blue background color. */
+  LOGGER_BG_MAGENTA   = 45, /**< Magenta background color. */
+  LOGGER_BG_CYAN      = 46, /**< Cyan background color. */
+  LOGGER_BG_WHITE     = 47  /**< White background color. */
 } logger_text_bg_t;
 
 
 /** Logger enum for text foreground color output. */
 typedef enum logger_text_fg_e {
-  LOGGER_FG_BLACK   = 30, /**< Black foreground color. */
-  LOGGER_FG_RED     = 31, /**< Red foreground color. */
-  LOGGER_FG_GREEN   = 32, /**< Green foreground color. */
-  LOGGER_FG_YELLOW  = 33, /**< Yellow foreground color. */
-  LOGGER_FG_BLUE    = 34, /**< Blue foreground color. */
-  LOGGER_FG_MAGENTA = 35, /**< Magenta foreground color. */
-  LOGGER_FG_CYAN    = 36, /**< Cyan foreground color. */
-  LOGGER_FG_WHITE   = 37  /**< White foreground color. */
+  LOGGER_FG_UNCHANGED = 0,  /**< Unchanged foreground color. */
+  LOGGER_FG_BLACK     = 30, /**< Black foreground color. */
+  LOGGER_FG_RED       = 31, /**< Red foreground color. */
+  LOGGER_FG_GREEN     = 32, /**< Green foreground color. */
+  LOGGER_FG_YELLOW    = 33, /**< Yellow foreground color. */
+  LOGGER_FG_BLUE      = 34, /**< Blue foreground color. */
+  LOGGER_FG_MAGENTA   = 35, /**< Magenta foreground color. */
+  LOGGER_FG_CYAN      = 36, /**< Cyan foreground color. */
+  LOGGER_FG_WHITE     = 37  /**< White foreground color. */
 } logger_text_fg_t;
 
 
