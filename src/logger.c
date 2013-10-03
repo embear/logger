@@ -2135,48 +2135,6 @@ logger_return_t logger_id_color_string_set(const logger_id_t id,
 
 
 /** ************************************************************************//**
- * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
- *
- * See logger_id_color_console_set().
- *
- * \param[in]     id      ID for setting level.
- * \param[in]     fg      Text foreground.
- * \param[in]     bg      Text background.
- * \param[in]     attr    Text attribute.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_id_color_set(const logger_id_t        id,
-                                    const logger_text_fg_t   fg,
-                                    const logger_text_bg_t   bg,
-                                    const logger_text_attr_t attr)
-{
-  return(logger_id_color_console_set(id, fg, bg, attr));
-}
-
-
-/** ************************************************************************//**
- * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
- *
- * See logger_id_color_console_set().
- *
- * \param[in]     id      ID for setting level.
- * \param[in]     fg      Text foreground.
- * \param[in]     bg      Text background.
- * \param[in]     attr    Text attribute.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_color_set(const logger_id_t        id,
-                                 const logger_text_fg_t   fg,
-                                 const logger_text_bg_t   bg,
-                                 const logger_text_attr_t attr)
-{
-  return(logger_id_color_console_set(id, fg, bg, attr));
-}
-
-
-/** ************************************************************************//**
  * \brief  Reset terminal text color and attributes.
  *
  * Reset text color and attributes of given ID back to defaults.
@@ -2200,22 +2158,6 @@ logger_return_t logger_id_color_reset(const logger_id_t id)
   logger_control[id].color_string_changed  = logger_true;
 
   return(LOGGER_OK);
-}
-
-
-/** ************************************************************************//**
- * \brief  *LEGACY FUNCTION* Reset terminal text color and attributes.
- *
- * Reset text color and attributes of given ID back to defaults. Use
- * logger_id_color_reset() instead!
- *
- * \param[in]     id      ID for setting level.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_color_reset(const logger_id_t id)
-{
-  return(logger_id_color_reset(id));
 }
 
 
@@ -2295,27 +2237,6 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
   logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
 
   return(LOGGER_OK);
-}
-
-
-/** ************************************************************************//**
- * \brief  *LEGACY FUNCTION* Change terminal text color and attributes for prefix.
- *
- * See logger_color_prefix_console_set()
- *
- * \param[in]     level   Level to set.
- * \param[in]     fg      Text foreground.
- * \param[in]     bg      Text background.
- * \param[in]     attr    Text attribute.
- *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
- ******************************************************************************/
-logger_return_t logger_color_prefix_set(const logger_level_t     level,
-                                        const logger_text_fg_t   fg,
-                                        const logger_text_bg_t   bg,
-                                        const logger_text_attr_t attr)
-{
-  return(logger_color_prefix_console_set(level, fg, bg, attr));
 }
 
 
@@ -3066,6 +2987,88 @@ logger_return_t logger_implementation(logger_id_t    id,
   }
 
   return(LOGGER_OK);
+}
+
+
+/* legacy functions */
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
+ *
+ * See logger_id_color_console_set().
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_color_set(const logger_id_t        id,
+                                    const logger_text_fg_t   fg,
+                                    const logger_text_bg_t   bg,
+                                    const logger_text_attr_t attr)
+{
+  return(logger_id_color_console_set(id, fg, bg, attr));
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
+ *
+ * See logger_id_color_console_set().
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_set(const logger_id_t        id,
+                                 const logger_text_fg_t   fg,
+                                 const logger_text_bg_t   bg,
+                                 const logger_text_attr_t attr)
+{
+  return(logger_id_color_console_set(id, fg, bg, attr));
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Reset terminal text color and attributes.
+ *
+ * Reset text color and attributes of given ID back to defaults. Use
+ * logger_id_color_reset() instead!
+ *
+ * \param[in]     id      ID for setting level.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_reset(const logger_id_t id)
+{
+  return(logger_id_color_reset(id));
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes for prefix.
+ *
+ * See logger_color_prefix_console_set()
+ *
+ * \param[in]     level   Level to set.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_prefix_set(const logger_level_t     level,
+                                        const logger_text_fg_t   fg,
+                                        const logger_text_bg_t   bg,
+                                        const logger_text_attr_t attr)
+{
+  return(logger_color_prefix_console_set(level, fg, bg, attr));
 }
 
 
