@@ -197,7 +197,8 @@ typedef enum logger_return_e {
   LOGGER_ERR_FUNCTION_INVALID  = -13,   /**< Function is invalid. */
   LOGGER_ERR_NAME_INVALID      = -14,   /**< Name string is invalid. */
   LOGGER_ERR_FORMAT_INVALID    = -15,   /**< Format string is invalid. */
-  LOGGER_ERR_FILE_INVALID      = -16    /**< File string is invalid. */
+  LOGGER_ERR_FILE_INVALID      = -16,   /**< File string is invalid. */
+  LOGGER_ERR_STRING_TOO_LONG   = -17    /**< Given string is too long. */
 } logger_return_t;
 
 

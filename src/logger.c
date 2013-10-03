@@ -2117,6 +2117,12 @@ logger_return_t logger_id_color_string_set(const logger_id_t id,
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
+  /* GUARD: check for too long color strings */
+  if ((strlen(begin) >= LOGGER_COLOR_STRING_MAX) ||
+      (strlen(end)   >= LOGGER_COLOR_STRING_MAX)) {
+    return(LOGGER_ERR_STRING_TOO_LONG);
+  }
+
   logger_control[id].color = logger_true;
   (void)strncpy(logger_control[id].color_string.begin, begin, LOGGER_COLOR_STRING_MAX);
   (void)strncpy(logger_control[id].color_string.end, end, LOGGER_COLOR_STRING_MAX);
@@ -2295,6 +2301,12 @@ logger_return_t logger_color_prefix_string_set(const logger_level_t level,
   if ((level <  LOGGER_UNKNOWN) ||
       (level >= LOGGER_MAX)) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* GUARD: check for too long color strings */
+  if ((strlen(begin) >= LOGGER_COLOR_STRING_MAX) ||
+      (strlen(end)   >= LOGGER_COLOR_STRING_MAX)) {
+    return(LOGGER_ERR_STRING_TOO_LONG);
   }
 
   (void)strncpy(logger_level_colors[level].begin, begin, LOGGER_COLOR_STRING_MAX);
