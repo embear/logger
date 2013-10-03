@@ -222,10 +222,14 @@ Version history
 
     * Add functions to change color markup strings for prefix an message. This
       makes it possible to use user defined color strings i.e. HTML markup.
+    * Console text attributes can be combined.
+    * Add special console colors `LOGGER_FG_UNCHANGED` and
+      `LOGGER_BG_UNCHANGED` as dummy colors to keep current foreground and
+      background color.
 
 * **v3.0.0** *(2013-08-30)*
 
-    * Complete rewrite of prefix generation with backward compatible interface
+    * Complete rewrite of prefix generation with backward compatible interface.
     * Add date/time prefix
     * Add functions to enable/disable colors for each output
     * Add possibility to register a user callback function as output. This way
