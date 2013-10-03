@@ -838,6 +838,61 @@ int main(int  argc,
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
   assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
+  assert(LOGGER_OK == logger_id_color_console_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_message_enable());
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_UNKNOWN, LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_DEBUG,   LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_INFO,    LOGGER_FG_GREEN,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_NOTICE,  LOGGER_FG_BLUE,   LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_WARNING, LOGGER_FG_YELLOW, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ERR,     LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_CRIT,    LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ALERT,   LOGGER_FG_BLACK,  LOGGER_BG_RED,   LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_EMERG,   LOGGER_FG_BLACK,  LOGGER_BG_RED,   LOGGER_ATTR_BLINK));
+
+  puts("All messages have the same color");
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+  puts("All messages have a level dependent  color for their prefix");
+  assert(LOGGER_OK == logger_color_prefix_enable());
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d\n", test, id, __LINE__));
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
+
+  assert(LOGGER_OK == logger_color_prefix_reset());
+  assert(LOGGER_OK == logger_color_prefix_disable());
+  assert(LOGGER_OK == logger_color_message_disable());
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- show prefix colors with custom color strings  ....\n", test);
+
+  puts("All messages have a different color for their prefix");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
   assert(LOGGER_OK == logger_id_color_string_set(id, "<span style=\"font-family:Courier;color:#00FF00\">", "</span>"));
   assert(LOGGER_OK == logger_color_message_enable());
   assert(LOGGER_OK == logger_color_prefix_string_set(LOGGER_UNKNOWN, "<span style=\"font-family:Courier;color:#FFFFFF;background-color:#000000\">", "</span>"));
