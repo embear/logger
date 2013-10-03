@@ -246,7 +246,7 @@ static logger_return_t logger_color_console_format(char                     *str
                                                    const logger_text_bg_t   bg,
                                                    const logger_text_attr_t attr)
 {
-  int used = 0;
+  int           used      = 0;
   logger_bool_t separator = logger_false;
 
   /* GUARD: check for valid ID */
@@ -262,7 +262,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_RESET);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_RESET);
     separator = logger_true;
   }
 
@@ -270,7 +270,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BRIGHT);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BRIGHT);
     separator = logger_true;
   }
 
@@ -278,7 +278,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_DIM);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_DIM);
     separator = logger_true;
   }
 
@@ -286,7 +286,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_UNDERLINE);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_UNDERLINE);
     separator = logger_true;
   }
 
@@ -294,7 +294,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BLINK);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BLINK);
     separator = logger_true;
   }
 
@@ -302,7 +302,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_REVERSE);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_REVERSE);
     separator = logger_true;
   }
 
@@ -310,17 +310,16 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_HIDDEN);
+    used     += snprintf(string + used, size - used, LOGGER_ATTR_STRING_HIDDEN);
     separator = logger_true;
   }
-
 
   /* foreground color */
   if (fg != LOGGER_FG_UNCHANGED) {
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, "%d", fg);
+    used     += snprintf(string + used, size - used, "%d", fg);
     separator = logger_true;
   }
 
@@ -329,7 +328,7 @@ static logger_return_t logger_color_console_format(char                     *str
     if (separator == logger_true) {
       used += snprintf(string + used, size - used, ";");
     }
-    used += snprintf(string + used, size - used, "%d", bg);
+    used     += snprintf(string + used, size - used, "%d", bg);
     separator = logger_true;
   }
 
@@ -2375,7 +2374,7 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
 
 
 /** ************************************************************************//**
- * \brief  Change terminal text color and attributes for prefix.
+ * \brief  Change text color and attributes for prefix.
  *
  * Change text color and attributes for message prefix with given level when
  * they are printed to \c stdout or \c stdin. Outputs to other streams

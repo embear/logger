@@ -256,7 +256,7 @@ typedef enum logger_text_fg_e {
 } logger_text_fg_t;
 
 
-/** logger output function type */
+/** Logger output function type */
 typedef void (*logger_output_function_t)(const char *);
 
 
