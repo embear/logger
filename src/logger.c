@@ -2069,10 +2069,10 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t logger_id_color_set(const logger_id_t        id,
-                                    const logger_text_fg_t   fg,
-                                    const logger_text_bg_t   bg,
-                                    const logger_text_attr_t attr)
+logger_return_t logger_id_color_console_set(const logger_id_t        id,
+                                            const logger_text_fg_t   fg,
+                                            const logger_text_bg_t   bg,
+                                            const logger_text_attr_t attr)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -2137,9 +2137,28 @@ logger_return_t logger_id_color_string_set(const logger_id_t id,
 /** ************************************************************************//**
  * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
  *
- * Change text color and attributes for all messages of given ID when they are
- * printed to \c stdout or \c stdin. Outputs to other streams including files
- * will have no color unless explicit enabled. Use logger_id_color_set() instead.
+ * See logger_id_color_console_set().
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_color_set(const logger_id_t        id,
+                                    const logger_text_fg_t   fg,
+                                    const logger_text_bg_t   bg,
+                                    const logger_text_attr_t attr)
+{
+  return(logger_id_color_console_set(id, fg, bg, attr));
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
+ *
+ * See logger_id_color_console_set().
  *
  * \param[in]     id      ID for setting level.
  * \param[in]     fg      Text foreground.
@@ -2153,7 +2172,7 @@ logger_return_t logger_color_set(const logger_id_t        id,
                                  const logger_text_bg_t   bg,
                                  const logger_text_attr_t attr)
 {
-  return(logger_id_color_set(id, fg, bg, attr));
+  return(logger_id_color_console_set(id, fg, bg, attr));
 }
 
 
@@ -2259,10 +2278,10 @@ logger_bool_t logger_color_prefix_is_enabled(void)
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t logger_color_prefix_set(const logger_level_t     level,
-                                        const logger_text_fg_t   fg,
-                                        const logger_text_bg_t   bg,
-                                        const logger_text_attr_t attr)
+logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
+                                                const logger_text_fg_t   fg,
+                                                const logger_text_bg_t   bg,
+                                                const logger_text_attr_t attr)
 {
   /* GUARD: check for valid level */
   if ((level <  LOGGER_UNKNOWN) ||
@@ -2276,6 +2295,27 @@ logger_return_t logger_color_prefix_set(const logger_level_t     level,
   logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
 
   return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  *LEGACY FUNCTION* Change terminal text color and attributes for prefix.
+ *
+ * See logger_color_prefix_console_set()
+ *
+ * \param[in]     level   Level to set.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_prefix_set(const logger_level_t     level,
+                                        const logger_text_fg_t   fg,
+                                        const logger_text_bg_t   bg,
+                                        const logger_text_attr_t attr)
+{
+  return(logger_color_prefix_console_set(level, fg, bg, attr));
 }
 
 
