@@ -114,6 +114,27 @@
 /** Format string for field separator */
 #define LOGGER_FORMAT_STRING_SEPARATOR ":"
 
+/** Reset attribute string. */
+#define LOGGER_ATTR_STRING_RESET     "0"
+
+/** Bright attribute string */
+#define LOGGER_ATTR_STRING_BRIGHT    "1"
+
+/** Dim attribute string */
+#define LOGGER_ATTR_STRING_DIM       "2"
+
+/** Underline attribute string */
+#define LOGGER_ATTR_STRING_UNDERLINE "3"
+
+/** Blink attribute string */
+#define LOGGER_ATTR_STRING_BLINK     "5"
+
+/** Reverse attribute string */
+#define LOGGER_ATTR_STRING_REVERSE   "7"
+
+/** Hidden attribute string */
+#define LOGGER_ATTR_STRING_HIDDEN    "8"
+
 
 /** Logger output type */
 typedef enum logger_output_type_e {
@@ -208,7 +229,8 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
  * \brief  Format escape sequence for unix consoles.
  *
  * Create a string containing a escape sequence constructed from given
- * foreground and background color as well as attributes.
+ * foreground and background color as well as attributes. Attributes can be
+ * combined using `|`.
  *
  * \param[out]    string  String for escape sequence.
  * \param[in]     size    Size of string.
@@ -236,11 +258,62 @@ static logger_return_t logger_color_console_format(char                     *str
   used += snprintf(string + used, size - used, "\x1B[");
 
   /* attribute */
-  if (separator == logger_true) {
-    used += snprintf(string + used, size - used, ";");
+  if (attr & LOGGER_ATTR_RESET) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_RESET);
+    separator = logger_true;
   }
-  used += snprintf(string + used, size - used, "%d", attr);
-  separator = logger_true;
+
+  if (attr & LOGGER_ATTR_BRIGHT) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BRIGHT);
+    separator = logger_true;
+  }
+
+  if (attr & LOGGER_ATTR_DIM) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_DIM);
+    separator = logger_true;
+  }
+
+  if (attr & LOGGER_ATTR_UNDERLINE) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_UNDERLINE);
+    separator = logger_true;
+  }
+
+  if (attr & LOGGER_ATTR_BLINK) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_BLINK);
+    separator = logger_true;
+  }
+
+  if (attr & LOGGER_ATTR_REVERSE) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_REVERSE);
+    separator = logger_true;
+  }
+
+  if (attr & LOGGER_ATTR_HIDDEN) {
+    if (separator == logger_true) {
+      used += snprintf(string + used, size - used, ";");
+    }
+    used += snprintf(string + used, size - used, LOGGER_ATTR_STRING_HIDDEN);
+    separator = logger_true;
+  }
+
 
   /* foreground color */
   if (fg != LOGGER_FG_UNCHANGED) {
@@ -2124,8 +2197,8 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
  * Change text color and attributes for all messages of given ID when they are
  * printed to \c stdout or \c stdin. Outputs to other streams including files
  * will have no color unless explicit enabled. This function uses escape
- * sequences of unix consoles. To set any other markup strings use
- * logger_id_color_string_set().
+ * sequences of unix consoles. Attributes can be combined using `|`. To set any
+ * other markup strings use logger_id_color_string_set().
  *
  * \param[in]     id      ID for setting level.
  * \param[in]     fg      Text foreground.
@@ -2273,8 +2346,8 @@ logger_bool_t logger_color_prefix_is_enabled(void)
  * Change text color and attributes for message prefix with given level when
  * they are printed to \c stdout or \c stdin. Outputs to other streams
  * including files will have no color unless explicit enabled. This function
- * uses escape sequences of unix consoles. To set any other markup strings use
- * logger_color_prefix_string_set().
+ * uses escape sequences of unix consoles. Attributes can be combined using
+ * `|`. To set any other markup strings use logger_color_prefix_string_set().
  *
  * \param[in]     level   Level to set.
  * \param[in]     fg      Text foreground.

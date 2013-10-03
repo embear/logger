@@ -203,16 +203,29 @@ typedef enum logger_return_e {
 } logger_return_t;
 
 
-/** Logger enum for text style output. */
-typedef enum logger_text_attr_e {
-  LOGGER_ATTR_RESET     = 0, /**< Reset attributes. */
-  LOGGER_ATTR_BRIGHT    = 1, /**< Bright attribute. */
-  LOGGER_ATTR_DIM       = 2, /**< Dim attribute. */
-  LOGGER_ATTR_UNDERLINE = 3, /**< Underline attribute. */
-  LOGGER_ATTR_BLINK     = 5, /**< Blink attribute. */
-  LOGGER_ATTR_REVERSE   = 7, /**< Reverse attribute. */
-  LOGGER_ATTR_HIDDEN    = 8  /**< Hidden attribute. */
-} logger_text_attr_t;
+/** Logger type for text style output. */
+typedef unsigned int logger_text_attr_t;
+
+/** Reset attributes. */
+#define LOGGER_ATTR_RESET     (1 << 0)
+
+/** Bright attribute. */
+#define LOGGER_ATTR_BRIGHT    (1 << 1)
+
+/** Dim attribute. */
+#define LOGGER_ATTR_DIM       (1 << 2)
+
+/** Underline attribute. */
+#define LOGGER_ATTR_UNDERLINE (1 << 3)
+
+/** Blink attribute. */
+#define LOGGER_ATTR_BLINK     (1 << 4)
+
+/** Reverse attribute. */
+#define LOGGER_ATTR_REVERSE   (1 << 5)
+
+/** Hidden attribute. */
+#define LOGGER_ATTR_HIDDEN    (1 << 6)
 
 
 /** Logger enum for text background color output. */
