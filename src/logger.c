@@ -47,7 +47,7 @@
 
 /** Length of logger color string including '\0' */
 #ifndef LOGGER_COLOR_STRING_MAX
-#define LOGGER_COLOR_STRING_MAX        (16)
+#define LOGGER_COLOR_STRING_MAX        (128)
 #endif /* LOGGER_COLOR_STRING_MAX */
 #if (LOGGER_COLOR_STRING_MAX < 1)
 #error "LOGGER_COLOR_STRING_MAX must be at least 1"
@@ -187,7 +187,10 @@ static const char *logger_level_names[] =
 
 
 /** level to color translation */
-static logger_color_string_t logger_level_colors[] =
+static logger_color_string_t logger_level_colors[LOGGER_MAX];
+
+/** level to color translation for console */
+static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
 {
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" == 0 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
   { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   == 1 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
@@ -230,6 +233,7 @@ logger_return_t logger_init(void)
     logger_enabled               = logger_true;
     logger_color_prefix_enabled  = logger_false;
     logger_color_message_enabled = logger_false;
+    memcpy(logger_level_colors, logger_level_colors_console, sizeof(logger_level_colors));
     memset(logger_control, 0, sizeof(logger_control));
     memset(logger_outputs, 0, sizeof(logger_outputs));
     memset(logger_message, 0, sizeof(logger_message));
@@ -420,9 +424,9 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
     /* found an empty slot */
     if (found == logger_true) {
       outputs[index].count++;
-      outputs[index].level  = LOGGER_UNKNOWN;
+      outputs[index].level     = LOGGER_UNKNOWN;
       outputs[index].use_color = logger_false;
-      outputs[index].type   = type;
+      outputs[index].type      = type;
 
       switch (type) {
         case LOGGER_OUTPUT_TYPE_UNKNOWN:
@@ -2054,7 +2058,9 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
  *
  * Change text color and attributes for all messages of given ID when they are
  * printed to \c stdout or \c stdin. Outputs to other streams including files
- * will have no color.
+ * will have no color unless explicit enabled. This function uses escape
+ * sequences of unix consoles. To set any other markup strings use
+ * logger_id_color_string_set().
  *
  * \param[in]     id      ID for setting level.
  * \param[in]     fg      Text foreground.
@@ -2087,11 +2093,47 @@ logger_return_t logger_id_color_set(const logger_id_t        id,
 
 
 /** ************************************************************************//**
+ * \brief  Change terminal text color and attributes.
+ *
+ * Change text color and attributes for all messages of given ID when they are
+ * printed to \c stdout or \c stdin. Outputs to other streams including files
+ * will have no color unless explicit enabled. To set colors for unix consoles
+ * use logger_color_prefix_set().
+ *
+ * \param[in]     id      ID for setting level.
+ * \param[in]     begin   Text color begin markup.
+ * \param[in]     end     Text color end markup.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_color_string_set(const logger_id_t id,
+                                           const char        *begin,
+                                           const char        *end)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  logger_control[id].color = logger_true;
+  (void)strncpy(logger_control[id].color_string.begin, begin, LOGGER_COLOR_STRING_MAX);
+  (void)strncpy(logger_control[id].color_string.end, end, LOGGER_COLOR_STRING_MAX);
+  logger_control[id].color_string.begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+  logger_control[id].color_string.end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+  logger_control[id].color_string_changed = logger_true;
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
  * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
  *
  * Change text color and attributes for all messages of given ID when they are
  * printed to \c stdout or \c stdin. Outputs to other streams including files
- * will have no color. Use logger_id_color_set() instead.
+ * will have no color unless explicit enabled. Use logger_id_color_set() instead.
  *
  * \param[in]     id      ID for setting level.
  * \param[in]     fg      Text foreground.
@@ -2192,6 +2234,91 @@ logger_return_t logger_color_prefix_disable(void)
 logger_bool_t logger_color_prefix_is_enabled(void)
 {
   return(logger_color_prefix_enabled);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Change terminal text color and attributes for prefix.
+ *
+ * Change text color and attributes for message prefix with given level when
+ * they are printed to \c stdout or \c stdin. Outputs to other streams
+ * including files will have no color unless explicit enabled. This function
+ * uses escape sequences of unix consoles. To set any other markup strings use
+ * logger_color_prefix_string_set().
+ *
+ * \param[in]     level   Level to set.
+ * \param[in]     fg      Text foreground.
+ * \param[in]     bg      Text background.
+ * \param[in]     attr    Text attribute.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_prefix_set(const logger_level_t     level,
+                                        const logger_text_fg_t   fg,
+                                        const logger_text_bg_t   bg,
+                                        const logger_text_attr_t attr)
+{
+  /* GUARD: check for valid level */
+  if ((level <  LOGGER_UNKNOWN) ||
+      (level >= LOGGER_MAX)) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  (void)snprintf(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, "\x1B[%d;%d;%dm", attr, fg, bg);
+  (void)snprintf(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, "\x1B[%dm", LOGGER_ATTR_RESET);
+  logger_level_colors[level].begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+  logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Change terminal text color and attributes for prefix.
+ *
+ * Change text color and attributes for message prefix with given level when
+ * they are printed to \c stdout or \c stdin. Outputs to other streams
+ * including files will have no color unless explicit enabled. To set colors
+ * for unix consoles use logger_color_prefix_set().
+ *
+ * \param[in]     level   Level for setting color string.
+ * \param[in]     begin   Text color begin markup.
+ * \param[in]     end     Text color end markup.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_prefix_string_set(const logger_level_t level,
+                                               const char           *begin,
+                                               const char           *end)
+{
+  /* GUARD: check for valid level */
+  if ((level <  LOGGER_UNKNOWN) ||
+      (level >= LOGGER_MAX)) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  (void)strncpy(logger_level_colors[level].begin, begin, LOGGER_COLOR_STRING_MAX);
+  (void)strncpy(logger_level_colors[level].end, end, LOGGER_COLOR_STRING_MAX);
+  logger_level_colors[level].begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+  logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Change terminal text color and attributes for prefix.
+ *
+ * Reset text color and attributes for message prefix to console default escape
+ * sequences.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_color_prefix_reset(void)
+{
+  memcpy(logger_level_colors, logger_level_colors_console, sizeof(logger_level_colors));
+
+  return(LOGGER_OK);
 }
 
 

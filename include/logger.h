@@ -321,10 +321,21 @@ logger_return_t logger_id_color_set(const logger_id_t        id,
                                     const logger_text_fg_t   fg,
                                     const logger_text_bg_t   bg,
                                     const logger_text_attr_t attr);
+logger_return_t logger_id_color_string_set(const logger_id_t id,
+                                           const char        *begin,
+                                           const char        *end);
 logger_return_t logger_id_color_reset(const logger_id_t id);
 logger_return_t logger_color_prefix_enable(void);
 logger_return_t logger_color_prefix_disable(void);
 logger_bool_t logger_color_prefix_is_enabled(void);
+logger_return_t logger_color_prefix_set(const logger_level_t     level,
+                                        const logger_text_fg_t   fg,
+                                        const logger_text_bg_t   bg,
+                                        const logger_text_attr_t attr);
+logger_return_t logger_color_prefix_string_set(const logger_level_t level,
+                                               const char           *begin,
+                                               const char           *end);
+logger_return_t logger_color_prefix_reset(void);
 logger_return_t logger_color_message_enable(void);
 logger_return_t logger_color_message_disable(void);
 logger_bool_t logger_color_message_is_enabled(void);
@@ -454,10 +465,14 @@ LOGGER_INLINE const char * logger_disabled_string(void)
 #define logger_id_output_function_color_disable(__id, __function)       logger_disabled_ok()
 #define logger_id_output_function_color_is_enabled(__id, __function)    logger_disabled_false()
 #define logger_id_color_set(__id, __fg, __bg, __attr)                   logger_disabled_ok()
+#define logger_id_color_string_set(__id, __begin, __end)                logger_disabled_ok()
 #define logger_id_color_reset(__id)                                     logger_disabled_ok()
 #define logger_color_prefix_enable()                                    logger_disabled_ok()
 #define logger_color_prefix_disable()                                   logger_disabled_ok()
 #define logger_color_prefix_is_enabled()                                logger_disabled_false()
+#define logger_color_prefix_set(__level, __fg, __bg, __attr)            logger_disabled_ok()
+#define logger_color_prefix_string_set(__level, __begin, __end)         logger_disabled_ok()
+#define logger_color_prefix_reset()                                     logger_disabled_ok()
 #define logger_color_message_enable()                                   logger_disabled_ok()
 #define logger_color_message_disable()                                  logger_disabled_ok()
 #define logger_color_message_is_enabled()                               logger_disabled_false()
