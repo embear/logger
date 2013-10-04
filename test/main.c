@@ -841,9 +841,9 @@ int main(int  argc,
   assert(LOGGER_OK == logger_id_color_console_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_message_enable());
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_UNKNOWN, LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
-  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_DEBUG,   LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
-  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_INFO,    LOGGER_FG_GREEN,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
-  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_NOTICE,  LOGGER_FG_BLUE,   LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_DEBUG,   LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_DIM));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_INFO,    LOGGER_FG_WHITE,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
+  assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_NOTICE,  LOGGER_FG_GREEN,  LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_WARNING, LOGGER_FG_YELLOW, LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_ERR,     LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_RESET));
   assert(LOGGER_OK == logger_color_prefix_console_set(LOGGER_CRIT,    LOGGER_FG_RED,    LOGGER_BG_BLACK, LOGGER_ATTR_BRIGHT));
