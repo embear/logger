@@ -849,19 +849,19 @@ LOGGER_INLINE logger_level_t logger_output_common_level_get(logger_output_t     
   /* GUARD: check for valid type */
   if ((type <= LOGGER_OUTPUT_TYPE_UNKNOWN) ||
       (type >= LOGGER_OUTPUT_TYPE_MAX)) {
-    return(LOGGER_ERR_TYPE_INVALID);
+    return(LOGGER_UNKNOWN);
   }
 
   /* GUARD: check for valid stream */
   if ((type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
       (stream == NULL)) {
-    return(LOGGER_ERR_STREAM_INVALID);
+    return(LOGGER_UNKNOWN);
   }
 
   /* GUARD: check for valid function */
   if ((type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
       (function == NULL)) {
-    return(LOGGER_ERR_FUNCTION_INVALID);
+    return(LOGGER_UNKNOWN);
   }
 
   /* GUARD: check for valid output */
