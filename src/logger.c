@@ -370,11 +370,11 @@ logger_return_t logger_init(void)
     logger_enabled               = logger_true;
     logger_color_prefix_enabled  = logger_false;
     logger_color_message_enabled = logger_false;
-    memcpy(logger_level_colors, logger_level_colors_console, sizeof(logger_level_colors));
-    memset(logger_control, 0, sizeof(logger_control));
-    memset(logger_outputs, 0, sizeof(logger_outputs));
-    memset(logger_message, 0, sizeof(logger_message));
-    memset(logger_prefix,  0, sizeof(logger_prefix));
+    (void)memcpy(logger_level_colors, logger_level_colors_console, sizeof(logger_level_colors));
+    (void)memset(logger_control, 0, sizeof(logger_control));
+    (void)memset(logger_outputs, 0, sizeof(logger_outputs));
+    (void)memset(logger_message, 0, sizeof(logger_message));
+    (void)memset(logger_prefix,  0, sizeof(logger_prefix));
   }
 
   return(LOGGER_OK);
@@ -1192,7 +1192,7 @@ logger_return_t logger_output_flush(void)
   /* search for used global outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     if (logger_outputs[index].count > 0) {
-      fflush(logger_outputs[index].stream);
+      (void)fflush(logger_outputs[index].stream);
     }
   }
 
@@ -1200,7 +1200,7 @@ logger_return_t logger_output_flush(void)
   for (id = 0 ; id < LOGGER_IDS_MAX ; id++) {
     for (index = 0 ; index < LOGGER_ID_OUTPUTS_MAX ; index++) {
       if (logger_control[id].outputs[index].count > 0) {
-        fflush(logger_control[id].outputs[index].stream);
+        (void)fflush(logger_control[id].outputs[index].stream);
       }
     }
   }
@@ -1419,7 +1419,7 @@ logger_id_t logger_id_request(const char *name)
       if (logger_control[index].used == logger_false) {
         found = logger_true;
         /* reset the ID */
-        memset(&logger_control[index], 0, sizeof(logger_control[index]));
+        (void)memset(&logger_control[index], 0, sizeof(logger_control[index]));
 
         /* initialize the ID */
         logger_control[index].used                  = logger_true;
@@ -1433,7 +1433,7 @@ logger_id_t logger_id_request(const char *name)
         logger_control[index].color_string_changed  = logger_false;
 
         /* copy the name */
-        strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
+        (void)strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
         logger_control[index].name[LOGGER_NAME_MAX - 1] = '\0';
 
         break;
@@ -1485,7 +1485,7 @@ logger_return_t logger_id_release(const logger_id_t id)
     logger_output_flush();
 
     /* reset the ID */
-    memset(&logger_control[id], 0, sizeof(logger_control[id]));
+    (void)memset(&logger_control[id], 0, sizeof(logger_control[id]));
 
     /* reset all ID dependent values to defaults */
     logger_control[id].used                  = logger_false;
@@ -1500,7 +1500,7 @@ logger_return_t logger_id_release(const logger_id_t id)
     logger_control[id].name[0]               = '\0';
 
     /* reset outputs */
-    memset(logger_control[id].outputs, 0, sizeof(logger_control[id].outputs));
+    (void)memset(logger_control[id].outputs, 0, sizeof(logger_control[id].outputs));
   }
 
   return(LOGGER_OK);
@@ -2219,8 +2219,8 @@ logger_return_t logger_id_color_console_set(const logger_id_t        id,
   }
 
   logger_control[id].color = logger_true;
-  logger_color_console_format(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
-  logger_color_console_format(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
+  (void)logger_color_console_format(logger_control[id].color_string.begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
+  (void)logger_color_console_format(logger_control[id].color_string.end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
   logger_control[id].color_string_changed = logger_true;
 
   return(LOGGER_OK);
@@ -2366,8 +2366,8 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  logger_color_console_format(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
-  logger_color_console_format(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
+  (void)logger_color_console_format(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
+  (void)logger_color_console_format(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
 
   return(LOGGER_OK);
 }
@@ -2987,7 +2987,7 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
 
         case LOGGER_OUTPUT_TYPE_FILESTREAM:
           /* put the message to stream */
-          fputs(logger_line, outputs[index].stream);
+          (void)fputs(logger_line, outputs[index].stream);
 #ifdef LOGGER_FORCE_FLUSH
           (void)fflush(outputs[index].stream);
 #endif  /* LOGGER_FORCE_FLUSH */
@@ -3081,14 +3081,14 @@ logger_return_t logger_implementation(logger_id_t    id,
       (logger_control[id].level < LOGGER_MAX) &&
       (logger_control[id].level <= level)) {
     /* format date */
-    logger_format_date(logger_date, sizeof(logger_date));
+    (void)logger_format_date(logger_date, sizeof(logger_date));
 
     /* format prefix */
-    logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
+    (void)logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
 
     /* format message */
     va_start(argp, format);
-    logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
+    (void)logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
     va_end(argp);
 
     /* initialize message pointer */
@@ -3108,10 +3108,10 @@ logger_return_t logger_implementation(logger_id_t    id,
       }
 
       /* output message to global streams */
-      logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
+      (void)logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
 
       /* output message to id streams */
-      logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
+      (void)logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
 
       /* update message part for next loop */
       message_part = message_end;
