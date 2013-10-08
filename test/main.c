@@ -1145,7 +1145,7 @@ int main(int  argc,
       for (fg_color = LOGGER_FG_BLACK ; fg_color <= LOGGER_FG_WHITE ; fg_color++)
       {
         logger_id_color_console_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
-        logger(id, LOGGER_DEBUG, "foreground: %d, background: %d, attr: %d  >>>>", fg_color, bg_color, attr);
+        logger(id, LOGGER_DEBUG, "foreground: %2d, background: %2d, attr: %2d  >>>>", fg_color, bg_color, attr);
         logger_id_color_console_set(id, fg_color, bg_color, attr);
         logger(id, LOGGER_DEBUG, "TEST TEST TEST TEST TEST");
         logger_id_color_console_set(id, LOGGER_FG_WHITE, LOGGER_BG_BLACK, LOGGER_ATTR_RESET);
