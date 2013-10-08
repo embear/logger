@@ -98,31 +98,31 @@ typedef enum logger_level_e {
 typedef uint16_t logger_prefix_t;
 
 /** Empty prefix */
-#define LOGGER_PFX_EMPTY            (0)
+#define LOGGER_PFX_EMPTY            ((logger_prefix_t)(0))
 
 /** Prefix date string */
-#define LOGGER_PFX_DATE             (1 << 0)
+#define LOGGER_PFX_DATE             ((logger_prefix_t)(1 << 0))
 
 /** Prefix loger ID name */
-#define LOGGER_PFX_NAME             (1 << 1)
+#define LOGGER_PFX_NAME             ((logger_prefix_t)(1 << 1))
 
 /** Prefix logger level */
-#define LOGGER_PFX_LEVEL            (1 << 2)
+#define LOGGER_PFX_LEVEL            ((logger_prefix_t)(1 << 2))
 
 /** Prefix file name */
-#define LOGGER_PFX_FILE             (1 << 3)
+#define LOGGER_PFX_FILE             ((logger_prefix_t)(1 << 3))
 
 /** Prefix function name */
-#define LOGGER_PFX_FUNCTION         (1 << 4)
+#define LOGGER_PFX_FUNCTION         ((logger_prefix_t)(1 << 4))
 
 /** Prefix function name */
-#define LOGGER_PFX_LINE             (1 << 5)
+#define LOGGER_PFX_LINE             ((logger_prefix_t)(1 << 5))
 
 /** Unset prefix */
-#define LOGGER_PFX_UNSET            (1 << 6)
+#define LOGGER_PFX_UNSET            ((logger_prefix_t)(1 << 6))
 
 /** All prefixes */
-#define LOGGER_PFX_ALL              (LOGGER_PFX_UNSET - 1)
+#define LOGGER_PFX_ALL              ((logger_prefix_t)(LOGGER_PFX_UNSET - 1))
 
 /** Legacy variable, please use (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL) instead instead */
 static const logger_prefix_t LOGGER_PREFIX_SHORT LOGGER_DEPRECATED((LOGGER_PFX_NAME | LOGGER_PFX_LEVEL)) = (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL);
@@ -207,25 +207,25 @@ typedef enum logger_return_e {
 typedef unsigned int logger_text_attr_t;
 
 /** Reset attributes. */
-#define LOGGER_ATTR_RESET     (1 << 0)
+#define LOGGER_ATTR_RESET     ((logger_text_attr_t)(1 << 0))
 
 /** Bright attribute. */
-#define LOGGER_ATTR_BRIGHT    (1 << 1)
+#define LOGGER_ATTR_BRIGHT    ((logger_text_attr_t)(1 << 1))
 
 /** Dim attribute. */
-#define LOGGER_ATTR_DIM       (1 << 2)
+#define LOGGER_ATTR_DIM       ((logger_text_attr_t)(1 << 2))
 
 /** Underline attribute. */
-#define LOGGER_ATTR_UNDERLINE (1 << 3)
+#define LOGGER_ATTR_UNDERLINE ((logger_text_attr_t)(1 << 3))
 
 /** Blink attribute. */
-#define LOGGER_ATTR_BLINK     (1 << 4)
+#define LOGGER_ATTR_BLINK     ((logger_text_attr_t)(1 << 4))
 
 /** Reverse attribute. */
-#define LOGGER_ATTR_REVERSE   (1 << 5)
+#define LOGGER_ATTR_REVERSE   ((logger_text_attr_t)(1 << 5))
 
 /** Hidden attribute. */
-#define LOGGER_ATTR_HIDDEN    (1 << 6)
+#define LOGGER_ATTR_HIDDEN    ((logger_text_attr_t)(1 << 6))
 
 
 /** Logger enum for text background color output. */
