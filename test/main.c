@@ -14,6 +14,8 @@
  ******************************************************************************/
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "logger.h"
 
 void test_printer(const char * string)
@@ -26,6 +28,7 @@ int main(int  argc,
          char *argv[])
 {
   int                test = 0;
+  uint32_t           tmp_uint32 = 32;
   FILE               *logger_stream;
   FILE               *logger_stream2;
   logger_level_t     level;
@@ -1118,6 +1121,36 @@ int main(int  argc,
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
   assert(LOGGER_OK == logger_id_release(id2));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- test inttypes macros ....\n", test);
+
+  puts("Test if inttypes macros are useable in format strings");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_WARNING));
+
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
 
   printf("Ending test %d ....\n", test);
 
