@@ -223,7 +223,7 @@ int main(void)
 Version history
 ---------------
 
-* **v3.2.0** *(XXXX-YY-ZZ)*
+* **v3.2.0** *(2013-10-23)*
 
     * Add `logger_va()` which is a variant of logger that takes a `va_list`
       argument instead of multiple arguments.
