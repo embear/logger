@@ -16,6 +16,11 @@ Logger needs to be enabled using the global define `LOGGER_ENABLE` when
 compiling the sources. Otherwise all functions will be excluded from
 compilation.
 
+Logger provides two functions to print messages. The first one is `logger()`
+which takes a format string and several arguments like `printf()`. The second
+one is `logger_va()` which takes a format string and a `va_list` as argument
+like `vprintf()`.
+
 Logger supports multiple IDs. A logger ID is requested with a call to
 `logger_id_request()` and released with `logger_id_release()`. Multiple
 calls to `logger_id_request()` with the same name as argument result in the
@@ -50,9 +55,9 @@ using `|`. Available prefix elements are:
 | `LOGGER_PFX_LINE`     | `"LINE:"`                          |
 | `LOGGER_PFX_ALL`      | All above prefixes in above order. |
 
-For backward compatibility the following prefix enums are also supported:
+For backward compatibility the following prefix enumerations are also supported:
 
-| Prefix enum              | Generated prefix                                    |
+| Prefix enumeration       | Generated prefix                                    |
 | ------------------------ | --------------------------------------------------- |
 | `LOGGER_PREFIX_EMPTY`    | `""`                                                |
 | `LOGGER_PREFIX_NAME`     | `"LOGGER_ID_NAME:"`                                 |
