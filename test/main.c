@@ -22,6 +22,21 @@ void test_printer(const char * string)
 {
   printf("test_printer: %s", string);
 }
+logger_return_t logger_wrapper(logger_id_t    id,
+                               logger_level_t level,
+                               const char     *format,
+                               ...)
+{
+  logger_return_t ret;
+  va_list         argp;
+
+  va_start(argp, format);
+  ret = logger_va(id, level, format, argp);
+  va_end(argp);
+
+  return(ret);
+}
+
 
 
 int main(int  argc,
@@ -1148,6 +1163,45 @@ int main(int  argc,
   assert(LOGGER_OK == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
   assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
   assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
+  printf("Starting test %d -- test variable argument list ....\n", test);
+
+  puts("Test logger variant with variable argument list");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_WARNING));
+
+  assert(LOGGER_OK == logger(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_DEBUG,   "test %d - id %d - LOGGER_DEBUG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_INFO,    "test %d - id %d - LOGGER_INFO    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_NOTICE,  "test %d - id %d - LOGGER_NOTICE  in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_WARNING, "test %d - id %d - LOGGER_WARNING in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_ERR,     "test %d - id %d - LOGGER_ERR     in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_CRIT,    "test %d - id %d - LOGGER_CRIT    in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_ALERT,   "test %d - id %d - LOGGER_ALERT   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
+  assert(LOGGER_OK == logger_wrapper(id, LOGGER_EMERG,   "test %d - id %d - LOGGER_EMERG   in line %d - value %"PRIu32"\n", test, id, __LINE__, tmp_uint32));
 
   assert(LOGGER_OK == logger_output_deregister(stdout));
   assert(LOGGER_OK == logger_id_release(id));
