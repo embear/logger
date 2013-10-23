@@ -59,7 +59,7 @@ extern "C" {
 #define LOGGER_VERSION_MAJOR    3
 
 /** Logger minor version number */
-#define LOGGER_VERSION_MINOR    0
+#define LOGGER_VERSION_MINOR    1
 
 /** Logger patch level */
 #define LOGGER_VERSION_PATCH    0

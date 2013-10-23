@@ -218,7 +218,7 @@ int main(void)
 Version history
 ---------------
 
-* **v3.1.0** *(XXXX-YY-ZZ)*
+* **v3.1.0** *(2013-10-23)*
 
     * Add functions to change color markup strings for prefix an message. This
       makes it possible to use user defined color strings i.e. HTML markup.
