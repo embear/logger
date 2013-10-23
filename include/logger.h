@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -364,6 +365,19 @@ logger_return_t logger_implementation(logger_id_t    id,
                                       uint32_t       line,
                                       const char     *format,
                                       ...) LOGGER_FORMAT_PRINTF(6, 7);
+logger_return_t logger_implementation_va(logger_id_t    id,
+                                         logger_level_t level,
+                                         const char     *file,
+                                         const char     *function,
+                                         uint32_t       line,
+                                         const char     *format,
+                                         va_list        argp);
+
+/** Macro to call the real logger function logger() with the information about the current position in code (file, function and line) */
+#define logger(__id, __level, ...)                    logger_implementation(__id, __level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+/** Macro to call the real logger function logger_va() with the information about the current position in code (file, function and line) */
+#define logger_va(__id, __level, __format, __argp)    logger_implementation_va(__id, __level, __FILE__, __FUNCTION__, __LINE__, __format, __argp)
 
 /* legacy functions */
 logger_return_t logger_id_color_set(const logger_id_t        id,
@@ -379,9 +393,6 @@ logger_return_t logger_color_prefix_set(const logger_level_t     level,
                                         const logger_text_fg_t   fg,
                                         const logger_text_bg_t   bg,
                                         const logger_text_attr_t attr) LOGGER_DEPRECATED("logger_id_color_console_set()");
-
-/** Macro to call the real logger function logger() with the information about the current position in code (file, function and line) */
-#define logger(__id, __level, ...)   logger_implementation(__id, __level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 
 #else  /* LOGGER_ENABLE */
@@ -505,6 +516,7 @@ LOGGER_INLINE const char * logger_disabled_string(void)
 #define logger_color_message_is_enabled()                               logger_disabled_false()
 #define logger_level_name_get(__level)                                  logger_disabled_string()
 #define logger(__id, __level, ...)                                      logger_disabled_ok()
+#define logger_va(__id, __level, ...)                                   logger_disabled_ok()
 
 /* legacy functions */
 #define logger_id_color_set(__id, __fg, __bg, __attr)                   logger_disabled_ok()

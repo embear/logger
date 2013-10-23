@@ -17,7 +17,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
 #include <unistd.h>
 #include <stddef.h>
 #include <time.h>
@@ -3031,20 +3030,20 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
  * \param[in]     function  Name of function where this call happend.
  * \param[in]     line      Line where this call happend.
  * \param[in]     format    \c printf() like format string.
+ * \param[in]     argp      variable argument list pointer
  *
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
-logger_return_t logger_implementation(logger_id_t    id,
-                                      logger_level_t level,
-                                      const char     *file,
-                                      const char     *function,
-                                      uint32_t       line,
-                                      const char     *format,
-                                      ...)
+LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
+                                                           logger_level_t level,
+                                                           const char     *file,
+                                                           const char     *function,
+                                                           uint32_t       line,
+                                                           const char     *format,
+                                                           va_list        argp)
 {
-  va_list         argp;
-  char            *message_part;
-  char            *message_end;
+  char *message_part;
+  char *message_end;
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -3087,9 +3086,7 @@ logger_return_t logger_implementation(logger_id_t    id,
     (void)logger_format_prefix(id, logger_prefix, sizeof(logger_prefix), level, file, function, line);
 
     /* format message */
-    va_start(argp, format);
     (void)logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
-    va_end(argp);
 
     /* initialize message pointer */
     message_part = logger_message;
@@ -3120,6 +3117,86 @@ logger_return_t logger_implementation(logger_id_t    id,
   }
 
   return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Print log message.
+ *
+ * Print the log message to all outputs registered using a printf()-like format
+ * string and variable argument list. It is possible to do repeated prints to
+ * the same line by omitting '\n' in the log message format sting. In this case
+ * a subsequent call will be appended without prefix. Only print the message if
+ *
+ *   - logging is globally enabled.
+ *   - logging ID is enabled.
+ *   - logging level is higher or equal to the logging level of the ID.
+ *   - logging level is higher or equal to the logging level of a output.
+ *
+ * \param[in]     id        ID outputting this message.
+ * \param[in]     level     Level of this message.
+ * \param[in]     file      Name of file where this call happend.
+ * \param[in]     function  Name of function where this call happend.
+ * \param[in]     line      Line where this call happend.
+ * \param[in]     format    \c printf() like format string.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_implementation(logger_id_t    id,
+                                      logger_level_t level,
+                                      const char     *file,
+                                      const char     *function,
+                                      uint32_t       line,
+                                      const char     *format,
+                                      ...)
+{
+  logger_return_t ret;
+  va_list         argp;
+
+  va_start(argp, format);
+  ret = logger_implementation_common(id, level, file, function, line, format, argp);
+  va_end(argp);
+
+  return(ret);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Print log message with variable argument list.
+ *
+ * Print the log message to all outputs registered using a printf()-like format
+ * string and variable argument list. It is possible to do repeated prints to
+ * the same line by omitting '\n' in the log message format sting. In this case
+ * a subsequent call will be appended without prefix. Only print the message if
+ *
+ *   - logging is globally enabled.
+ *   - logging ID is enabled.
+ *   - logging level is higher or equal to the logging level of the ID.
+ *   - logging level is higher or equal to the logging level of a output.
+ *
+ * \param[in]     id        ID outputting this message.
+ * \param[in]     level     Level of this message.
+ * \param[in]     file      Name of file where this call happend.
+ * \param[in]     function  Name of function where this call happend.
+ * \param[in]     line      Line where this call happend.
+ * \param[in]     format    \c printf() like format string.
+ * \param[in]     argp      variable argument list pointer
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_implementation_va(logger_id_t    id,
+                                         logger_level_t level,
+                                         const char     *file,
+                                         const char     *function,
+                                         uint32_t       line,
+                                         const char     *format,
+                                         va_list        argp)
+{
+  logger_return_t ret;
+
+  ret = logger_implementation_common(id, level, file, function, line, format, argp);
+
+  return(ret);
 }
 
 
