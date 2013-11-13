@@ -82,18 +82,40 @@ typedef uint8_t  logger_bool_t;    /**< Logger boolean type. */
 #define logger_false    ((logger_bool_t)0)
 
 /** Logger log level types */
-typedef enum logger_level_e {
-  LOGGER_UNKNOWN = 0,  /**< Unknown level. */
-  LOGGER_DEBUG   = 1,  /**< Debug-level message. */
-  LOGGER_INFO    = 2,  /**< Informational message. */
-  LOGGER_NOTICE  = 3,  /**< Normal, but significant, condition. */
-  LOGGER_WARNING = 4,  /**< Warning conditions. */
-  LOGGER_ERR     = 5,  /**< Error conditions. */
-  LOGGER_CRIT    = 6,  /**< Critical conditions. */
-  LOGGER_ALERT   = 7,  /**< Action must be taken immediately. */
-  LOGGER_EMERG   = 8,  /**< System is unusable. */
-  LOGGER_MAX     = 9   /**< Last entry, always! */
-} logger_level_t;
+typedef uint16_t logger_level_t;
+
+/** Unknown level. */
+#define  LOGGER_UNKNOWN ((logger_level_t)(0))
+
+/** Debug-level message. */
+#define  LOGGER_DEBUG   ((logger_level_t)(1 << 0))
+
+/** Informational message. */
+#define  LOGGER_INFO    ((logger_level_t)(1 << 1))
+
+/** Normal, but significant, condition. */
+#define  LOGGER_NOTICE  ((logger_level_t)(1 << 2))
+
+/** Warning conditions. */
+#define  LOGGER_WARNING ((logger_level_t)(1 << 3))
+
+/** Error conditions. */
+#define  LOGGER_ERR     ((logger_level_t)(1 << 4))
+
+/** Critical conditions. */
+#define  LOGGER_CRIT    ((logger_level_t)(1 << 5))
+
+/** Action must be taken immediately. */
+#define  LOGGER_ALERT   ((logger_level_t)(1 << 6))
+
+/** System is unusable. */
+#define  LOGGER_EMERG   ((logger_level_t)(1 << 7))
+
+/** All possible levels. */
+#define  LOGGER_ALL     ((logger_level_t)((1 << 8) - 1))
+
+/** Number of valid levels. */
+#define  LOGGER_MAX     (9)
 
 /** Logger prefix type */
 typedef uint16_t logger_prefix_t;

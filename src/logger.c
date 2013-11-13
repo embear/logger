@@ -11,6 +11,7 @@
  * \brief  Logging facility for C.
  * \author Markus Braun
  ******************************************************************************/
+/* TODO (mbr, 2013-11-13): level guard anpassen! */
 #include "logger.h"
 
 #ifdef LOGGER_ENABLE
@@ -192,17 +193,17 @@ static char             logger_line[LOGGER_LINE_STRING_MAX];                   /
 
 
 /** level to name translation */
-static const char *logger_level_names[] =
+static const char *logger_level_names[LOGGER_MAX] =
 {
-  "UNKNOWN", /**< Name for level "UNKNOWN" == 0 */
-  "DEBUG",   /**< Name for level "DEBUG"   == 1 */
-  "INFO",    /**< Name for level "INFO"    == 2 */
-  "NOTICE",  /**< Name for level "NOTICE"  == 3 */
-  "WARNING", /**< Name for level "WARNING" == 4 */
-  "ERR",     /**< Name for level "ERR"     == 5 */
-  "CRIT",    /**< Name for level "CRIT"    == 6 */
-  "ALERT",   /**< Name for level "ALERT"   == 7 */
-  "EMERG"    /**< Name for level "EMERG"   == 8 */
+  "UNKNOWN", /**< Name for level "UNKNOWN" */
+  "DEBUG",   /**< Name for level "DEBUG"   */
+  "INFO",    /**< Name for level "INFO"    */
+  "NOTICE",  /**< Name for level "NOTICE"  */
+  "WARNING", /**< Name for level "WARNING" */
+  "ERR",     /**< Name for level "ERR"     */
+  "CRIT",    /**< Name for level "CRIT"    */
+  "ALERT",   /**< Name for level "ALERT"   */
+  "EMERG"    /**< Name for level "EMERG"   */
 };
 
 
@@ -212,16 +213,80 @@ static logger_color_string_t logger_level_colors[LOGGER_MAX];
 /** level to color translation for console */
 static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
 {
-  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" == 0 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
-  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   == 1 -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;47m", "\x1B[0m" }, /* Prefix color string for level "INFO"    == 2 -> LOGGER_BG_WHITE,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;44m", "\x1B[0m" }, /* Prefix color string for level "NOTICE"  == 3 -> LOGGER_BG_BLUE,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;46m", "\x1B[0m" }, /* Prefix color string for level "WARNING" == 4 -> LOGGER_BG_CYAN,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;42m", "\x1B[0m" }, /* Prefix color string for level "ERR"     == 5 -> LOGGER_BG_GREEN,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;43m", "\x1B[0m" }, /* Prefix color string for level "CRIT"    == 6 -> LOGGER_BG_YELLOW,  LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   == 7 -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
-  { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   == 8 -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "UNKNOWN" -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
+  { "\x1B[0;37;40m", "\x1B[0m" }, /* Prefix color string for level "DEBUG"   -> LOGGER_BG_BLACK,   LOGGER_FG_WHITE, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;47m", "\x1B[0m" }, /* Prefix color string for level "INFO"    -> LOGGER_BG_WHITE,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;44m", "\x1B[0m" }, /* Prefix color string for level "NOTICE"  -> LOGGER_BG_BLUE,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;46m", "\x1B[0m" }, /* Prefix color string for level "WARNING" -> LOGGER_BG_CYAN,    LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;42m", "\x1B[0m" }, /* Prefix color string for level "ERR"     -> LOGGER_BG_GREEN,   LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;43m", "\x1B[0m" }, /* Prefix color string for level "CRIT"    -> LOGGER_BG_YELLOW,  LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
+  { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
+
+
+/** ************************************************************************//**
+ * \brief  Convert logger levels to index for level arrays.
+ *
+ * Convert logger levels to an index that can be used to access a level based
+ * array like level specific colors or level to name conversion.
+ *
+ * \param[in]     level   Level to convert.
+ *
+ * \return        Index corresponding given level
+ ******************************************************************************/
+static uint16_t logger_level_to_index(const logger_level_t level)
+{
+  uint16_t index = 0;
+
+  switch (level) {
+    case LOGGER_UNKNOWN:
+      index = 0;
+      break;
+
+    case LOGGER_DEBUG:
+      index = 1;
+      break;
+
+    case LOGGER_INFO:
+      index = 2;
+      break;
+
+    case LOGGER_NOTICE:
+      index = 3;
+      break;
+
+    case LOGGER_WARNING:
+      index = 4;
+      break;
+
+    case LOGGER_ERR:
+      index = 5;
+      break;
+
+    case LOGGER_CRIT:
+      index = 6;
+      break;
+
+    case LOGGER_ALERT:
+      index = 7;
+      break;
+
+    case LOGGER_EMERG:
+      index = 8;
+      break;
+
+    case LOGGER_ALL:
+      index = 0;
+      break;
+
+    default:
+      index = 0;
+      break;
+  }
+
+  return(index);
+}
 
 
 /** ************************************************************************//**
@@ -792,12 +857,6 @@ LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t    
     return(LOGGER_ERR_OUTPUT_INVALID);
   }
 
-  /* GUARD: check for valid level */
-  if ((level <= LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
-    return(LOGGER_ERR_LEVEL_UNKNOWN);
-  }
-
   /* check if this output is registered */
   found = logger_false;
   for (index = 0 ; index < size ; index++) {
@@ -1084,13 +1143,19 @@ logger_bool_t logger_output_is_registered(FILE *stream)
 logger_return_t logger_output_level_set(FILE                 *stream,
                                         const logger_level_t level)
 {
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0 &&
+      (level & (level - 1)) == 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
   /* set stream output level to global outputs */
   return(logger_output_common_level_set(logger_outputs,
                                         LOGGER_OUTPUTS_MAX,
                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
                                         stream,
                                         (logger_output_function_t)NULL,
-                                        level));
+                                        LOGGER_ALL ^ (level - 1)));
 }
 
 
@@ -1105,12 +1170,17 @@ logger_return_t logger_output_level_set(FILE                 *stream,
  ******************************************************************************/
 logger_level_t logger_output_level_get(FILE *stream)
 {
+  logger_level_t level;
+
   /* get stream output level to global outputs */
-  return(logger_output_common_level_get(logger_outputs,
-                                        LOGGER_OUTPUTS_MAX,
-                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                        stream,
-                                        (logger_output_function_t)NULL));
+  level = logger_output_common_level_get(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL);
+
+  /* return only lowest set bit */
+  return(LOGGER_ALL ^ (level - 1));
 }
 
 
@@ -1284,13 +1354,19 @@ logger_bool_t logger_output_function_is_registered(logger_output_function_t func
 logger_return_t logger_output_function_level_set(logger_output_function_t function,
                                                  const logger_level_t     level)
 {
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0 &&
+      (level & (level - 1)) == 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
   /* set function output level to global outputs */
   return(logger_output_common_level_set(logger_outputs,
                                         LOGGER_OUTPUTS_MAX,
                                         LOGGER_OUTPUT_TYPE_FUNCTION,
                                         (FILE *)NULL,
                                         function,
-                                        level));
+                                        LOGGER_ALL ^ (level - 1)));
 }
 
 
@@ -1305,12 +1381,17 @@ logger_return_t logger_output_function_level_set(logger_output_function_t functi
  ******************************************************************************/
 logger_level_t logger_output_function_level_get(logger_output_function_t function)
 {
+  logger_level_t level;
+
   /* get function output level to global outputs */
-  return(logger_output_common_level_get(logger_outputs,
-                                        LOGGER_OUTPUTS_MAX,
-                                        LOGGER_OUTPUT_TYPE_FUNCTION,
-                                        (FILE *)NULL,
-                                        function));
+  level = logger_output_common_level_get(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function);
+
+  /* return only lowest set bit */
+  return(LOGGER_ALL ^ (level - 1));
 }
 
 
@@ -1601,13 +1682,13 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
   }
 
   /* GUARD: check for valid level */
-  if ((level <= LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
+  if ((level & ~LOGGER_ALL) != 0 &&
+      (level & (level - 1)) == 0) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
   /* set ID level */
-  logger_control[id].level = level;
+  logger_control[id].level = LOGGER_ALL ^ (level - 1);
 
   return(LOGGER_OK);
 }
@@ -1631,8 +1712,8 @@ logger_level_t logger_id_level_get(const logger_id_t id)
     return(LOGGER_UNKNOWN);
   }
 
-  /* get ID level */
-  return(logger_control[id].level);
+  /* get ID level, return only lowest set bit */
+  return(LOGGER_ALL ^ (logger_control[id].level - 1));
 }
 
 
@@ -1828,13 +1909,19 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0 &&
+      (level & (level - 1)) == 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
   /* set stream output level to id specific outputs */
   return(logger_output_common_level_set(logger_control[id].outputs,
                                         LOGGER_ID_OUTPUTS_MAX,
                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
                                         stream,
                                         (logger_output_function_t)NULL,
-                                        level));
+                                        LOGGER_ALL ^ (level - 1)));
 }
 
 
@@ -1851,6 +1938,8 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
 logger_level_t logger_id_output_level_get(const logger_id_t id,
                                           FILE              *stream)
 {
+  logger_level_t level;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
       (id >= LOGGER_IDS_MAX) ||
@@ -1859,11 +1948,14 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
   }
 
   /* get stream output level from id specific outputs */
-  return(logger_output_common_level_get(logger_control[id].outputs,
-                                        LOGGER_ID_OUTPUTS_MAX,
-                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                        stream,
-                                        (logger_output_function_t)NULL));
+  level = logger_output_common_level_get(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL);
+
+  /* return only lowest set bit */
+  return(LOGGER_ALL ^ (level - 1));
 }
 
 
@@ -2061,13 +2153,19 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0 &&
+      (level & (level - 1)) == 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
   /* set function output level to id specific outputs */
   return(logger_output_common_level_set(logger_control[id].outputs,
                                         LOGGER_ID_OUTPUTS_MAX,
                                         LOGGER_OUTPUT_TYPE_FUNCTION,
                                         (FILE *)NULL,
                                         function,
-                                        level));
+                                        LOGGER_ALL ^ (level - 1)));
 }
 
 
@@ -2084,6 +2182,8 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
 logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
                                                    logger_output_function_t function)
 {
+  logger_level_t level;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
       (id >= LOGGER_IDS_MAX) ||
@@ -2092,11 +2192,14 @@ logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
   }
 
   /* get function output level from id specific outputs */
-  return(logger_output_common_level_get(logger_control[id].outputs,
-                                        LOGGER_ID_OUTPUTS_MAX,
-                                        LOGGER_OUTPUT_TYPE_FUNCTION,
-                                        (FILE *)NULL,
-                                        function));
+  level = logger_output_common_level_get(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function);
+
+  /* return only lowest set bit */
+  return(LOGGER_ALL ^ (level - 1));
 }
 
 
@@ -2359,14 +2462,18 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
                                                 const logger_text_bg_t   bg,
                                                 const logger_text_attr_t attr)
 {
+  uint16_t index;
+
   /* GUARD: check for valid level */
-  if ((level <  LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
+  if ((level & ~LOGGER_ALL) != 0) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  (void)logger_color_console_format(logger_level_colors[level].begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
-  (void)logger_color_console_format(logger_level_colors[level].end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
+  /* get index for level */
+  index = logger_level_to_index(level);
+
+  (void)logger_color_console_format(logger_level_colors[index].begin, LOGGER_COLOR_STRING_MAX, fg, bg, attr);
+  (void)logger_color_console_format(logger_level_colors[index].end, LOGGER_COLOR_STRING_MAX, LOGGER_FG_UNCHANGED, LOGGER_BG_UNCHANGED, LOGGER_ATTR_RESET);
 
   return(LOGGER_OK);
 }
@@ -2390,9 +2497,10 @@ logger_return_t logger_color_prefix_string_set(const logger_level_t level,
                                                const char           *begin,
                                                const char           *end)
 {
+  uint16_t index;
+
   /* GUARD: check for valid level */
-  if ((level <  LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
+  if ((level & ~LOGGER_ALL) != 0) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
@@ -2402,10 +2510,13 @@ logger_return_t logger_color_prefix_string_set(const logger_level_t level,
     return(LOGGER_ERR_STRING_TOO_LONG);
   }
 
-  (void)strncpy(logger_level_colors[level].begin, begin, LOGGER_COLOR_STRING_MAX);
-  (void)strncpy(logger_level_colors[level].end, end, LOGGER_COLOR_STRING_MAX);
-  logger_level_colors[level].begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
-  logger_level_colors[level].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
+  /* get index for level */
+  index = logger_level_to_index(level);
+
+  (void)strncpy(logger_level_colors[index].begin, begin, LOGGER_COLOR_STRING_MAX);
+  (void)strncpy(logger_level_colors[index].end, end, LOGGER_COLOR_STRING_MAX);
+  logger_level_colors[index].begin[LOGGER_COLOR_STRING_MAX - 1] = '\0';
+  logger_level_colors[index].end[LOGGER_COLOR_STRING_MAX - 1]   = '\0';
 
   return(LOGGER_OK);
 }
@@ -2481,14 +2592,18 @@ logger_bool_t logger_color_message_is_enabled(void)
  ******************************************************************************/
 const char *logger_level_name_get(const logger_level_t level)
 {
+  uint16_t index;
+
   /* GUARD: check for valid level */
-  if ((level <= LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
-    return(logger_level_names[LOGGER_UNKNOWN]);
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(logger_level_names[logger_level_to_index(LOGGER_UNKNOWN)]);
   }
 
+  /* get index for level */
+  index = logger_level_to_index(level);
+
   /* get level name */
-  return(logger_level_names[level]);
+  return(logger_level_names[index]);
 }
 
 
@@ -2829,9 +2944,7 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
   /* loop over all possible outputs */
   for (index = 0 ; index < size ; index++) {
     if ((outputs[index].count > 0) &&
-        (outputs[index].level > LOGGER_UNKNOWN) &&
-        (outputs[index].level < LOGGER_MAX) &&
-        (outputs[index].level <= level)) {
+        ((outputs[index].level & level) != 0)) {
       /* set colors */
       if (outputs[index].use_color == logger_true) {
         /* message color */
@@ -2848,7 +2961,7 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
               (logger_color_message_enabled == logger_false)) {
             prefix_color_print_begin = logger_true;
             prefix_color_print_end   = logger_true;
-            prefix_color             = &logger_level_colors[level];
+            prefix_color             = &logger_level_colors[logger_level_to_index(level)];
 
             message_color_print_begin = logger_false;
             message_color_print_end   = logger_false;
@@ -2869,7 +2982,7 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
                   (logger_color_message_enabled == logger_true)) {
                 prefix_color_print_begin = logger_true;
                 prefix_color_print_end   = logger_true;
-                prefix_color             = &logger_level_colors[level];
+                prefix_color             = &logger_level_colors[logger_level_to_index(level)];
 
                 message_color_print_begin = logger_true;
                 message_color_print_end   = logger_true;
@@ -3053,8 +3166,7 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
   }
 
   /* GUARD: check for valid level */
-  if ((level <= LOGGER_UNKNOWN) ||
-      (level >= LOGGER_MAX)) {
+  if ((level & ~LOGGER_ALL) != 0) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
@@ -3076,9 +3188,7 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
   /* check if ID is enabled and level is high enough */
   if ((logger_enabled == logger_true) &&
       (logger_control[id].enabled == logger_true) &&
-      (logger_control[id].level > LOGGER_UNKNOWN) &&
-      (logger_control[id].level < LOGGER_MAX) &&
-      (logger_control[id].level <= level)) {
+      ((logger_control[id].level & level) != 0)) {
     /* format date */
     (void)logger_format_date(logger_date, sizeof(logger_date));
 

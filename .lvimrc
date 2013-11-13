@@ -1,9 +1,6 @@
-" get root directory
-let s:root_path=expand("<sfile>:h")
-
 " set makeprg to change directory in advance
-if (isdirectory(s:root_path."/build"))
-  let &l:makeprg="cd ".s:root_path."/build && make"
+if (isdirectory(g:localvimrc_script_dir."/build"))
+  let &l:makeprg="cd ".g:localvimrc_script_dir."/build && make"
 else
-  let &l:makeprg="cd ".s:root_path." && make"
+  let &l:makeprg="cd ".g:localvimrc_script_dir." && make"
 endif
