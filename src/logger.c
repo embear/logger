@@ -2068,8 +2068,8 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
  * \return        \c LOGGER_OK if no error occurred, error code otherwise.
  ******************************************************************************/
 logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
-                                           FILE                 *stream,
-                                           const logger_level_t level)
+                                                FILE                 *stream,
+                                                const logger_level_t level)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
@@ -2104,7 +2104,7 @@ logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
  * \return        Currently set logging level mask.
  ******************************************************************************/
 logger_level_t logger_id_output_level_mask_get(const logger_id_t id,
-                                          FILE              *stream)
+                                               FILE              *stream)
 {
   logger_level_t level;
 
