@@ -26,7 +26,10 @@ Logger supports multiple IDs. A logger ID is requested with a call to
 calls to `logger_id_request()` with the same name as argument result in the
 same ID. Thus it inherits all already done configurations. A ID needs to be
 enabled by `logger_id_enable()` and could be disabled by
-`logger_id_disable()`.
+`logger_id_disable()`. The function `logger_id_generates_output()` provides
+a way to check if an ID and level combination would generate any output. This
+is useful to avoid expensive calculations if subsequent calls to logger() would
+never output the results.
 
 Each ID has its own severity which needs to be set by `logger_id_level_set()`.
 Only calls to `logger()` with the same or higher severity are considered for
@@ -241,6 +244,8 @@ Version history
       of severities.
     * Unify outputs for each IF so that a message is never printed twice to the
       same output.
+    * Add function to check if a ID and level combination would generate an
+      output.
 
 * **v3.2.0** *(2013-10-23)*
 
