@@ -322,6 +322,8 @@ logger_return_t logger_id_release(const logger_id_t id);
 logger_return_t logger_id_enable(const logger_id_t id);
 logger_return_t logger_id_disable(const logger_id_t id);
 logger_bool_t logger_id_is_enabled(const logger_id_t id);
+logger_bool_t logger_id_generates_output(const logger_id_t id,
+                                         const logger_level_t level);
 logger_return_t logger_id_level_set(const logger_id_t    id,
                                     const logger_level_t level);
 logger_level_t logger_id_level_get(const logger_id_t id);
@@ -539,6 +541,7 @@ LOGGER_INLINE uint16_t logger_disabled_zero(void)
 #define logger_id_enable(__id)                                               logger_disabled_ok()
 #define logger_id_disable(__id)                                              logger_disabled_ok()
 #define logger_id_is_enabled(__id)                                           logger_disabled_false()
+#define logger_id_generates_output(__id, __level)                            logger_disabled_false()
 #define logger_id_level_set(__id, __level)                                   logger_disabled_ok()
 #define logger_id_level_get(__id)                                            logger_disabled_unknown()
 #define logger_id_level_mask_set(__id, __level)                              logger_disabled_ok()

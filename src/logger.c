@@ -1793,7 +1793,7 @@ logger_return_t logger_id_disable(const logger_id_t id)
  *
  * \param[in]     id      Logger ID.
  *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ * \return        \c logger_true if id is enabled, \c logger_false otherwise.
  ******************************************************************************/
 logger_bool_t logger_id_is_enabled(const logger_id_t id)
 {
@@ -1806,6 +1806,55 @@ logger_bool_t logger_id_is_enabled(const logger_id_t id)
 
   /* ID enable state */
   return(logger_control[id].enabled);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query if a given level for a given ID would generate any output
+ *
+ * Query if a call to logger() for the given ID and level would generate any
+ * output. This is useful to to avoid expensive calculations when subsequent
+ * calls to logger() would never output the results.
+ *
+ * \param[in]     id      Logger ID.
+ * \param[in]     level   Level.
+ *
+ * \return        \c logger_true if output would be generated, \c logger_false otherwise.
+ ******************************************************************************/
+logger_bool_t logger_id_generates_output(const logger_id_t    id,
+                                         const logger_level_t level)
+{
+  logger_bool_t generates_output = logger_false;
+  int16_t       index;
+
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(logger_false);
+  }
+
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(logger_false);
+  }
+
+  /* check if ID is enabled and level is enabled */
+  if ((logger_enabled == logger_true) &&
+      (logger_control[id].enabled == logger_true) &&
+      ((logger_control[id].level & level) != 0)) {
+    /* loop over all possible outputs */
+    for (index = 0 ; index < LOGGER_UNIFIED_OUTPUTS_MAX ; index++) {
+      /* heck if output is enabled and level is enabled */
+      if ((logger_control[id].unified_outputs[index].count > 0) &&
+          ((logger_control[id].unified_outputs[index].level & level) != 0)) {
+        generates_output = logger_true;
+        break;
+      }
+    }
+  }
+
+  return(generates_output);
 }
 
 
