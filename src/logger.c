@@ -89,6 +89,9 @@
 #define LOGGER_PREFIX_STANDARD       (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)
 #endif /* LOGGER_PREFIX_STANDARD */
 
+/** Number of unified outputs */
+#define LOGGER_UNIFIED_OUTPUTS_MAX   (LOGGER_OUTPUTS_MAX + LOGGER_ID_OUTPUTS_MAX)
+
 /** Format string for strftime */
 #define LOGGER_FORMAT_STRFTIME         "%Y-%m-%d %H:%M:%S"
 
@@ -164,17 +167,18 @@ typedef struct logger_color_string_s {
 
 /** Logger control structure */
 typedef struct  logger_control_s {
-  logger_bool_t         used;                           /**< This ID is used. */
-  int16_t               count;                          /**< Number of registrations for this ID. */
-  logger_bool_t         enabled;                        /**< This ID is enabled. */
-  logger_level_t        level;                          /**< Level for this ID. */
-  logger_prefix_t       prefix;                         /**< Prefix for this ID. */
-  logger_bool_t         color;                          /**< Changed colors for this ID. */
-  logger_color_string_t color_string;                   /**< Color string for this ID. */
-  logger_bool_t         color_string_changed;           /**< Color string had been changed for this ID. */
-  logger_bool_t         append;                         /**< Previous message didn't contain a newline just append next message */
-  char                  name[LOGGER_NAME_MAX];          /**< Name of this logger ID. */
-  logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX]; /**< Storage for possible ID outputs. */
+  logger_bool_t         used;                                        /**< This ID is used. */
+  int16_t               count;                                       /**< Number of registrations for this ID. */
+  logger_bool_t         enabled;                                     /**< This ID is enabled. */
+  logger_level_t        level;                                       /**< Level for this ID. */
+  logger_prefix_t       prefix;                                      /**< Prefix for this ID. */
+  logger_bool_t         color;                                       /**< Changed colors for this ID. */
+  logger_color_string_t color_string;                                /**< Color string for this ID. */
+  logger_bool_t         color_string_changed;                        /**< Color string had been changed for this ID. */
+  logger_bool_t         append;                                      /**< Previous message didn't contain a newline just append next message */
+  char                  name[LOGGER_NAME_MAX];                       /**< Name of this logger ID. */
+  logger_output_t       outputs[LOGGER_ID_OUTPUTS_MAX];              /**< Storage for possible ID outputs. */
+  logger_output_t       unified_outputs[LOGGER_UNIFIED_OUTPUTS_MAX]; /**< Storage for unified global and ID specific outputs. */
 } logger_control_t;
 
 
@@ -481,6 +485,95 @@ logger_prefix_t logger_prefix_get(void)
 
 
 /** ************************************************************************//**
+ * \brief  Unify outputs for IDs
+ *
+ * Merge all possible outputs of all IDs into one list. During merge make every
+ * output unique.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_output_common_unify(void)
+{
+  int16_t id_index;
+  int16_t unified_index;
+  int16_t global_index;
+  int16_t specific_index;
+
+  /* loop over all IDs */
+  for (id_index = 0 ; id_index < LOGGER_IDS_MAX ; id_index++) {
+    if (logger_control[id_index].used == logger_true) {
+      /* reset list of unified outputs */
+      memset(logger_control[id_index].unified_outputs, 0, sizeof(logger_control[id_index].unified_outputs));
+
+      /* loop over all global outputs */
+      for (global_index = 0 ; global_index < LOGGER_OUTPUTS_MAX ; global_index++)
+      {
+        /* if global output is valid */
+        if (logger_outputs[global_index].count > 0) {
+          /* search this global output in unified outputs */
+          for (unified_index = 0 ; unified_index < LOGGER_UNIFIED_OUTPUTS_MAX ; unified_index++) {
+            /* if this unified entry is used */
+            if (logger_control[id_index].unified_outputs[unified_index].count != 0) {
+              /* if it is the same then current global output has been added already*/
+              if (((logger_outputs[global_index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+                   (logger_control[id_index].unified_outputs[unified_index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+                   (logger_control[id_index].unified_outputs[unified_index].stream == logger_outputs[global_index].stream)) ||
+                  ((logger_outputs[global_index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+                   (logger_control[id_index].unified_outputs[unified_index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+                   (logger_control[id_index].unified_outputs[unified_index].function == logger_outputs[global_index].function))) {
+                logger_control[id_index].unified_outputs[unified_index].use_color |= logger_outputs[global_index].use_color;
+                logger_control[id_index].unified_outputs[unified_index].level     |= logger_outputs[global_index].level;
+                break;
+              }
+            }
+            else {
+              /* if this unified entry is not used the global output has not been added to unified list */
+              logger_control[id_index].unified_outputs[unified_index]       = logger_outputs[global_index];
+              logger_control[id_index].unified_outputs[unified_index].count = 1;
+              break;
+            }
+          }
+        }
+      }
+
+      /* loop over all ID specific outputs */
+      for (specific_index = 0 ; specific_index < LOGGER_ID_OUTPUTS_MAX ; specific_index++)
+      {
+        /* if ID specific output is valid */
+        if (logger_control[id_index].outputs[specific_index].count > 0) {
+          /* search this ID specific output in unified outputs */
+          for (unified_index = 0 ; unified_index < LOGGER_UNIFIED_OUTPUTS_MAX ; unified_index++) {
+            /* if this unified entry is used */
+            if (logger_control[id_index].unified_outputs[unified_index].count != 0) {
+              /* if it is the same then current ID specific output has been added already*/
+              if (((logger_control[id_index].outputs[specific_index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+                   (logger_control[id_index].unified_outputs[unified_index].type == LOGGER_OUTPUT_TYPE_FILESTREAM) &&
+                   (logger_control[id_index].unified_outputs[unified_index].stream == logger_control[id_index].outputs[specific_index].stream)) ||
+                  ((logger_control[id_index].outputs[specific_index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+                   (logger_control[id_index].unified_outputs[unified_index].type == LOGGER_OUTPUT_TYPE_FUNCTION) &&
+                   (logger_control[id_index].unified_outputs[unified_index].function == logger_control[id_index].outputs[specific_index].function))) {
+                logger_control[id_index].unified_outputs[unified_index].use_color |= logger_control[id_index].outputs[specific_index].use_color;
+                logger_control[id_index].unified_outputs[unified_index].level     |= logger_control[id_index].outputs[specific_index].level;
+                break;
+              }
+            }
+            else {
+              /* if this unified entry is not used the ID specific output has not been added to unified list */
+              logger_control[id_index].unified_outputs[unified_index]       = logger_control[id_index].outputs[specific_index];
+              logger_control[id_index].unified_outputs[unified_index].count = 1;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
  * \brief  Register an output to a list of outputs.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -593,6 +686,9 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
     }
   }
 
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
   return(ret);
 }
 
@@ -678,6 +774,9 @@ LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t   
   else {
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
   }
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
 
   return(ret);
 }
@@ -813,6 +912,9 @@ LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t    
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
   }
 
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
   return(ret);
 }
 
@@ -935,6 +1037,9 @@ LOGGER_INLINE logger_return_t logger_output_common_color(logger_output_t        
       break;
     }
   }
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
 
   return(ret);
 }
@@ -1556,6 +1661,9 @@ logger_id_t logger_id_request(const char *name)
         /* copy the name */
         (void)strncpy(logger_control[index].name, name, LOGGER_NAME_MAX);
         logger_control[index].name[LOGGER_NAME_MAX - 1] = '\0';
+
+        /* update unified output lists of each ID */
+        (void)logger_output_common_unify();
 
         break;
       }
@@ -3452,11 +3560,8 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
         message_end++;
       }
 
-      /* output message to global streams */
-      (void)logger_output(id, level, logger_outputs, LOGGER_OUTPUTS_MAX, logger_prefix, message_part);
-
-      /* output message to id streams */
-      (void)logger_output(id, level, logger_control[id].outputs, LOGGER_ID_OUTPUTS_MAX, logger_prefix, message_part);
+      /* output message to id unified outputs */
+      (void)logger_output(id, level, logger_control[id].unified_outputs, LOGGER_UNIFIED_OUTPUTS_MAX, logger_prefix, message_part);
 
       /* update message part for next loop */
       message_part = message_end;

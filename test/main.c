@@ -425,7 +425,7 @@ int main(int  argc,
   puts("");
   printf("Starting test %d -- id with global and id specific output ....\n", test);
 
-  puts("Message will be shown two times, once for the global output, once for the id specific one");
+  puts("Message will be shown only once because outputs are merged and made unique");
 
   assert(LOGGER_OK == logger_output_register(stdout));
   assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
