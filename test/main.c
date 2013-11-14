@@ -573,6 +573,7 @@ int main(int  argc,
   assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_DEBUG));
   id = logger_id_request("logger_test_id");
   assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_set(id, LOGGER_DEBUG));
 
   assert(LOGGER_OK == logger(id,  LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id, __LINE__));
   assert(LOGGER_ERR_ID_UNKNOWN == logger(id2, LOGGER_EMERG, "test %d - id %d - LOGGER_EMERG   in line %d\n", test, id2, __LINE__));
