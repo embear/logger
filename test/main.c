@@ -313,6 +313,36 @@ int main(int  argc,
   puts("* TEST *********************************************************************");
   puts("****************************************************************************");
   puts("");
+  printf("Starting test %d -- check output generation ....\n", test);
+
+  puts("Check if an ID / level combination would generate an output");
+
+  assert(LOGGER_OK == logger_output_register(stdout));
+  assert(LOGGER_OK == logger_output_level_set(stdout, LOGGER_WARNING));
+  id = logger_id_request("logger_test_id");
+  assert(LOGGER_OK == logger_id_enable(id));
+  assert(LOGGER_OK == logger_id_level_mask_set(id, LOGGER_DEBUG|LOGGER_ERR|LOGGER_CRIT));
+
+  assert(logger_false == logger_id_generates_output(id, LOGGER_DEBUG));
+  assert(logger_false == logger_id_generates_output(id, LOGGER_INFO));
+  assert(logger_false == logger_id_generates_output(id, LOGGER_NOTICE));
+  assert(logger_false == logger_id_generates_output(id, LOGGER_WARNING));
+  assert(logger_true  == logger_id_generates_output(id, LOGGER_ERR));
+  assert(logger_true  == logger_id_generates_output(id, LOGGER_CRIT));
+  assert(logger_false == logger_id_generates_output(id, LOGGER_ALERT));
+  assert(logger_false == logger_id_generates_output(id, LOGGER_EMERG));
+
+  assert(LOGGER_OK == logger_output_deregister(stdout));
+  assert(LOGGER_OK == logger_id_release(id));
+
+  printf("Ending test %d ....\n", test);
+
+  test++;
+  puts("");
+  puts("****************************************************************************");
+  puts("* TEST *********************************************************************");
+  puts("****************************************************************************");
+  puts("");
   printf("Starting test %d -- id and id2 are the same ....\n", test);
 
   puts("Log messages of id and id2 will be shown");
