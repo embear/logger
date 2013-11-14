@@ -11,7 +11,6 @@
  * \brief  Logging facility for C.
  * \author Markus Braun
  ******************************************************************************/
-/* TODO (mbr, 2013-11-13): level guard anpassen! */
 #include "logger.h"
 
 #ifdef LOGGER_ENABLE
@@ -223,70 +222,6 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
   { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
-
-
-/** ************************************************************************//**
- * \brief  Convert logger levels to index for level arrays.
- *
- * Convert logger levels to an index that can be used to access a level based
- * array like level specific colors or level to name conversion.
- *
- * \param[in]     level   Level to convert.
- *
- * \return        Index corresponding given level
- ******************************************************************************/
-static uint16_t logger_level_to_index(const logger_level_t level)
-{
-  uint16_t index = 0;
-
-  switch (level) {
-    case LOGGER_UNKNOWN:
-      index = 0;
-      break;
-
-    case LOGGER_DEBUG:
-      index = 1;
-      break;
-
-    case LOGGER_INFO:
-      index = 2;
-      break;
-
-    case LOGGER_NOTICE:
-      index = 3;
-      break;
-
-    case LOGGER_WARNING:
-      index = 4;
-      break;
-
-    case LOGGER_ERR:
-      index = 5;
-      break;
-
-    case LOGGER_CRIT:
-      index = 6;
-      break;
-
-    case LOGGER_ALERT:
-      index = 7;
-      break;
-
-    case LOGGER_EMERG:
-      index = 8;
-      break;
-
-    case LOGGER_ALL:
-      index = 0;
-      break;
-
-    default:
-      index = 0;
-      break;
-  }
-
-  return(index);
-}
 
 
 /** ************************************************************************//**
@@ -1185,6 +1120,59 @@ logger_level_t logger_output_level_get(FILE *stream)
 
 
 /** ************************************************************************//**
+ * \brief  Set logging level mask for global output stream.
+ *
+ * Set a logging level mask for given output stream. Only log messages with
+ * a level set in the given level mask will be printed to the given stream.
+ *
+ * \param[in]     stream  Previous registered file stream.
+ * \param[in]     level   Level mask to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_output_level_mask_set(FILE                 *stream,
+                                             const logger_level_t level)
+{
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* set stream output level to global outputs */
+  return(logger_output_common_level_set(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL,
+                                        level));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging level mask for global output stream.
+ *
+ * Query the currently set level mask for the given logging output stream.
+ *
+ * \param[in]     stream  Previous registered file stream.
+ *
+ * \return        Currently set logging level mask.
+ ******************************************************************************/
+logger_level_t logger_output_level_mask_get(FILE *stream)
+{
+  logger_level_t level;
+
+  /* get stream output level to global outputs */
+  level = logger_output_common_level_get(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL);
+
+  return(level);
+}
+
+
+/** ************************************************************************//**
  * \brief  Enable the global output stream color setting.
  *
  * Enable the color setting for a given output stream.
@@ -1343,8 +1331,8 @@ logger_bool_t logger_output_function_is_registered(logger_output_function_t func
 /** ************************************************************************//**
  * \brief  Set logging level for global output function.
  *
- * Set the minimum logging level for given output function. Only log messages
- * equal or above the given level the function will be called.
+ * Set the minimum logging level for given output function. Only for log
+ * messages equal or above the given level the function will be called.
  *
  * \param[in]     function  User provided output function.
  * \param[in]     level     Level to set.
@@ -1360,7 +1348,7 @@ logger_return_t logger_output_function_level_set(logger_output_function_t functi
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
-  /* set function output level to global outputs */
+  /* set function output level from global outputs */
   return(logger_output_common_level_set(logger_outputs,
                                         LOGGER_OUTPUTS_MAX,
                                         LOGGER_OUTPUT_TYPE_FUNCTION,
@@ -1377,7 +1365,7 @@ logger_return_t logger_output_function_level_set(logger_output_function_t functi
  *
  * \param[in]     function  User provided output function.
  *
- * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ * \return        Currently set logging level.
  ******************************************************************************/
 logger_level_t logger_output_function_level_get(logger_output_function_t function)
 {
@@ -1392,6 +1380,59 @@ logger_level_t logger_output_function_level_get(logger_output_function_t functio
 
   /* return only lowest set bit */
   return(LOGGER_ALL ^ (level - 1));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Set logging level mask for global output function.
+ *
+ * Set a logging level mask for given output function. Only for log messages
+ * with a level set in the given level mask the function will be called.
+ *
+ * \param[in]     function  User provided output function.
+ * \param[in]     level     Level mask to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_output_function_level_mask_set(logger_output_function_t function,
+                                                      const logger_level_t     level)
+{
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* set function output level to global outputs */
+  return(logger_output_common_level_set(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function,
+                                        level));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging level mask for global output function.
+ *
+ * Query the currently set level mask for the given logging output function.
+ *
+ * \param[in]     function  User provided output function.
+ *
+ * \return        Currently set logging level mask.
+ ******************************************************************************/
+logger_level_t logger_output_function_level_mask_get(logger_output_function_t function)
+{
+  logger_level_t level;
+
+  /* get function output level from global outputs */
+  level = logger_output_common_level_get(logger_outputs,
+                                         LOGGER_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function);
+
+  return(level);
 }
 
 
@@ -1718,6 +1759,61 @@ logger_level_t logger_id_level_get(const logger_id_t id)
 
 
 /** ************************************************************************//**
+ * \brief  Set logging level mask for ID.
+ *
+ * Set a logging level mask for given ID. Only log messages with a level set in
+ * the given level mask will be printed to outputs.
+ *
+ * \param[in]     id      Logger ID.
+ * \param[in]     level   Level to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_level_mask_set(const logger_id_t    id,
+                                         const logger_level_t level)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* set ID level */
+  logger_control[id].level = level;
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging level for ID.
+ *
+ * Query the currently set minimum level for the given logging ID.
+ *
+ * \param[in]     id      Logger ID.
+ *
+ * \return        Currently set level.
+ ******************************************************************************/
+logger_level_t logger_id_level_mask_get(const logger_id_t id)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_UNKNOWN);
+  }
+
+  return(logger_control[id].level);
+}
+
+
+/** ************************************************************************//**
  * \brief  Set logging prefix for ID.
  *
  * Set the prefix for given ID. All messages for this ID will get this prefix
@@ -1956,6 +2052,77 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
 
   /* return only lowest set bit */
   return(LOGGER_ALL ^ (level - 1));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Set logging level mask for id specific output stream.
+ *
+ * Set a logging level mask for given output stream. Only log messages
+ * with a level set in the given level mask will be printed to the given stream.
+ *
+ * \param[in]     id      Logger ID.
+ * \param[in]     stream  Previous registered file stream.
+ * \param[in]     level   Level mask to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
+                                           FILE                 *stream,
+                                           const logger_level_t level)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* set stream output level to id specific outputs */
+  return(logger_output_common_level_set(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL,
+                                        level));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging level mask for id specific output stream.
+ *
+ * Query the currently set level mask for the given logging output stream.
+ *
+ * \param[in]     id      Logger ID.
+ * \param[in]     stream  Previous registered file stream.
+ *
+ * \return        Currently set logging level mask.
+ ******************************************************************************/
+logger_level_t logger_id_output_level_mask_get(const logger_id_t id,
+                                          FILE              *stream)
+{
+  logger_level_t level;
+
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_UNKNOWN);
+  }
+
+  /* get stream output level from id specific outputs */
+  level = logger_output_common_level_get(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                         stream,
+                                         (logger_output_function_t)NULL);
+
+  return(level);
 }
 
 
@@ -2200,6 +2367,77 @@ logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
 
   /* return only lowest set bit */
   return(LOGGER_ALL ^ (level - 1));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Set logging level mask for id specific output function.
+ *
+ * Set a logging level mask for given output function. Only for log messages
+ * with a level set in the given level mask the function will be called.
+ *
+ * \param[in]     id        Logger ID.
+ * \param[in]     function  User provided output function.
+ * \param[in]     level     Level mask to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_id_output_function_level_mask_set(const logger_id_t        id,
+                                                         logger_output_function_t function,
+                                                         const logger_level_t     level)
+{
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_ERR_ID_UNKNOWN);
+  }
+
+  /* GUARD: check for valid level */
+  if ((level & ~LOGGER_ALL) != 0) {
+    return(LOGGER_ERR_LEVEL_UNKNOWN);
+  }
+
+  /* set function output level to id specific outputs */
+  return(logger_output_common_level_set(logger_control[id].outputs,
+                                        LOGGER_ID_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function,
+                                        level));
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query logging level mask for id specific output function.
+ *
+ * Query the currently set minimum level for the given logging output function.
+ *
+ * \param[in]     id        Logger ID.
+ * \param[in]     function  User provided output function.
+ *
+ * \return        Currently set logging level mask.
+ ******************************************************************************/
+logger_level_t logger_id_output_function_level_mask_get(const logger_id_t        id,
+                                                   logger_output_function_t function)
+{
+  logger_level_t level;
+
+  /* GUARD: check for valid ID */
+  if ((id < 0) ||
+      (id >= LOGGER_IDS_MAX) ||
+      (logger_control[id].used == logger_false)) {
+    return(LOGGER_UNKNOWN);
+  }
+
+  /* get function output level from id specific outputs */
+  level = logger_output_common_level_get(logger_control[id].outputs,
+                                         LOGGER_ID_OUTPUTS_MAX,
+                                         LOGGER_OUTPUT_TYPE_FUNCTION,
+                                         (FILE *)NULL,
+                                         function);
+
+  return(level);
 }
 
 
@@ -2912,7 +3150,7 @@ LOGGER_INLINE logger_return_t logger_format_message(logger_id_t id,
  *
  *   - logging is globally enabled.
  *   - logging ID is enabled.
- *   - logging level is high enough.
+ *   - logging level is enabled.
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
@@ -3134,8 +3372,8 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
  *
  *   - logging is globally enabled.
  *   - logging ID is enabled.
- *   - logging level is higher or equal to the logging level of the ID.
- *   - logging level is higher or equal to the logging level of a output.
+ *   - logging level is enabled in the logging level of the ID.
+ *   - logging level is enabled in the logging level of a output.
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
@@ -3185,7 +3423,7 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
     return(LOGGER_ERR_FORMAT_INVALID);
   }
 
-  /* check if ID is enabled and level is high enough */
+  /* check if ID is enabled and level is enabled */
   if ((logger_enabled == logger_true) &&
       (logger_control[id].enabled == logger_true) &&
       ((logger_control[id].level & level) != 0)) {
@@ -3240,8 +3478,8 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
  *
  *   - logging is globally enabled.
  *   - logging ID is enabled.
- *   - logging level is higher or equal to the logging level of the ID.
- *   - logging level is higher or equal to the logging level of a output.
+ *   - logging level is enabled in the logging level of the ID.
+ *   - logging level is enabled in the logging level of a output.
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
@@ -3281,8 +3519,8 @@ logger_return_t logger_implementation(logger_id_t    id,
  *
  *   - logging is globally enabled.
  *   - logging ID is enabled.
- *   - logging level is higher or equal to the logging level of the ID.
- *   - logging level is higher or equal to the logging level of a output.
+ *   - logging level is enabled in the logging level of the ID.
+ *   - logging level is enabled in the logging level of a output.
  *
  * \param[in]     id        ID outputting this message.
  * \param[in]     level     Level of this message.
@@ -3307,6 +3545,161 @@ logger_return_t logger_implementation_va(logger_id_t    id,
   ret = logger_implementation_common(id, level, file, function, line, format, argp);
 
   return(ret);
+}
+
+
+/* helper functions */
+
+
+/** ************************************************************************//**
+ * \brief  Convert logger levels to index for level arrays.
+ *
+ * Convert logger levels to an index that can be used to access a level based
+ * array like level specific colors or level to name conversion.
+ *
+ * <table border>
+ * <tr>  <th> level             </th>  <th> index </th>  </tr>
+ * <tr>  <td> \c LOGGER_UNKNOWN </td>  <td> 0     </td>  </tr>
+ * <tr>  <td> \c LOGGER_DEBUG   </td>  <td> 1     </td>  </tr>
+ * <tr>  <td> \c LOGGER_INFO    </td>  <td> 2     </td>  </tr>
+ * <tr>  <td> \c LOGGER_NOTICE  </td>  <td> 3     </td>  </tr>
+ * <tr>  <td> \c LOGGER_WARNING </td>  <td> 4     </td>  </tr>
+ * <tr>  <td> \c LOGGER_ERR     </td>  <td> 5     </td>  </tr>
+ * <tr>  <td> \c LOGGER_CRIT    </td>  <td> 6     </td>  </tr>
+ * <tr>  <td> \c LOGGER_ALERT   </td>  <td> 7     </td>  </tr>
+ * <tr>  <td> \c LOGGER_EMERG   </td>  <td> 8     </td>  </tr>
+ * <tr>  <td> \c LOGGER_ALL     </td>  <td> 0     </td>  </tr>
+ * <tr>  <td> <i> other </i>    </td>  <td> 0     </td>  </tr>
+ * </table>
+ * \param[in]     level   Level to convert.
+ *
+ * \return        Index corresponding given level.
+ ******************************************************************************/
+uint16_t logger_level_to_index(const logger_level_t level)
+{
+  uint16_t index = 0;
+
+  switch (level) {
+    case LOGGER_UNKNOWN:
+      index = 0;
+      break;
+
+    case LOGGER_DEBUG:
+      index = 1;
+      break;
+
+    case LOGGER_INFO:
+      index = 2;
+      break;
+
+    case LOGGER_NOTICE:
+      index = 3;
+      break;
+
+    case LOGGER_WARNING:
+      index = 4;
+      break;
+
+    case LOGGER_ERR:
+      index = 5;
+      break;
+
+    case LOGGER_CRIT:
+      index = 6;
+      break;
+
+    case LOGGER_ALERT:
+      index = 7;
+      break;
+
+    case LOGGER_EMERG:
+      index = 8;
+      break;
+
+    case LOGGER_ALL:
+      index = 0;
+      break;
+
+    default:
+      index = 0;
+      break;
+  }
+
+  return(index);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Convert logger level index to logger level.
+ *
+ * Convert logger level index to an level that can be used to set a level for
+ * an ID or an output.
+ *
+ * <table border>
+ * <tr>  <th> index          </th>  <th> level             </th>  </tr>
+ * <tr>  <td> 0              </td>  <td> \c LOGGER_UNKNOWN </td>  </tr>
+ * <tr>  <td> 1              </td>  <td> \c LOGGER_DEBUG   </td>  </tr>
+ * <tr>  <td> 2              </td>  <td> \c LOGGER_INFO    </td>  </tr>
+ * <tr>  <td> 3              </td>  <td> \c LOGGER_NOTICE  </td>  </tr>
+ * <tr>  <td> 4              </td>  <td> \c LOGGER_WARNING </td>  </tr>
+ * <tr>  <td> 5              </td>  <td> \c LOGGER_ERR     </td>  </tr>
+ * <tr>  <td> 6              </td>  <td> \c LOGGER_CRIT    </td>  </tr>
+ * <tr>  <td> 7              </td>  <td> \c LOGGER_ALERT   </td>  </tr>
+ * <tr>  <td> 8              </td>  <td> \c LOGGER_EMERG   </td>  </tr>
+ * <tr>  <td> <i> other </i> </td>  <td> \c LOGGER_UNKNOWN </td>  </tr>
+ * </table>
+ *
+ * \param[in]     index   Level index to convert.
+ *
+ * \return        Level corresponding given level index.
+ ******************************************************************************/
+logger_level_t logger_index_to_level(const uint16_t index)
+{
+  logger_level_t level = LOGGER_UNKNOWN;
+
+  switch (index) {
+    case 0:
+      level = LOGGER_UNKNOWN;
+      break;
+
+    case 1:
+      level = LOGGER_DEBUG;
+      break;
+
+    case 2:
+      level = LOGGER_INFO;
+      break;
+
+    case 3:
+      level = LOGGER_NOTICE;
+      break;
+
+    case 4:
+      level = LOGGER_WARNING;
+      break;
+
+    case 5:
+      level = LOGGER_ERR;
+      break;
+
+    case 6:
+      level = LOGGER_CRIT;
+      break;
+
+    case 7:
+      level = LOGGER_ALERT;
+      break;
+
+    case 8:
+      level = LOGGER_EMERG;
+      break;
+
+    default:
+      level = LOGGER_UNKNOWN;
+      break;
+  }
+
+  return(level);
 }
 
 

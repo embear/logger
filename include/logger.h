@@ -298,6 +298,9 @@ logger_bool_t logger_output_is_registered(FILE *stream);
 logger_return_t logger_output_level_set(FILE                 *stream,
                                         const logger_level_t level);
 logger_level_t logger_output_level_get(FILE *stream);
+logger_return_t logger_output_level_mask_set(FILE                 *stream,
+                                             const logger_level_t level);
+logger_level_t logger_output_level_mask_get(FILE *stream);
 logger_return_t logger_output_color_enable(FILE *stream);
 logger_return_t logger_output_color_disable(FILE *stream);
 logger_bool_t logger_output_color_is_enabled(FILE *stream);
@@ -308,6 +311,9 @@ logger_bool_t logger_output_function_is_registered(logger_output_function_t func
 logger_return_t logger_output_function_level_set(logger_output_function_t function,
                                                  const logger_level_t     level);
 logger_level_t logger_output_function_level_get(logger_output_function_t function);
+logger_return_t logger_output_function_level_mask_set(logger_output_function_t function,
+                                                      const logger_level_t     level);
+logger_level_t logger_output_function_level_mask_get(logger_output_function_t function);
 logger_return_t logger_output_function_color_enable(logger_output_function_t function);
 logger_return_t logger_output_function_color_disable(logger_output_function_t function);
 logger_bool_t logger_output_function_color_is_enabled(logger_output_function_t function);
@@ -319,6 +325,9 @@ logger_bool_t logger_id_is_enabled(const logger_id_t id);
 logger_return_t logger_id_level_set(const logger_id_t    id,
                                     const logger_level_t level);
 logger_level_t logger_id_level_get(const logger_id_t id);
+logger_return_t logger_id_level_mask_set(const logger_id_t    id,
+                                         const logger_level_t level);
+logger_level_t logger_id_level_mask_get(const logger_id_t id);
 logger_return_t logger_id_prefix_set(const logger_id_t     id,
                                      const logger_prefix_t prefix);
 logger_prefix_t logger_id_prefix_get(const logger_id_t id);
@@ -334,6 +343,11 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
                                            const logger_level_t level);
 logger_level_t logger_id_output_level_get(const logger_id_t id,
                                           FILE              *stream);
+logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
+                                                FILE                 *stream,
+                                                const logger_level_t level);
+logger_level_t logger_id_output_level_mask_get(const logger_id_t id,
+                                               FILE              *stream);
 logger_return_t logger_id_output_color_enable(const logger_id_t id,
                                               FILE              *stream);
 logger_return_t logger_id_output_color_disable(const logger_id_t id,
@@ -351,6 +365,11 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
                                                     const logger_level_t     level);
 logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
                                                    logger_output_function_t function);
+logger_return_t logger_id_output_function_level_mask_set(const logger_id_t        id,
+                                                         logger_output_function_t function,
+                                                         const logger_level_t     level);
+logger_level_t logger_id_output_function_level_mask_get(const logger_id_t        id,
+                                                        logger_output_function_t function);
 logger_return_t logger_id_output_function_color_enable(const logger_id_t        id,
                                                        logger_output_function_t function);
 logger_return_t logger_id_output_function_color_disable(const logger_id_t        id,
@@ -400,6 +419,11 @@ logger_return_t logger_implementation_va(logger_id_t    id,
 
 /** Macro to call the real logger function logger_va() with the information about the current position in code (file, function and line) */
 #define logger_va(__id, __level, __format, __argp)    logger_implementation_va(__id, __level, __FILE__, __FUNCTION__, __LINE__, __format, __argp)
+
+
+/* helper functions */
+uint16_t logger_level_to_index(const logger_level_t level);
+logger_level_t logger_index_to_level(const uint16_t index);
 
 /* legacy functions */
 logger_return_t logger_id_color_set(const logger_id_t        id,
@@ -466,6 +490,7 @@ LOGGER_INLINE logger_prefix_t logger_disabled_unset(void)
   return(LOGGER_PFX_UNSET);
 }
 
+
 static const char *logger_empty_string = "";
 
 LOGGER_INLINE const char * logger_disabled_string(void)
@@ -473,79 +498,100 @@ LOGGER_INLINE const char * logger_disabled_string(void)
   return(logger_empty_string);
 }
 
-#define logger_version()                                                logger_disabled_version()
-#define logger_init()                                                   logger_disabled_ok()
-#define logger_is_initialized()                                         logger_disabled_false()
-#define logger_enable()                                                 logger_disabled_ok()
-#define logger_disable()                                                logger_disabled_ok()
-#define logger_is_enabled(__id)                                         logger_disabled_false()
-#define logger_prefix_set(__prefix)                                     logger_disabled_ok()
-#define logger_prefix_get()                                             logger_disabled_unset()
-#define logger_output_register(__stream)                                logger_disabled_ok()
-#define logger_output_deregister(__stream)                              logger_disabled_ok()
-#define logger_output_is_registered(__stream)                           logger_disabled_false()
-#define logger_output_level_set(__stream, __level)                      logger_disabled_ok()
-#define logger_output_level_get(__stream)                               logger_disabled_unknown()
-#define logger_output_color_enable(__stream)                            logger_disabled_ok()
-#define logger_output_color_disable(__stream)                           logger_disabled_ok()
-#define logger_output_color_is_enabled(__stream)                        logger_disabled_false()
-#define logger_output_flush()                                           logger_disabled_ok()
-#define logger_output_function_register(__function)                     logger_disabled_ok()
-#define logger_output_function_deregister(__function)                   logger_disabled_ok()
-#define logger_output_function_is_registered(__function)                logger_disabled_false()
-#define logger_output_function_level_set(__function, __level)           logger_disabled_ok()
-#define logger_output_function_level_get(__function)                    logger_disabled_unkown()
-#define logger_output_function_color_enable(__function)                 logger_disabled_ok()
-#define logger_output_function_color_disable(__function)                logger_disabled_ok()
-#define logger_output_function_color_is_enabled(__function)             logger_disabled_false()
-#define logger_id_request(__name)                                       logger_disabled_id()
-#define logger_id_release(__id)                                         logger_disabled_ok()
-#define logger_id_enable(__id)                                          logger_disabled_ok()
-#define logger_id_disable(__id)                                         logger_disabled_ok()
-#define logger_id_is_enabled(__id)                                      logger_disabled_false()
-#define logger_id_level_set(__id, __level)                              logger_disabled_ok()
-#define logger_id_level_get(__id)                                       logger_disabled_unknown()
-#define logger_id_prefix_set(__id, __prefix)                            logger_disabled_ok()
-#define logger_id_prefix_get(__id)                                      logger_disabled_unset()
-#define logger_id_name_get(__id)                                        logger_disabled_string()
-#define logger_id_output_register(__id, __stream)                       logger_disabled_ok()
-#define logger_id_output_deregister(__id, __stream)                     logger_disabled_ok()
-#define logger_id_output_is_registered(__id, __stream)                  logger_disabled_false()
-#define logger_id_output_level_set(__id, __stream, __level)             logger_disabled_ok()
-#define logger_id_output_level_get(__id, __stream)                      logger_disabled_err()
-#define logger_id_output_color_enable(__id, __stream)                   logger_disabled_ok()
-#define logger_id_output_color_disable(__id, __stream)                  logger_disabled_ok()
-#define logger_id_output_color_is_enabled(__id, __stream)               logger_disabled_false()
-#define logger_id_output_function_register(__id, __function)            logger_disabled_ok()
-#define logger_id_output_function_deregister(__id, __function)          logger_disabled_ok()
-#define logger_id_output_function_is_registered(__id, __function)       logger_disabled_false()
-#define logger_id_output_function_level_set(__id, __function, __level)  logger_disabled_ok()
-#define logger_id_output_function_level_get(__id, __function)           logger_disabled_err()
-#define logger_id_output_function_color_enable(__id, __function)        logger_disabled_ok()
-#define logger_id_output_function_color_disable(__id, __function)       logger_disabled_ok()
-#define logger_id_output_function_color_is_enabled(__id, __function)    logger_disabled_false()
-#define logger_id_color_console_set(__id, __fg, __bg, __attr)           logger_disabled_ok()
-#define logger_id_color_string_set(__id, __begin, __end)                logger_disabled_ok()
-#define logger_id_color_reset(__id)                                     logger_disabled_ok()
-#define logger_color_prefix_enable()                                    logger_disabled_ok()
-#define logger_color_prefix_disable()                                   logger_disabled_ok()
-#define logger_color_prefix_is_enabled()                                logger_disabled_false()
-#define logger_color_prefix_console_set(__level, __fg, __bg, __attr)    logger_disabled_ok()
-#define logger_color_prefix_string_set(__level, __begin, __end)         logger_disabled_ok()
-#define logger_color_prefix_reset()                                     logger_disabled_ok()
-#define logger_color_message_enable()                                   logger_disabled_ok()
-#define logger_color_message_disable()                                  logger_disabled_ok()
-#define logger_color_message_is_enabled()                               logger_disabled_false()
-#define logger_level_name_get(__level)                                  logger_disabled_string()
-#define logger(__id, __level, ...)                                      logger_disabled_ok()
-#define logger_va(__id, __level, ...)                                   logger_disabled_ok()
+
+LOGGER_INLINE uint16_t logger_disabled_zero(void)
+{
+  return(0);
+}
+
+
+#define logger_version()                                                     logger_disabled_version()
+#define logger_init()                                                        logger_disabled_ok()
+#define logger_is_initialized()                                              logger_disabled_false()
+#define logger_enable()                                                      logger_disabled_ok()
+#define logger_disable()                                                     logger_disabled_ok()
+#define logger_is_enabled(__id)                                              logger_disabled_false()
+#define logger_prefix_set(__prefix)                                          logger_disabled_ok()
+#define logger_prefix_get()                                                  logger_disabled_unset()
+#define logger_output_register(__stream)                                     logger_disabled_ok()
+#define logger_output_deregister(__stream)                                   logger_disabled_ok()
+#define logger_output_is_registered(__stream)                                logger_disabled_false()
+#define logger_output_level_set(__stream, __level)                           logger_disabled_ok()
+#define logger_output_level_get(__stream)                                    logger_disabled_unknown()
+#define logger_output_level_mask_get(__stream)                               logger_disabled_unknown()
+#define logger_output_level_mask_set(__stream, __level)                      logger_disabled_ok()
+#define logger_output_color_enable(__stream)                                 logger_disabled_ok()
+#define logger_output_color_disable(__stream)                                logger_disabled_ok()
+#define logger_output_color_is_enabled(__stream)                             logger_disabled_false()
+#define logger_output_flush()                                                logger_disabled_ok()
+#define logger_output_function_register(__function)                          logger_disabled_ok()
+#define logger_output_function_deregister(__function)                        logger_disabled_ok()
+#define logger_output_function_is_registered(__function)                     logger_disabled_false()
+#define logger_output_function_level_set(__function, __level)                logger_disabled_ok()
+#define logger_output_function_level_get(__function)                         logger_disabled_unkown()
+#define logger_output_function_level_mask_set(__function, __level)           logger_disabled_ok()
+#define logger_output_function_level_mask_get(__function)                    logger_disabled_unkown()
+#define logger_output_function_color_enable(__function)                      logger_disabled_ok()
+#define logger_output_function_color_disable(__function)                     logger_disabled_ok()
+#define logger_output_function_color_is_enabled(__function)                  logger_disabled_false()
+#define logger_id_request(__name)                                            logger_disabled_id()
+#define logger_id_release(__id)                                              logger_disabled_ok()
+#define logger_id_enable(__id)                                               logger_disabled_ok()
+#define logger_id_disable(__id)                                              logger_disabled_ok()
+#define logger_id_is_enabled(__id)                                           logger_disabled_false()
+#define logger_id_level_set(__id, __level)                                   logger_disabled_ok()
+#define logger_id_level_get(__id)                                            logger_disabled_unknown()
+#define logger_id_level_mask_set(__id, __level)                              logger_disabled_ok()
+#define logger_id_level_mask_get(__id)                                       logger_disabled_unknown()
+#define logger_id_prefix_set(__id, __prefix)                                 logger_disabled_ok()
+#define logger_id_prefix_get(__id)                                           logger_disabled_unset()
+#define logger_id_name_get(__id)                                             logger_disabled_string()
+#define logger_id_output_register(__id, __stream)                            logger_disabled_ok()
+#define logger_id_output_deregister(__id, __stream)                          logger_disabled_ok()
+#define logger_id_output_is_registered(__id, __stream)                       logger_disabled_false()
+#define logger_id_output_level_set(__id, __stream, __level)                  logger_disabled_ok()
+#define logger_id_output_level_get(__id, __stream)                           logger_disabled_err()
+#define logger_id_output_level_mask_set(__id, __stream, __level)             logger_disabled_ok()
+#define logger_id_output_level_mask_get(__id, __stream)                      logger_disabled_err()
+#define logger_id_output_color_enable(__id, __stream)                        logger_disabled_ok()
+#define logger_id_output_color_disable(__id, __stream)                       logger_disabled_ok()
+#define logger_id_output_color_is_enabled(__id, __stream)                    logger_disabled_false()
+#define logger_id_output_function_register(__id, __function)                 logger_disabled_ok()
+#define logger_id_output_function_deregister(__id, __function)               logger_disabled_ok()
+#define logger_id_output_function_is_registered(__id, __function)            logger_disabled_false()
+#define logger_id_output_function_level_set(__id, __function, __level)       logger_disabled_ok()
+#define logger_id_output_function_level_get(__id, __function)                logger_disabled_err()
+#define logger_id_output_function_level_mask_set(__id, __function, __level)  logger_disabled_ok()
+#define logger_id_output_function_level_mask_get(__id, __function)           logger_disabled_err()
+#define logger_id_output_function_color_enable(__id, __function)             logger_disabled_ok()
+#define logger_id_output_function_color_disable(__id, __function)            logger_disabled_ok()
+#define logger_id_output_function_color_is_enabled(__id, __function)         logger_disabled_false()
+#define logger_id_color_console_set(__id, __fg, __bg, __attr)                logger_disabled_ok()
+#define logger_id_color_string_set(__id, __begin, __end)                     logger_disabled_ok()
+#define logger_id_color_reset(__id)                                          logger_disabled_ok()
+#define logger_color_prefix_enable()                                         logger_disabled_ok()
+#define logger_color_prefix_disable()                                        logger_disabled_ok()
+#define logger_color_prefix_is_enabled()                                     logger_disabled_false()
+#define logger_color_prefix_console_set(__level, __fg, __bg, __attr)         logger_disabled_ok()
+#define logger_color_prefix_string_set(__level, __begin, __end)              logger_disabled_ok()
+#define logger_color_prefix_reset()                                          logger_disabled_ok()
+#define logger_color_message_enable()                                        logger_disabled_ok()
+#define logger_color_message_disable()                                       logger_disabled_ok()
+#define logger_color_message_is_enabled()                                    logger_disabled_false()
+#define logger_level_name_get(__level)                                       logger_disabled_string()
+#define logger(__id, __level, ...)                                           logger_disabled_ok()
+#define logger_va(__id, __level, ...)                                        logger_disabled_ok()
+
+/* helper functions */
+#define logger_level_to_index(__level)                                       logger_disabled_zero()
+#define logger_index_to_level(__index)                                       logger_disabled_unkown()
 
 /* legacy functions */
-#define logger_id_color_set(__id, __fg, __bg, __attr)                   logger_disabled_ok()
-#define logger_color_set(__id, __fg, __bg, __attr)                      logger_disabled_ok()
-#define logger_color_reset(__id)                                        logger_disabled_ok()
-#define logger_id_color_set(__id, __fg, __bg, __attr)                   logger_disabled_ok()
-#define logger_color_prefix_set(__level, __fg, __bg, __attr)            logger_disabled_ok()
+#define logger_id_color_set(__id, __fg, __bg, __attr)                        logger_disabled_ok()
+#define logger_color_set(__id, __fg, __bg, __attr)                           logger_disabled_ok()
+#define logger_color_reset(__id)                                             logger_disabled_ok()
+#define logger_id_color_set(__id, __fg, __bg, __attr)                        logger_disabled_ok()
+#define logger_color_prefix_set(__level, __fg, __bg, __attr)                 logger_disabled_ok()
 #endif /* LOGGER_ENABLE */
 
 #ifdef __cplusplus
