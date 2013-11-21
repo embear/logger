@@ -5,6 +5,8 @@ Logger is a simple logging facility for the C language. It is possible to
 output logging information to different output stream and to use different
 logging severities.
 
+![logger message processing](doc/logger_flow.png)
+
 **Table of contents**
 
 [TOC]
@@ -292,7 +294,7 @@ Version history
 * **v2.0.0** *(2012-12-05)*
 
     * Possibility to change logging prefix for each ID independent
-    * Support for logging strings containing multiple '\n' characters
+    * Support for logging strings containing multiple `\n` characters
     * Add possibility to define logging ID specific outputs
     * Possibility to flush all outputs after each line
     * Add functions to check state of logger, logging IDs and streams
