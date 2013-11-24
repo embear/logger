@@ -1,0 +1,16 @@
+[0;32m logger_test_id:  DEBUG:                          main():   32: id 0 - LOGGER_DEBUG   in line 32[0m
+[0;32m logger_test_id:   INFO:                          main():   33: id 0 - LOGGER_INFO    in line 33[0m
+[0;32m logger_test_id: NOTICE:                          main():   34: id 0 - LOGGER_NOTICE  in line 34[0m
+[0;32m logger_test_id:WARNING:                          main():   35: id 0 - LOGGER_WARNING in line 35[0m
+[0;32m logger_test_id:    ERR:                          main():   36: id 0 - LOGGER_ERR     in line 36[0m
+[0;32m logger_test_id:   CRIT:                          main():   37: id 0 - LOGGER_CRIT    in line 37[0m
+[0;32m logger_test_id:  ALERT:                          main():   38: id 0 - LOGGER_ALERT   in line 38[0m
+[0;32m logger_test_id:  EMERG:                          main():   39: id 0 - LOGGER_EMERG   in line 39[0m
+[2m logger_test_id:  DEBUG:                          main():   42: [0m[0;32mid 0 - LOGGER_DEBUG   in line 42[0m
+[0m logger_test_id:   INFO:                          main():   43: [0m[0;32mid 0 - LOGGER_INFO    in line 43[0m
+[0;32m logger_test_id: NOTICE:                          main():   44: [0m[0;32mid 0 - LOGGER_NOTICE  in line 44[0m
+[0;33m logger_test_id:WARNING:                          main():   45: [0m[0;32mid 0 - LOGGER_WARNING in line 45[0m
+[0;31m logger_test_id:    ERR:                          main():   46: [0m[0;32mid 0 - LOGGER_ERR     in line 46[0m
+[1;31m logger_test_id:   CRIT:                          main():   47: [0m[0;32mid 0 - LOGGER_CRIT    in line 47[0m
+[1;7;31m logger_test_id:  ALERT:                          main():   48: [0m[0;32mid 0 - LOGGER_ALERT   in line 48[0m
+[1;5;7;31m logger_test_id:  EMERG:                          main():   49: [0m[0;32mid 0 - LOGGER_EMERG   in line 49[0m

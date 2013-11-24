@@ -1,0 +1,4 @@
+[0;32m logger_test_id:  DEBUG:                          main():   26: id 0 - LOGGER_DEBUG   in line 26[0m
+[0;32m logger_test_id:  DEBUG:                          main():   31: id 0 - LOGGER_DEBUG   in line 31[0m
+ logger_test_id:  DEBUG:                          main():   36: id 0 - LOGGER_DEBUG   in line 36
+[0;32m logger_test_id:  DEBUG:                          main():   41: id 0 - LOGGER_DEBUG   in line 41[0m

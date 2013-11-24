@@ -1,0 +1,8 @@
+[0;31m logger_test_id:  DEBUG:                          main():   23: id 0 - LOGGER_DEBUG   in line 23[0m
+[1;31m logger_test_id:  DEBUG:                          main():   25: id 0 - LOGGER_DEBUG   in line 25[0m
+[5;31m logger_test_id:  DEBUG:                          main():   27: id 0 - LOGGER_DEBUG   in line 27[0m
+[7;31m logger_test_id:  DEBUG:                          main():   29: id 0 - LOGGER_DEBUG   in line 29[0m
+[0;34m logger_test_id:  DEBUG:                          main():   31: id 0 - LOGGER_DEBUG   in line 31[0m
+[0;33m logger_test_id:  DEBUG:                          main():   33: id 0 - LOGGER_DEBUG   in line 33[0m
+[0;32m logger_test_id:  DEBUG:                          main():   35: id 0 - LOGGER_DEBUG   in line 35[0m
+ logger_test_id:  DEBUG:                          main():   37: id 0 - LOGGER_DEBUG   in line 37

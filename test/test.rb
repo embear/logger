@@ -2,11 +2,14 @@
 #
 # run all available tests in current directory
 
+require "pathname"
+
 count = 0
 pass_count = 0
 fail_count = 0
 
-working_directory = File.dirname(__FILE__)
+working_directory = Pathname.new(__FILE__).expand_path.dirname
+Dir.chdir(working_directory)
 
 testcases = Dir.glob("#{working_directory}/test*.rb")
 

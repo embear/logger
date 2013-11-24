@@ -1,0 +1,15 @@
+Logging level is WARNING
+ logger_test_id:WARNING:                          main():   26: id 0 - LOGGER_WARNING in line 26
+ logger_test_id:    ERR:                          main():   27: id 0 - LOGGER_ERR     in line 27
+ logger_test_id:   CRIT:                          main():   28: id 0 - LOGGER_CRIT    in line 28
+ logger_test_id:  ALERT:                          main():   29: id 0 - LOGGER_ALERT   in line 29
+ logger_test_id:  EMERG:                          main():   30: id 0 - LOGGER_EMERG   in line 30
+Logging level is ALERT
+ logger_test_id:  ALERT:                          main():   42: id 0 - LOGGER_ALERT   in line 42
+ logger_test_id:  EMERG:                          main():   43: id 0 - LOGGER_EMERG   in line 43
+Logging level is restored to WARNING
+ logger_test_id:WARNING:                          main():   51: id 0 - LOGGER_WARNING in line 51
+ logger_test_id:    ERR:                          main():   52: id 0 - LOGGER_ERR     in line 52
+ logger_test_id:   CRIT:                          main():   53: id 0 - LOGGER_CRIT    in line 53
+ logger_test_id:  ALERT:                          main():   54: id 0 - LOGGER_ALERT   in line 54
+ logger_test_id:  EMERG:                          main():   55: id 0 - LOGGER_EMERG   in line 55
