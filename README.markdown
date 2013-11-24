@@ -5,7 +5,7 @@ Logger is a simple logging facility for the C language. It is possible to
 output logging information to different output stream and to use different
 logging severities.
 
-![logger message processing](doc/logger_flow.png)
+![logger message processing](https://bitbucket.org/embear/logger/raw/tip/doc/logger_flow.png)
 
 **Table of contents**
 
