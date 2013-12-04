@@ -13,7 +13,7 @@ Dir.chdir(working_directory)
 
 testcases = Dir.glob("#{working_directory}/test*.rb")
 
-testcases.sort.each { |test|
+testcases.sort.each do |test|
   if /test\d+\.rb$/ =~ test
     count += 1
     if system("ruby #{test}")
@@ -22,7 +22,7 @@ testcases.sort.each { |test|
       fail_count += 1
     end
   end
-}
+end
 
 puts ""
 puts "test suite summary:"

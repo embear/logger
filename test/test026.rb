@@ -28,6 +28,8 @@ definition.temporary_files     = [ "#{definition.executable}" ]
 
 operator = TestOperator.new(environment, definition)
 
+operator.setup()
+
 if operator.buildTest()
   puts "#{definition.name} ... #{fail()} (build)"
   return_value = 1

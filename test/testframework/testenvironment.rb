@@ -20,6 +20,6 @@ class TestEnvironment
     @sources             = [ "../src/logger.c" ]
     @library_directories = Array.new(0, String.new())
     @libraries           = Array.new(0, String.new())
-    @verbose             = true
+    @verbose             = false
   end
 end

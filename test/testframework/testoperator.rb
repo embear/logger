@@ -23,7 +23,7 @@ class TestOperator
       end
       mismatch = true
     end
-    expect.zip(result).map{ |expect, result|
+    expect.zip(result).map do |expect, result|
       if expect != result
         if @environment.verbose
           puts "EXPECT: #{expect}"
@@ -31,9 +31,16 @@ class TestOperator
         end
         mismatch = true
       end
-    }
+    end
 
     return mismatch
+  end
+
+  # Setup test
+  def setup()
+    if @environment.verbose
+      puts "========== BEGIN #{@definition.name} - #{@definition.description} =========="
+    end
   end
 
   # Build test executable using information in +environment+ and +description+
@@ -43,37 +50,49 @@ class TestOperator
     arguments = Array.new()
     arguments.concat(@environment.compiler_flags)
     arguments.concat(@definition.compiler_flags)
-    arguments.concat(@environment.include_directories.map{ |dir| "-I#{dir}" })
-    arguments.concat(@environment.library_directories.map{ |dir| "-L#{dir}" })
-    arguments.concat(@definition.library_directories.map{ |dir| "-L#{dir}" })
+    arguments.concat(@environment.include_directories.map do |dir| "-I#{dir}" end)
+    arguments.concat(@environment.library_directories.map do |dir| "-L#{dir}" end)
+    arguments.concat(@definition.library_directories.map do |dir| "-L#{dir}" end)
     arguments.concat(@environment.sources)
     arguments.concat(@definition.source_files)
     arguments.push("-o#{@definition.executable}")
-    arguments.concat(@environment.libraries.map{ |library| "-l#{library}" })
-    arguments.concat(@definition.libraries.map{ |library| "-l#{library}" })
+    arguments.concat(@environment.libraries.map do |library| "-l#{library}" end)
+    arguments.concat(@definition.libraries.map do |library| "-l#{library}" end)
 
     stdin, stdout, stderr, wait_thr = Open3.popen3(@environment.compiler, *arguments)
 
     stdin.close
 
-    stdout.each { |line|
+    stdout.each do |line|
       if /error/ =~ line
+        if @environment.verbose
+          puts line
+        end
         return_value = true
       end
       if /warning/ =~ line
+        if @environment.verbose
+          puts line
+        end
         return_value = true
       end
-    }
+    end
     stdout.close
 
-    stderr.each { |line|
+    stderr.each do |line|
       if /error/ =~ line
+        if @environment.verbose
+          puts line
+        end
         return_value = true
       end
       if /warning/ =~ line
+        if @environment.verbose
+          puts line
+        end
         return_value = true
       end
-    }
+    end
     stderr.close
 
     return return_value
@@ -91,7 +110,7 @@ class TestOperator
       expect_stdin = [ ]
     end
 
-    expect_stdin.each{ |x| stdin.puts x}
+    expect_stdin.each do |x| stdin.puts x end
     stdin.close
 
     # store program output
@@ -121,7 +140,7 @@ class TestOperator
 
     # compare program output files
     mismatch_files = false
-    @definition.files.each{ |output_file, file|
+    @definition.files.each do |output_file, file|
       if File.file?(file)
         expect_file = IO.readlines(file)
       else
@@ -134,7 +153,7 @@ class TestOperator
         result_file = [ ]
       end
       mismatch_files |= compare(expect_file, result_file)
-    }
+    end
 
     # compare program status
     mismatch_status = @definition.status != result_status
@@ -165,11 +184,15 @@ class TestOperator
     return return_value
   end
 
+  # Cleanup after test run
   def cleanup()
-    @definition.temporary_files.each { |file|
+    @definition.temporary_files.each do |file|
       if File.exists?(file) && File.writable?(file)
         File.delete(file)
       end
-    }
+    end
+    if @environment.verbose
+      puts "========== END #{@definition.name} =========="
+    end
   end
 end

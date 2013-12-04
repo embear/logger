@@ -35,5 +35,4 @@ class TestDefinition
     @status              = 0
     @temporary_files     = Array.new(0, String.new())
   end
-
 end
