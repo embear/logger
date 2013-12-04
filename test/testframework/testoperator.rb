@@ -39,7 +39,8 @@ class TestOperator
   # Setup test
   def setup()
     if @environment.verbose
-      puts "========== BEGIN #{@definition.name} - #{@definition.description} =========="
+      puts "========== BEGIN #{@definition.name} =========="
+      puts "#{@definition.description}"
     end
   end
 
@@ -192,7 +193,7 @@ class TestOperator
       end
     end
     if @environment.verbose
-      puts "========== END #{@definition.name} =========="
+      puts "========== END #{@definition.name} ============"
     end
   end
 end
