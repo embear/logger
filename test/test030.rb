@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 require "pathname"
-require "./testframework/testhelper"
-require "./testframework/testenvironment"
-require "./testframework/testdefinition"
-require "./testframework/testoperator"
+require_relative "testframework/testhelper"
+require_relative "testframework/testenvironment"
+require_relative "testframework/testdefinition"
+require_relative "testframework/testoperator"
 
 environment = TestEnvironment.new()
 definition = TestDefinition.new()
