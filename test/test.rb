@@ -3,6 +3,7 @@
 # run all available tests in current directory
 
 require "pathname"
+require_relative "testframework/testhelper"
 
 count = 0
 pass_count = 0
@@ -27,5 +28,5 @@ end
 puts ""
 puts "test suite summary:"
 puts "  testcases: #{count}"
-puts "  passed:    #{pass_count}"
-puts "  failed:    #{fail_count}"
+puts "  passed:    #{green(pass_count)}"
+puts "  failed:    #{red(fail_count)}"
