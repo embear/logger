@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "modify standard prefix - change the standard prefix and revert back"
+definition.description         = "change the standard prefix and revert back"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

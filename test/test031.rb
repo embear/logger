@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "enable/disable output colors per id output stream - coloring of messages could be enabled/disabled for each id specific output stream"
+definition.description         = "coloring of messages could be enabled/disabled for each id specific output stream"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

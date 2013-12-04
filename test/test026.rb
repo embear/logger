@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "colors in text output - print log messages in different colors"
+definition.description         = "print log messages in different colors"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

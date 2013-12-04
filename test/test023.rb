@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = " using control functions - changing and restoring logging level"
+definition.description         = "changing and restoring logging level"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

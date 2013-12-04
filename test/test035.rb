@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "test inttypes macros - test if inttypes macros are useable in format strings"
+definition.description         = "test if inttypes macros are usable in format strings"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

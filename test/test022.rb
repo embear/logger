@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "output to stdout, global and id specific file - all log messages will be printed to stdout and appended to file \"test022.out\", messages to id2 additionally to \"test022.out2\""
+definition.description         = "log messages will be printed to stdout and appended to file \"test022.out\", messages to id2 additionally to \"test022.out2\""
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

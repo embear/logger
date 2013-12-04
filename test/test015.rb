@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "id with global and id specific output - message will be shown only once because outputs are merged and made unique"
+definition.description         = "id with global and id specific output, message will be shown only once because outputs are merged and made unique"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

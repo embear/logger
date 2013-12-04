@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "only id specific output for id, none for id2 - no global output stream is registered and only id gets its id specific one, id2 has no output"
+definition.description         = "no global output stream is registered and only id gets its id specific one, id2 has no output"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

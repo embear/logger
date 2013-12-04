@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "output to stdout and stderr with mask - message with severity INFO is printed to stdout, message with severity ERR is printed to stderr" 
+definition.description         = "message with severity INFO is printed to stdout, message with severity ERR is printed to stderr"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

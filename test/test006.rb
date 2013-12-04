@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "level not set - no log messages will be shown because id level is not set ( -> level is UNKNOWN by default)" 
+definition.description         = "no log messages will be shown because id level is not set (-> level is UNKNOWN by default)"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]

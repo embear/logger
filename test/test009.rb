@@ -12,7 +12,7 @@ definition = TestDefinition.new()
 pathname = Pathname.new(__FILE__).expand_path
 
 definition.name                = pathname.basename.sub_ext("")
-definition.description         = "level mask set to LOGGER_WARNING|LOGGER_ERR|LOGGER_CRIT - only log messages with level WARNING or ERR or CRIT will be shown"
+definition.description         = "level mask set to LOGGER_WARNING|LOGGER_ERR|LOGGER_CRIT, only log messages with level WARNING or ERR or CRIT will be shown"
 definition.compiler_flags      = [ "-DLOGGER_ENABLE" ]
 definition.library_directories = [ ]
 definition.libraries           = [ ]
