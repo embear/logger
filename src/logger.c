@@ -3104,12 +3104,11 @@ LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
                                                    const char     *function,
                                                    uint32_t       line)
 {
-  int16_t  characters = 0;
-  uint16_t rev_idx;
-
   /* do prefix stuff only if needed */
   if ((logger_control[id].append == logger_false) &&
       (logger_control[id].prefix != LOGGER_PFX_EMPTY)) {
+    int16_t         characters = 0;
+    uint16_t        rev_idx;
     logger_prefix_t local_prefix;
 
     if (logger_control[id].prefix & LOGGER_PFX_UNSET) {
@@ -3550,9 +3549,6 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
                                                            const char     *format,
                                                            va_list        argp)
 {
-  char *message_part;
-  char *message_end;
-
   /* GUARD: check for valid ID */
   if ((id < 0) ||
       (id >= LOGGER_IDS_MAX) ||
@@ -3584,6 +3580,9 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
   if ((logger_enabled == logger_true) &&
       (logger_control[id].enabled == logger_true) &&
       ((logger_control[id].level & level) != 0)) {
+    char *message_part;
+    char *message_end;
+
     /* format date */
     (void)logger_format_date(logger_date, sizeof(logger_date));
 
