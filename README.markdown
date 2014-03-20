@@ -240,14 +240,15 @@ int main(void)
 Version history
 ---------------
 
-* **vX.Y.Z** *(XXXX-YY-ZZ)*
+* **v4.0.0** *(2014-03-20)*
 
     * Add ability to set bitmasks for levels to show for example only a range
       of severities.
-    * Unify outputs for each IF so that a message is never printed twice to the
+    * Unify outputs for each ID so that a message is never printed twice to the
       same output.
     * Add function to check if a ID and level combination would generate an
       output.
+    * Add Ruby based test suite.
 
 * **v3.2.0** *(2013-10-23)*
 

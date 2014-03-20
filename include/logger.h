@@ -57,10 +57,10 @@ extern "C" {
 #endif /* __GNUC__ */
 
 /** Logger major version number */
-#define LOGGER_VERSION_MAJOR    3
+#define LOGGER_VERSION_MAJOR    4
 
 /** Logger minor version number */
-#define LOGGER_VERSION_MINOR    2
+#define LOGGER_VERSION_MINOR    0
 
 /** Logger patch level */
 #define LOGGER_VERSION_PATCH    0
