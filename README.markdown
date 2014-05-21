@@ -240,6 +240,10 @@ int main(void)
 Version history
 ---------------
 
+* **vX.Y.Z** *(XXXX-YY-ZZ)*
+
+    * Compress repeated messages. Only print once and show the number of repeats.
+
 * **v4.0.0** *(2014-03-20)*
 
     * Add ability to set bitmasks for levels to show for example only a range

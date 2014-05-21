@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <stddef.h>
 #include <time.h>
+#include <inttypes.h>
 
 /** Number of possible simultaneous outputs. */
 #ifndef LOGGER_OUTPUTS_MAX
@@ -166,7 +167,7 @@ typedef struct logger_color_string_s {
 
 
 /** Logger control structure */
-typedef struct  logger_control_s {
+typedef struct logger_control_s {
   logger_bool_t         used;                                        /**< This ID is used. */
   int16_t               count;                                       /**< Number of registrations for this ID. */
   logger_bool_t         enabled;                                     /**< This ID is enabled. */
@@ -182,6 +183,16 @@ typedef struct  logger_control_s {
 } logger_control_t;
 
 
+/** Logger repeated message structure */
+typedef struct logger_repeat_s {
+  uint16_t       count;                              /**< Number of repeats for previous message */
+  logger_id_t    id;                                 /**< ID of repeated message */
+  logger_level_t level;                              /**< Level of repeated message */
+  uint16_t       prefix_length;                      /**< Length of prefix string of repeated message */
+  char           message[LOGGER_MESSAGE_STRING_MAX]; /**< Storage for repeated message string */
+} logger_repeat_t;
+
+
 static logger_bool_t     logger_initialized           = logger_false;           /**< Logger is initialized. */
 static logger_bool_t     logger_enabled               = logger_false;           /**< Logger is enabled. */
 static logger_prefix_t   logger_prefix_standard       = LOGGER_PREFIX_STANDARD; /**< Logger standard prefix */
@@ -189,6 +200,7 @@ static logger_bool_t     logger_color_prefix_enabled  = logger_false;           
 static logger_bool_t     logger_color_message_enabled = logger_false;           /**< Logger message color is enabled. */
 static logger_control_t  logger_control[LOGGER_IDS_MAX + 1];                    /**< Control storage for possible IDs plus system ID. */
 static logger_output_t   logger_outputs[LOGGER_OUTPUTS_MAX];                    /**< Storage for possible outputs. */
+static logger_repeat_t   logger_repeat;                                         /**< Storage for repeated message information. */
 static char              logger_date[LOGGER_DATE_STRING_MAX];                   /**< Storage for date string */
 static char              logger_prefix[LOGGER_PREFIX_STRING_MAX];               /**< Storage for prefix string */
 static char              logger_message[LOGGER_MESSAGE_STRING_MAX];             /**< Storage for message string */
@@ -213,6 +225,7 @@ static const char *logger_level_names[LOGGER_MAX] =
 /** level to color translation */
 static logger_color_string_t logger_level_colors[LOGGER_MAX];
 
+
 /** level to color translation for console */
 static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
 {
@@ -226,6 +239,10 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
   { "\x1B[0;30;45m", "\x1B[0m" }, /* Prefix color string for level "ALERT"   -> LOGGER_BG_MAGENTA, LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
+
+
+/* declarations */
+LOGGER_INLINE void logger_repeat_message(void);
 
 
 /** ************************************************************************//**
@@ -430,6 +447,9 @@ logger_return_t logger_enable(void)
  ******************************************************************************/
 logger_return_t logger_disable(void)
 {
+  /* outputs will change, print repeat message */
+  logger_repeat_message();
+
   logger_enabled = logger_false;
 
   return(LOGGER_OK);
@@ -661,6 +681,9 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
 
     /* found an empty slot */
     if (found == logger_true) {
+      /* outputs will change, print repeat message */
+      logger_repeat_message();
+
       outputs[index].count++;
       outputs[index].level     = LOGGER_UNKNOWN;
       outputs[index].use_color = logger_false;
@@ -763,6 +786,9 @@ LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t   
 
     /* remove this output if this was the last reference */
     if (outputs[index].count <= 0) {
+      /* outputs will change, print repeat message */
+      logger_repeat_message();
+
       /* flush everything in this stream */
       if (type == LOGGER_OUTPUT_TYPE_FILESTREAM) {
         fflush(outputs[index].stream);
@@ -908,6 +934,9 @@ LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t    
 
   /* found given output in a slot */
   if (found == logger_true) {
+    /* outputs will change, print repeat message */
+    logger_repeat_message();
+
     /* set log level */
     outputs[index].level = level;
   }
@@ -1368,6 +1397,9 @@ logger_return_t logger_output_flush(void)
   int16_t index;
   int16_t id;
 
+  /* outputs will change, print repeat message */
+  logger_repeat_message();
+
   /* search for used global outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     if (logger_outputs[index].count > 0) {
@@ -1736,8 +1768,8 @@ logger_return_t logger_id_release(const logger_id_t id)
 
   /* if this was the last ID */
   if (logger_control[id].count <= 0) {
-    /* flush all streams */
-    logger_output_flush();
+    /* outputs will change, print repeat message */
+    logger_repeat_message();
 
     /* reset the ID */
     (void)memset(&logger_control[id], 0, sizeof(logger_control[id]));
@@ -1806,6 +1838,9 @@ logger_return_t logger_id_disable(const logger_id_t id)
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
   }
+
+  /* outputs will change, print repeat message */
+  logger_repeat_message();
 
   /* disable given ID */
   logger_control[id].enabled = logger_false;
@@ -1916,6 +1951,9 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
 
+  /* outputs will change, print repeat message */
+  logger_repeat_message();
+
   /* set ID level */
   logger_control[id].level = LOGGER_ALL ^ (level - 1);
 
@@ -1973,6 +2011,9 @@ logger_return_t logger_id_level_mask_set(const logger_id_t    id,
   if ((level & ~LOGGER_ALL) != 0) {
     return(LOGGER_ERR_LEVEL_UNKNOWN);
   }
+
+  /* outputs will change, print repeat message */
+  logger_repeat_message();
 
   /* set ID level */
   logger_control[id].level = level;
@@ -3646,6 +3687,42 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
 
 
 /** ************************************************************************//**
+ * \brief  Print repeat message.
+ *
+ * When a message repeats several times the message is only printed once by
+ * logger_implementation_common(). When a different message should be printed
+ * or outputs change this function will print the number of repeats.
+ ******************************************************************************/
+LOGGER_INLINE void logger_repeat_message(void)
+{
+  if (logger_repeat.count > 0) {
+    char repeat_prefix[LOGGER_PREFIX_STRING_MAX];
+    char repeat_message[LOGGER_MESSAGE_STRING_MAX];
+
+    /* generate an empty prefix */
+    memset(repeat_prefix, ' ', logger_repeat.prefix_length);
+    repeat_prefix[logger_repeat.prefix_length] = 0;
+
+    /* generate string that contains number of repeats */
+    if (logger_repeat.count == 1) {
+      (void)snprintf(repeat_message, sizeof(repeat_message), "  -> previous message repeated %" PRIu16 " more time", logger_repeat.count);
+    }
+    else {
+      (void)snprintf(repeat_message, sizeof(repeat_message), "  -> previous message repeated %" PRIu16 " more times", logger_repeat.count);
+    }
+
+    /* output message */
+    (void)logger_output(logger_repeat.id, logger_repeat.level, logger_control[logger_repeat.id].unified_outputs, LOGGER_UNIFIED_OUTPUTS_MAX, repeat_prefix, repeat_message);
+
+    /* reset repeat members */
+    logger_repeat.count = 0;
+    logger_repeat.id    = logger_id_unknown;
+    logger_repeat.level = LOGGER_UNKNOWN;
+  }
+}
+
+
+/** ************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all outputs registered using a printf()-like format
@@ -3708,8 +3785,6 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
   if ((logger_enabled == logger_true) &&
       (logger_control[id].enabled == logger_true) &&
       ((logger_control[id].level & level) != 0)) {
-    char *message_part;
-    char *message_end;
 
     /* format date */
     (void)logger_format_date(logger_date, sizeof(logger_date));
@@ -3720,29 +3795,56 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
     /* format message */
     (void)logger_format_message(id, logger_message, sizeof(logger_message), format, argp);
 
-    /* initialize message pointer */
-    message_part = logger_message;
+    /* check if message is the same as previous message */
+    if ((strncmp(logger_message, logger_repeat.message, sizeof(logger_message)) == 0) &&
+        (id == logger_repeat.id) &&
+        (level == logger_repeat.level)) {
+      /* increase repeat counter */
+      logger_repeat.count++;
 
-    /* loop over all message parts */
-    do {
-      /* search for the next linefeed */
-      message_end = strchr(message_part, '\n');
-
-      if (message_end != NULL) {
-        /* replace linefeed with string end */
-        *message_end = '\0';
-
-        /* make message_end point to the next message part */
-        message_end++;
-      }
-
-      /* output message to id unified outputs */
-      (void)logger_output(id, level, logger_control[id].unified_outputs, LOGGER_UNIFIED_OUTPUTS_MAX, logger_prefix, message_part);
-
-      /* update message part for next loop */
-      message_part = message_end;
+      /* don't output message */
     }
-    while (message_part != NULL);
+    else {
+      char *message_part;
+      char *message_end;
+
+      /* store id and level */
+      logger_repeat.id = id;
+      logger_repeat.level = level;
+
+      /* calculate length of prefix string */
+      logger_repeat.prefix_length = strlen(logger_prefix);
+
+      /* copy new message to storage */
+      logger_string_copy(logger_repeat.message, logger_message, sizeof(logger_repeat.message));
+
+      /* output repeat message */
+      logger_repeat_message();
+
+      /* initialize message pointer */
+      message_part = logger_message;
+
+      /* loop over all message parts */
+      do {
+        /* search for the next linefeed */
+        message_end = strchr(message_part, '\n');
+
+        if (message_end != NULL) {
+          /* replace linefeed with string end */
+          *message_end = '\0';
+
+          /* make message_end point to the next message part */
+          message_end++;
+        }
+
+        /* output message to id unified outputs */
+        (void)logger_output(id, level, logger_control[id].unified_outputs, LOGGER_UNIFIED_OUTPUTS_MAX, logger_prefix, message_part);
+
+        /* update message part for next loop */
+        message_part = message_end;
+      }
+      while (message_part != NULL);
+    }
   }
 
   return(LOGGER_OK);
