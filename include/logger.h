@@ -430,8 +430,8 @@ logger_return_t logger_implementation_va(logger_id_t    id,
 
 
 /* helper functions */
-uint16_t logger_level_to_index(const logger_level_t level);
-logger_level_t logger_index_to_level(const uint16_t index);
+size_t logger_level_to_index(const logger_level_t level);
+logger_level_t logger_index_to_level(const size_t index);
 
 /* legacy functions */
 logger_return_t logger_id_color_set(const logger_id_t        id,
