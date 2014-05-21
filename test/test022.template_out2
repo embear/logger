@@ -1,6 +1,6 @@
-logger_test_id2: NOTICE:                          main():   45: id 1 - LOGGER_NOTICE  in line 45
-logger_test_id2:WARNING:                          main():   46: id 1 - LOGGER_WARNING in line 46
-logger_test_id2:    ERR:                          main():   47: id 1 - LOGGER_ERR     in line 47
-logger_test_id2:   CRIT:                          main():   48: id 1 - LOGGER_CRIT    in line 48
-logger_test_id2:  ALERT:                          main():   49: id 1 - LOGGER_ALERT   in line 49
-logger_test_id2:  EMERG:                          main():   50: id 1 - LOGGER_EMERG   in line 50
+logger_test_id2: NOTICE:                          main():   45: id 2 - LOGGER_NOTICE  in line 45
+logger_test_id2:WARNING:                          main():   46: id 2 - LOGGER_WARNING in line 46
+logger_test_id2:    ERR:                          main():   47: id 2 - LOGGER_ERR     in line 47
+logger_test_id2:   CRIT:                          main():   48: id 2 - LOGGER_CRIT    in line 48
+logger_test_id2:  ALERT:                          main():   49: id 2 - LOGGER_ALERT   in line 49
+logger_test_id2:  EMERG:                          main():   50: id 2 - LOGGER_EMERG   in line 50

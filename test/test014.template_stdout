@@ -1,2 +1,2 @@
- logger_test_id:  EMERG:                          main():   26: id 0 - LOGGER_EMERG   in line 26
-                          main():   27: id 1 - LOGGER_EMERG   in line 27
+ logger_test_id:  EMERG:                          main():   26: id 1 - LOGGER_EMERG   in line 26
+                          main():   27: id 2 - LOGGER_EMERG   in line 27

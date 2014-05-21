@@ -1,16 +1,16 @@
- logger_test_id:  DEBUG:                          main():   35: id 0 - LOGGER_DEBUG   in line 35
- logger_test_id:   INFO:                          main():   36: id 0 - LOGGER_INFO    in line 36
- logger_test_id: NOTICE:                          main():   37: id 0 - LOGGER_NOTICE  in line 37
- logger_test_id:WARNING:                          main():   38: id 0 - LOGGER_WARNING in line 38
- logger_test_id:    ERR:                          main():   39: id 0 - LOGGER_ERR     in line 39
- logger_test_id:   CRIT:                          main():   40: id 0 - LOGGER_CRIT    in line 40
- logger_test_id:  ALERT:                          main():   41: id 0 - LOGGER_ALERT   in line 41
- logger_test_id:  EMERG:                          main():   42: id 0 - LOGGER_EMERG   in line 42
-logger_test_id2:  DEBUG:                          main():   43: id 1 - LOGGER_DEBUG   in line 43
-logger_test_id2:   INFO:                          main():   44: id 1 - LOGGER_INFO    in line 44
-logger_test_id2: NOTICE:                          main():   45: id 1 - LOGGER_NOTICE  in line 45
-logger_test_id2:WARNING:                          main():   46: id 1 - LOGGER_WARNING in line 46
-logger_test_id2:    ERR:                          main():   47: id 1 - LOGGER_ERR     in line 47
-logger_test_id2:   CRIT:                          main():   48: id 1 - LOGGER_CRIT    in line 48
-logger_test_id2:  ALERT:                          main():   49: id 1 - LOGGER_ALERT   in line 49
-logger_test_id2:  EMERG:                          main():   50: id 1 - LOGGER_EMERG   in line 50
+ logger_test_id:  DEBUG:                          main():   35: id 1 - LOGGER_DEBUG   in line 35
+ logger_test_id:   INFO:                          main():   36: id 1 - LOGGER_INFO    in line 36
+ logger_test_id: NOTICE:                          main():   37: id 1 - LOGGER_NOTICE  in line 37
+ logger_test_id:WARNING:                          main():   38: id 1 - LOGGER_WARNING in line 38
+ logger_test_id:    ERR:                          main():   39: id 1 - LOGGER_ERR     in line 39
+ logger_test_id:   CRIT:                          main():   40: id 1 - LOGGER_CRIT    in line 40
+ logger_test_id:  ALERT:                          main():   41: id 1 - LOGGER_ALERT   in line 41
+ logger_test_id:  EMERG:                          main():   42: id 1 - LOGGER_EMERG   in line 42
+logger_test_id2:  DEBUG:                          main():   43: id 2 - LOGGER_DEBUG   in line 43
+logger_test_id2:   INFO:                          main():   44: id 2 - LOGGER_INFO    in line 44
+logger_test_id2: NOTICE:                          main():   45: id 2 - LOGGER_NOTICE  in line 45
+logger_test_id2:WARNING:                          main():   46: id 2 - LOGGER_WARNING in line 46
+logger_test_id2:    ERR:                          main():   47: id 2 - LOGGER_ERR     in line 47
+logger_test_id2:   CRIT:                          main():   48: id 2 - LOGGER_CRIT    in line 48
+logger_test_id2:  ALERT:                          main():   49: id 2 - LOGGER_ALERT   in line 49
+logger_test_id2:  EMERG:                          main():   50: id 2 - LOGGER_EMERG   in line 50

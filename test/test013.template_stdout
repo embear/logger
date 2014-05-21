@@ -1,7 +1,7 @@
-id 0 - LOGGER_EMERG   in line 29
-[0;30;41m                          main(): [0mid 0 - LOGGER_EMERG   in line 32
-[0;30;41m                          main():   35: [0mid 0 - LOGGER_EMERG   in line 35
-[0;30;41m                     test013.c:                          main():   38: [0mid 0 - LOGGER_EMERG   in line 38
-[0;30;41m  EMERG:                     test013.c:                          main():   41: [0mid 0 - LOGGER_EMERG   in line 41
-[0;30;41m logger_test_id:  EMERG:                     test013.c:                          main():   44: [0mid 0 - LOGGER_EMERG   in line 44
-[0;30;41m2009-02-14 00:31:30: logger_test_id:  EMERG:                     test013.c:                          main():   47: [0mid 0 - LOGGER_EMERG   in line 47
+id 1 - LOGGER_EMERG   in line 29
+[0;30;41m                          main(): [0mid 1 - LOGGER_EMERG   in line 32
+[0;30;41m                          main():   35: [0mid 1 - LOGGER_EMERG   in line 35
+[0;30;41m                     test013.c:                          main():   38: [0mid 1 - LOGGER_EMERG   in line 38
+[0;30;41m  EMERG:                     test013.c:                          main():   41: [0mid 1 - LOGGER_EMERG   in line 41
+[0;30;41m logger_test_id:  EMERG:                     test013.c:                          main():   44: [0mid 1 - LOGGER_EMERG   in line 44
+[0;30;41m2009-02-14 00:31:30: logger_test_id:  EMERG:                     test013.c:                          main():   47: [0mid 1 - LOGGER_EMERG   in line 47

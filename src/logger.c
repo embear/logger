@@ -182,18 +182,18 @@ typedef struct  logger_control_s {
 } logger_control_t;
 
 
-static logger_bool_t    logger_initialized           = logger_false;           /**< Logger is initialized. */
-static logger_bool_t    logger_enabled               = logger_false;           /**< Logger is enabled. */
-static logger_prefix_t  logger_prefix_standard       = LOGGER_PREFIX_STANDARD; /**< Logger standard prefix */
-static logger_bool_t    logger_color_prefix_enabled  = logger_false;           /**< Logger prefix color is enabled. */
-static logger_bool_t    logger_color_message_enabled = logger_false;           /**< Logger message color is enabled. */
-static logger_control_t logger_control[LOGGER_IDS_MAX];                        /**< Control storage for possible IDs. */
-static logger_output_t  logger_outputs[LOGGER_OUTPUTS_MAX];                    /**< Storage for possible outputs. */
-static char             logger_date[LOGGER_DATE_STRING_MAX];                   /**< Storage for date string */
-static char             logger_prefix[LOGGER_PREFIX_STRING_MAX];               /**< Storage for prefix string */
-static char             logger_message[LOGGER_MESSAGE_STRING_MAX];             /**< Storage for message string */
-static char             logger_line[LOGGER_LINE_STRING_MAX];                   /**< Storage for whole output line */
-
+static logger_bool_t     logger_initialized           = logger_false;           /**< Logger is initialized. */
+static logger_bool_t     logger_enabled               = logger_false;           /**< Logger is enabled. */
+static logger_prefix_t   logger_prefix_standard       = LOGGER_PREFIX_STANDARD; /**< Logger standard prefix */
+static logger_bool_t     logger_color_prefix_enabled  = logger_false;           /**< Logger prefix color is enabled. */
+static logger_bool_t     logger_color_message_enabled = logger_false;           /**< Logger message color is enabled. */
+static logger_control_t  logger_control[LOGGER_IDS_MAX + 1];                    /**< Control storage for possible IDs plus system ID. */
+static logger_output_t   logger_outputs[LOGGER_OUTPUTS_MAX];                    /**< Storage for possible outputs. */
+static char              logger_date[LOGGER_DATE_STRING_MAX];                   /**< Storage for date string */
+static char              logger_prefix[LOGGER_PREFIX_STRING_MAX];               /**< Storage for prefix string */
+static char              logger_message[LOGGER_MESSAGE_STRING_MAX];             /**< Storage for message string */
+static char              logger_line[LOGGER_LINE_STRING_MAX];                   /**< Storage for whole output line */
+static const logger_id_t logger_system_id = 0;                                  /**< System logging ID */
 
 /** level to name translation */
 static const char *logger_level_names[LOGGER_MAX] =
@@ -252,7 +252,7 @@ static logger_return_t logger_color_console_format(char                     *str
   int           used      = 0;
   logger_bool_t separator = logger_false;
 
-  /* GUARD: check for valid ID */
+  /* GUARD: check for valid string */
   if (string == NULL) {
     return(LOGGER_ERR_STRING_INVALID);
   }
@@ -378,6 +378,15 @@ logger_return_t logger_init(void)
     (void)memset(logger_outputs, 0, sizeof(logger_outputs));
     (void)memset(logger_message, 0, sizeof(logger_message));
     (void)memset(logger_prefix,  0, sizeof(logger_prefix));
+
+    /* initialize logger system ID */
+    logger_control[logger_system_id].used    = logger_true;
+    logger_control[logger_system_id].count   = 1;
+    logger_control[logger_system_id].enabled = logger_true;
+    logger_control[logger_system_id].level   = LOGGER_ALL;
+    logger_control[logger_system_id].prefix  = LOGGER_PREFIX_STANDARD;
+    logger_control[logger_system_id].color   = logger_false;
+    (void)strncpy(logger_control[logger_system_id].name, "LOGGER_SYSTEM", LOGGER_NAME_MAX);
   }
 
   return(LOGGER_OK);
@@ -494,7 +503,7 @@ logger_prefix_t logger_prefix_get(void)
  ******************************************************************************/
 logger_return_t logger_output_common_unify(void)
 {
-  int16_t id_index;
+  logger_id_t id_index;
   int16_t unified_index;
   int16_t global_index;
   int16_t specific_index;
@@ -686,9 +695,6 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
     }
   }
 
-  /* update unified output lists of each ID */
-  (void)logger_output_common_unify();
-
   return(ret);
 }
 
@@ -774,9 +780,6 @@ LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t   
   else {
     ret = LOGGER_ERR_OUTPUT_NOT_FOUND;
   }
-
-  /* update unified output lists of each ID */
-  (void)logger_output_common_unify();
 
   return(ret);
 }
@@ -1120,12 +1123,19 @@ LOGGER_INLINE logger_bool_t logger_output_common_color_is_enabled(logger_output_
  ******************************************************************************/
 logger_return_t logger_output_register(FILE *stream)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* add stream to global outputs */
-  return(logger_output_common_register(logger_outputs,
-                                       LOGGER_OUTPUTS_MAX,
-                                       LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                       stream,
-                                       (logger_output_function_t)NULL));
+  ret = logger_output_common_register(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -1140,12 +1150,19 @@ logger_return_t logger_output_register(FILE *stream)
  ******************************************************************************/
 logger_return_t logger_output_deregister(FILE *stream)
 {
-  /* delete stream to global outputs */
-  return(logger_output_common_deregister(logger_outputs,
-                                         LOGGER_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                         stream,
-                                         (logger_output_function_t)NULL));
+  logger_return_t ret = LOGGER_OK;
+
+  /* delete stream from global outputs */
+  ret = logger_output_common_deregister(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -1384,12 +1401,19 @@ logger_return_t logger_output_flush(void)
  ******************************************************************************/
 logger_return_t logger_output_function_register(logger_output_function_t function)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* add function to global outputs */
-  return(logger_output_common_register(logger_outputs,
-                                       LOGGER_OUTPUTS_MAX,
-                                       LOGGER_OUTPUT_TYPE_FUNCTION,
-                                       (FILE *)NULL,
-                                       function));
+  ret = logger_output_common_register(logger_outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -1404,12 +1428,19 @@ logger_return_t logger_output_function_register(logger_output_function_t functio
  ******************************************************************************/
 logger_return_t logger_output_function_deregister(logger_output_function_t function)
 {
-  /* delete function to global outputs */
-  return(logger_output_common_deregister(logger_outputs,
-                                         LOGGER_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FUNCTION,
-                                         (FILE *)NULL,
-                                         function));
+  logger_return_t ret = LOGGER_OK;
+
+  /* delete function from global outputs */
+  ret = logger_output_common_deregister(logger_outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -1695,12 +1726,7 @@ logger_return_t logger_id_release(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
-      (id >= LOGGER_IDS_MAX)) {
-    return(LOGGER_ERR_ID_UNKNOWN);
-  }
-
-  /* GUARD: check for valid ID */
-  if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1749,6 +1775,7 @@ logger_return_t logger_id_enable(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1774,6 +1801,7 @@ logger_return_t logger_id_disable(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1799,6 +1827,7 @@ logger_bool_t logger_id_is_enabled(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1829,6 +1858,7 @@ logger_bool_t logger_id_generates_output(const logger_id_t    id,
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(logger_false);
@@ -1874,6 +1904,7 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1905,6 +1936,7 @@ logger_level_t logger_id_level_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -1931,6 +1963,7 @@ logger_return_t logger_id_level_mask_set(const logger_id_t    id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -1961,6 +1994,7 @@ logger_level_t logger_id_level_mask_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -1986,6 +2020,7 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2017,6 +2052,7 @@ logger_prefix_t logger_id_prefix_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_PFX_EMPTY);
@@ -2040,6 +2076,7 @@ const char *logger_id_name_get(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(NULL);
@@ -2065,19 +2102,40 @@ const char *logger_id_name_get(const logger_id_t id)
 logger_return_t logger_id_output_register(const logger_id_t id,
                                           FILE              *stream)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
-  /* add stream to id specific outputs */
-  return(logger_output_common_register(logger_control[id].outputs,
-                                       LOGGER_ID_OUTPUTS_MAX,
-                                       LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                       stream,
-                                       (logger_output_function_t)NULL));
+  /* add stream to system outputs */
+  (void)logger_output_common_register(logger_control[logger_system_id].outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL);
+  (void)logger_output_common_level_set(logger_control[logger_system_id].outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL,
+                                      LOGGER_ALL);
+
+  /* add stream to global outputs */
+  ret = logger_output_common_register(logger_control[id].outputs,
+                                      LOGGER_ID_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                      stream,
+                                      (logger_output_function_t)NULL);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -2094,19 +2152,34 @@ logger_return_t logger_id_output_register(const logger_id_t id,
 logger_return_t logger_id_output_deregister(const logger_id_t id,
                                             FILE              *stream)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
-  /* delete stream to id specific outputs */
-  return(logger_output_common_deregister(logger_control[id].outputs,
-                                         LOGGER_ID_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FILESTREAM,
-                                         stream,
-                                         (logger_output_function_t)NULL));
+  /* delete stream from global outputs */
+  ret = logger_output_common_deregister(logger_control[id].outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL);
+
+  /* delete stream from system outputs */
+  (void)logger_output_common_deregister(logger_control[logger_system_id].outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FILESTREAM,
+                                        stream,
+                                        (logger_output_function_t)NULL);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -2125,6 +2198,7 @@ logger_bool_t logger_id_output_is_registered(const logger_id_t id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2157,6 +2231,7 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2195,6 +2270,7 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -2230,6 +2306,7 @@ logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2267,6 +2344,7 @@ logger_level_t logger_id_output_level_mask_get(const logger_id_t id,
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -2298,6 +2376,7 @@ logger_return_t logger_id_output_color_enable(const logger_id_t id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2328,6 +2407,7 @@ logger_return_t logger_id_output_color_disable(const logger_id_t id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2380,19 +2460,40 @@ logger_bool_t logger_id_output_color_is_enabled(const logger_id_t id,
 logger_return_t logger_id_output_function_register(const logger_id_t        id,
                                                    logger_output_function_t function)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
+  /* add function to system outputs */
+  (void)logger_output_common_register(logger_control[logger_system_id].outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function);
+  (void)logger_output_common_level_set(logger_control[logger_system_id].outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function,
+                                      LOGGER_ALL);
+
   /* add function to global outputs */
-  return(logger_output_common_register(logger_control[id].outputs,
-                                       LOGGER_ID_OUTPUTS_MAX,
-                                       LOGGER_OUTPUT_TYPE_FUNCTION,
-                                       (FILE *)NULL,
-                                       function));
+  ret = logger_output_common_register(logger_control[id].outputs,
+                                      LOGGER_OUTPUTS_MAX,
+                                      LOGGER_OUTPUT_TYPE_FUNCTION,
+                                      (FILE *)NULL,
+                                      function);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -2409,19 +2510,34 @@ logger_return_t logger_id_output_function_register(const logger_id_t        id,
 logger_return_t logger_id_output_function_deregister(const logger_id_t        id,
                                                      logger_output_function_t function)
 {
+  logger_return_t ret = LOGGER_OK;
+
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
   }
 
-  /* delete function to global outputs */
-  return(logger_output_common_deregister(logger_control[id].outputs,
-                                         LOGGER_ID_OUTPUTS_MAX,
-                                         LOGGER_OUTPUT_TYPE_FUNCTION,
-                                         (FILE *)NULL,
-                                         function));
+  /* delete function from global outputs */
+  ret = logger_output_common_deregister(logger_control[id].outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function);
+
+  /* delete function from system outputs */
+  (void)logger_output_common_deregister(logger_control[logger_system_id].outputs,
+                                        LOGGER_OUTPUTS_MAX,
+                                        LOGGER_OUTPUT_TYPE_FUNCTION,
+                                        (FILE *)NULL,
+                                        function);
+
+  /* update unified output lists of each ID */
+  (void)logger_output_common_unify();
+
+  return(ret);
 }
 
 
@@ -2440,6 +2556,7 @@ logger_bool_t logger_id_output_function_is_registered(const logger_id_t        i
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2472,6 +2589,7 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2510,6 +2628,7 @@ logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -2545,6 +2664,7 @@ logger_return_t logger_id_output_function_level_mask_set(const logger_id_t      
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2582,6 +2702,7 @@ logger_level_t logger_id_output_function_level_mask_get(const logger_id_t       
 
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_UNKNOWN);
@@ -2613,6 +2734,7 @@ logger_return_t logger_id_output_function_color_enable(const logger_id_t        
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2643,6 +2765,7 @@ logger_return_t logger_id_output_function_color_disable(const logger_id_t       
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2673,6 +2796,7 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(logger_false);
@@ -2710,6 +2834,7 @@ logger_return_t logger_id_color_console_set(const logger_id_t        id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2744,6 +2869,7 @@ logger_return_t logger_id_color_string_set(const logger_id_t id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -2779,6 +2905,7 @@ logger_return_t logger_id_color_reset(const logger_id_t id)
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);
@@ -3551,6 +3678,7 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
 {
   /* GUARD: check for valid ID */
   if ((id < 0) ||
+      (id == logger_system_id) ||
       (id >= LOGGER_IDS_MAX) ||
       (logger_control[id].used == logger_false)) {
     return(LOGGER_ERR_ID_UNKNOWN);

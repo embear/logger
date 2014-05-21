@@ -1,2 +1,2 @@
- logger_test_id:  DEBUG:                          main():   20: id 0 - LOGGER_DEBUG   in line 20
- logger_test_id:  DEBUG:                          main():   28: id 0 - LOGGER_DEBUG   in line 28
+ logger_test_id:  DEBUG:                          main():   20: id 1 - LOGGER_DEBUG   in line 20
+ logger_test_id:  DEBUG:                          main():   28: id 1 - LOGGER_DEBUG   in line 28

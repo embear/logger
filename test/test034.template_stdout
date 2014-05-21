@@ -1,6 +1,6 @@
- logger_test_id:  EMERG:                          main():   32: id 0 - LOGGER_EMERG   in line 32
-logger_test_id2:  EMERG:                          main():   33: id 1 - LOGGER_EMERG   in line 33
-2009-02-14 00:31:30:                     test034.c:   37: id 0 - LOGGER_EMERG   in line 37
-2009-02-14 00:31:30:                     test034.c:   38: id 1 - LOGGER_EMERG   in line 38
- logger_test_id:  EMERG:                          main():   41: id 0 - LOGGER_EMERG   in line 41
-logger_test_id2:  EMERG:                          main():   42: id 1 - LOGGER_EMERG   in line 42
+ logger_test_id:  EMERG:                          main():   32: id 1 - LOGGER_EMERG   in line 32
+logger_test_id2:  EMERG:                          main():   33: id 2 - LOGGER_EMERG   in line 33
+2009-02-14 00:31:30:                     test034.c:   37: id 1 - LOGGER_EMERG   in line 37
+2009-02-14 00:31:30:                     test034.c:   38: id 2 - LOGGER_EMERG   in line 38
+ logger_test_id:  EMERG:                          main():   41: id 1 - LOGGER_EMERG   in line 41
+logger_test_id2:  EMERG:                          main():   42: id 2 - LOGGER_EMERG   in line 42

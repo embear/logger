@@ -1,5 +1,5 @@
- logger_test_id:WARNING:                          main():   23: id 0 - LOGGER_WARNING in line 23
- logger_test_id:    ERR:                          main():   24: id 0 - LOGGER_ERR     in line 24
- logger_test_id:   CRIT:                          main():   25: id 0 - LOGGER_CRIT    in line 25
- logger_test_id:  ALERT:                          main():   26: id 0 - LOGGER_ALERT   in line 26
- logger_test_id:  EMERG:                          main():   27: id 0 - LOGGER_EMERG   in line 27
+ logger_test_id:WARNING:                          main():   23: id 1 - LOGGER_WARNING in line 23
+ logger_test_id:    ERR:                          main():   24: id 1 - LOGGER_ERR     in line 24
+ logger_test_id:   CRIT:                          main():   25: id 1 - LOGGER_CRIT    in line 25
+ logger_test_id:  ALERT:                          main():   26: id 1 - LOGGER_ALERT   in line 26
+ logger_test_id:  EMERG:                          main():   27: id 1 - LOGGER_EMERG   in line 27
