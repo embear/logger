@@ -196,10 +196,13 @@ static const logger_prefix_t LOGGER_PREFIX_NAME_LEVEL_FILE_LINE LOGGER_DEPRECATE
 static const logger_prefix_t LOGGER_PREFIX_NAME_LEVEL_FUNCTION_LINE LOGGER_DEPRECATED((LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE)) = (LOGGER_PFX_NAME | LOGGER_PFX_LEVEL | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE);
 
 /** Logger ID type. */
-typedef int16_t  logger_id_t;
+typedef int16_t logger_id_t;
 
 /** Unknown logger ID. */
 #define logger_id_unknown    ((logger_id_t)-1)
+
+/** Logger rate limit type. */
+typedef uint16_t logger_rate_limit_t;
 
 
 /** Logger function return codes */
@@ -222,7 +225,8 @@ typedef enum logger_return_e {
   LOGGER_ERR_FORMAT_INVALID    = -15,   /**< Format string is invalid. */
   LOGGER_ERR_FILE_INVALID      = -16,   /**< File string is invalid. */
   LOGGER_ERR_STRING_TOO_LONG   = -17,   /**< Given string is too long. */
-  LOGGER_ERR_STRING_INVALID    = -18    /**< Given string is invalid. */
+  LOGGER_ERR_STRING_INVALID    = -18,   /**< Given string is invalid. */
+  LOGGER_ERR_RATE_LIMIT        = -19    /**< Rate limit reached, message not printed. */
 } logger_return_t;
 
 
@@ -292,6 +296,8 @@ logger_return_t logger_disable(void);
 logger_bool_t logger_is_enabled(void);
 logger_return_t logger_prefix_set(const logger_prefix_t prefix);
 logger_prefix_t logger_prefix_get(void);
+logger_return_t logger_rate_limit_set(const logger_rate_limit_t limit);
+logger_rate_limit_t logger_rate_limit_get(void);
 logger_return_t logger_output_register(FILE *stream);
 logger_return_t logger_output_deregister(FILE *stream);
 logger_bool_t logger_output_is_registered(FILE *stream);
@@ -515,6 +521,8 @@ LOGGER_INLINE uint16_t logger_disabled_zero(void)
 #define logger_is_enabled(__id)                                              logger_disabled_false()
 #define logger_prefix_set(__prefix)                                          logger_disabled_ok()
 #define logger_prefix_get()                                                  logger_disabled_unset()
+#define logger_rate_limit_set(__limit)                                       logger_disabled_ok()
+#define logger_rate_limit_get()                                              logger_disabled_zero()
 #define logger_output_register(__stream)                                     logger_disabled_ok()
 #define logger_output_deregister(__stream)                                   logger_disabled_ok()
 #define logger_output_is_registered(__stream)                                logger_disabled_false()

@@ -243,6 +243,7 @@ Version history
 * **vX.Y.Z** *(XXXX-YY-ZZ)*
 
     * Compress repeated messages. Only print once and show the number of repeats.
+    * Add possibility to limit number of messages per second.
 
 * **v4.0.0** *(2014-03-20)*
 

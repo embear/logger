@@ -1,0 +1,22 @@
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 0
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 1
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 2
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 3
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 4
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 5
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 6
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 7
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 8
+ logger_test_id:  EMERG:                          main():   30: id 1 - LOGGER_EMERG message 9
+LOGGER SYSTEM MESSAGE: 1 message skipped because of rate limit (10 messages per second)
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 0
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 1
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 2
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 3
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 4
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 5
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 6
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 7
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 8
+ logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG message 9
+LOGGER SYSTEM MESSAGE: 10 messages skipped because of rate limit (10 messages per second)

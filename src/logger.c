@@ -193,6 +193,16 @@ typedef struct logger_repeat_s {
 } logger_repeat_t;
 
 
+/** logger rate limit structure */
+typedef struct logger_limit_s {
+  logger_rate_limit_t limit;           /**< Message rate limit (messages per second) */
+  logger_rate_limit_t counter;         /**< Message counter (messages this second) */
+  logger_bool_t       exceeded;        /**< Flag: Number of messages per second is exceeded */
+  logger_bool_t       message_request; /**< Flag: Output of message is requested */
+  logger_rate_limit_t skipped;         /**< Number of skipped messages */
+} logger_limit_t;
+
+
 static logger_bool_t     logger_initialized           = logger_false;           /**< Logger is initialized. */
 static logger_bool_t     logger_enabled               = logger_false;           /**< Logger is enabled. */
 static logger_prefix_t   logger_prefix_standard       = LOGGER_PREFIX_STANDARD; /**< Logger standard prefix */
@@ -201,6 +211,7 @@ static logger_bool_t     logger_color_message_enabled = logger_false;           
 static logger_control_t  logger_control[LOGGER_IDS_MAX + 1];                    /**< Control storage for possible IDs plus system ID. */
 static logger_output_t   logger_outputs[LOGGER_OUTPUTS_MAX];                    /**< Storage for possible outputs. */
 static logger_repeat_t   logger_repeat;                                         /**< Storage for repeated message information. */
+static logger_limit_t    logger_limit;                                          /**< Storage for rate limit information. */
 static char              logger_date[LOGGER_DATE_STRING_MAX];                   /**< Storage for date string */
 static char              logger_prefix[LOGGER_PREFIX_STRING_MAX];               /**< Storage for prefix string */
 static char              logger_message[LOGGER_MESSAGE_STRING_MAX];             /**< Storage for message string */
@@ -243,6 +254,7 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
 
 /* declarations */
 LOGGER_INLINE void logger_repeat_message(void);
+LOGGER_INLINE void logger_rate_limit_message(logger_bool_t force);
 
 
 /** ************************************************************************//**
@@ -396,6 +408,13 @@ logger_return_t logger_init(void)
     (void)memset(logger_message, 0, sizeof(logger_message));
     (void)memset(logger_prefix,  0, sizeof(logger_prefix));
 
+    /* initialize limit variables */
+    logger_limit.limit           = 0;
+    logger_limit.counter         = 0;
+    logger_limit.exceeded        = logger_false;
+    logger_limit.message_request = logger_false;
+    logger_limit.skipped         = 0;
+
     /* initialize logger system ID */
     logger_control[logger_system_id].used    = logger_true;
     logger_control[logger_system_id].count   = 1;
@@ -449,6 +468,9 @@ logger_return_t logger_disable(void)
 {
   /* outputs will change, print repeat message */
   logger_repeat_message();
+
+  /* outputs will change, print rate limit message */
+  logger_rate_limit_message(logger_true);
 
   logger_enabled = logger_false;
 
@@ -510,6 +532,37 @@ logger_prefix_t logger_prefix_get(void)
 {
   /* get global prefix */
   return(logger_prefix_standard);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Set message rate limit
+ *
+ * Set the the limit of messages per second that will be printed to outputs.
+ * specific prefix. A value of `0` disables rate limiting.
+ *
+ * \param[in]     limit   Limit to set.
+ *
+ * \return        \c LOGGER_OK if no error occurred, error code otherwise.
+ ******************************************************************************/
+logger_return_t logger_rate_limit_set(const logger_rate_limit_t limit)
+{
+  logger_limit.limit = limit;
+
+  return(LOGGER_OK);
+}
+
+
+/** ************************************************************************//**
+ * \brief  Query message rate limit
+ *
+ * Query the currently set limit of messages per second.
+ *
+ * \return        Currently set limit.
+ ******************************************************************************/
+logger_rate_limit_t logger_rate_limit_get(void)
+{
+  return(logger_limit.limit);
 }
 
 
@@ -684,6 +737,9 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
       /* outputs will change, print repeat message */
       logger_repeat_message();
 
+      /* outputs will change, print rate limit message */
+      logger_rate_limit_message(logger_true);
+
       outputs[index].count++;
       outputs[index].level     = LOGGER_UNKNOWN;
       outputs[index].use_color = logger_false;
@@ -788,6 +844,9 @@ LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t   
     if (outputs[index].count <= 0) {
       /* outputs will change, print repeat message */
       logger_repeat_message();
+
+      /* outputs will change, print rate limit message */
+      logger_rate_limit_message(logger_true);
 
       /* flush everything in this stream */
       if (type == LOGGER_OUTPUT_TYPE_FILESTREAM) {
@@ -936,6 +995,9 @@ LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t    
   if (found == logger_true) {
     /* outputs will change, print repeat message */
     logger_repeat_message();
+
+    /* outputs will change, print rate limit message */
+    logger_rate_limit_message(logger_true);
 
     /* set log level */
     outputs[index].level = level;
@@ -1400,6 +1462,9 @@ logger_return_t logger_output_flush(void)
   /* outputs will change, print repeat message */
   logger_repeat_message();
 
+  /* outputs will change, print rate limit message */
+  logger_rate_limit_message(logger_true);
+
   /* search for used global outputs */
   for (index = 0 ; index < LOGGER_OUTPUTS_MAX ; index++) {
     if (logger_outputs[index].count > 0) {
@@ -1771,6 +1836,9 @@ logger_return_t logger_id_release(const logger_id_t id)
     /* outputs will change, print repeat message */
     logger_repeat_message();
 
+    /* outputs will change, print rate limit message */
+    logger_rate_limit_message(logger_true);
+
     /* reset the ID */
     (void)memset(&logger_control[id], 0, sizeof(logger_control[id]));
 
@@ -1841,6 +1909,9 @@ logger_return_t logger_id_disable(const logger_id_t id)
 
   /* outputs will change, print repeat message */
   logger_repeat_message();
+
+  /* outputs will change, print rate limit message */
+  logger_rate_limit_message(logger_true);
 
   /* disable given ID */
   logger_control[id].enabled = logger_false;
@@ -1954,6 +2025,9 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
   /* outputs will change, print repeat message */
   logger_repeat_message();
 
+  /* outputs will change, print rate limit message */
+  logger_rate_limit_message(logger_true);
+
   /* set ID level */
   logger_control[id].level = LOGGER_ALL ^ (level - 1);
 
@@ -2014,6 +2088,9 @@ logger_return_t logger_id_level_mask_set(const logger_id_t    id,
 
   /* outputs will change, print repeat message */
   logger_repeat_message();
+
+  /* outputs will change, print rate limit message */
+  logger_rate_limit_message(logger_true);
 
   /* set ID level */
   logger_control[id].level = level;
@@ -3723,6 +3800,97 @@ LOGGER_INLINE void logger_repeat_message(void)
 
 
 /** ************************************************************************//**
+ * \brief  Print rate limit message message.
+ *
+ * When a message is not printed because of a rate limit print the number of
+ * skipped messages.
+ ******************************************************************************/
+LOGGER_INLINE void logger_rate_limit_message(logger_bool_t force)
+{
+  /* check if message should be printed */
+  if ((logger_limit.message_request == logger_true) ||
+      ((force == logger_true) && (logger_limit.skipped > 0))) {
+    char limit_prefix[LOGGER_PREFIX_STRING_MAX];
+    char limit_message[LOGGER_MESSAGE_STRING_MAX];
+
+    /* generate system empty prefix */
+    strncpy(limit_prefix, "LOGGER SYSTEM MESSAGE: ", LOGGER_PREFIX_STRING_MAX);
+
+    /* generate string that contains number of repeats */
+    if (logger_limit.skipped == 1) {
+      (void)snprintf(limit_message, sizeof(limit_message), "%" PRIu16 " message skipped because of rate limit (%" PRIu16 " messages per second)", logger_limit.skipped, logger_limit.limit);
+    }
+    else {
+      (void)snprintf(limit_message, sizeof(limit_message), "%" PRIu16 " messages skipped because of rate limit (%" PRIu16 " messages per second)", logger_limit.skipped, logger_limit.limit);
+    }
+
+    /* output message */
+    (void)logger_output(logger_system_id, LOGGER_EMERG, logger_control[logger_system_id].unified_outputs, LOGGER_UNIFIED_OUTPUTS_MAX, limit_prefix, limit_message);
+
+    /* reset message request */
+    logger_limit.message_request = logger_false;
+
+    /* reset skip counter */
+    logger_limit.skipped = 0;
+  }
+}
+
+
+/** ************************************************************************//**
+ * \brief  Check if rate limit is exceeded.
+ *
+ * Check if rate limit is exceeded and return `logger_true` in that case.
+ * Additionally request a rate limit message.
+ *
+ * \return        \c logger_true if rate limit is exceeded.
+ ******************************************************************************/
+LOGGER_INLINE logger_bool_t logger_check_rate_limit(void)
+{
+  static time_t previous_time = 0;
+  time_t        current_time;
+  time_t        diff_time;
+
+  /* get current time */
+  current_time = time(NULL);
+
+  /* time difference */
+  diff_time = current_time - previous_time;
+
+  /* check if time has changed */
+  if (diff_time != 0) {
+    if (logger_limit.exceeded == logger_true) {
+      /* request message printing */
+      logger_limit.message_request = logger_true;
+
+      /* reset counter */
+      logger_limit.counter = 0;
+    }
+
+    /* update previous time */
+    previous_time = current_time;
+  }
+
+  /* increment counter */
+  logger_limit.counter++;
+
+  /* check if limit is exceeded */
+  if ((logger_limit.limit > 0) &&
+      ((logger_limit.counter / (diff_time + 1)) > logger_limit.limit)) {
+    logger_limit.exceeded = logger_true;
+
+      /* add number of skipped messages */
+      logger_limit.skipped++;
+
+  }
+  else {
+    logger_limit.exceeded = logger_false;
+  }
+
+  return(logger_limit.exceeded);
+}
+
+
+/** ************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all outputs registered using a printf()-like format
@@ -3781,6 +3949,11 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
     return(LOGGER_ERR_FORMAT_INVALID);
   }
 
+  /* GUARD: check rate limit */
+  if (logger_check_rate_limit() == logger_true) {
+    return(LOGGER_ERR_RATE_LIMIT);
+  }
+
   /* check if ID is enabled and level is enabled */
   if ((logger_enabled == logger_true) &&
       (logger_control[id].enabled == logger_true) &&
@@ -3820,6 +3993,9 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
 
       /* output repeat message */
       logger_repeat_message();
+
+      /* output rate limit message */
+      logger_rate_limit_message(logger_false);
 
       /* initialize message pointer */
       message_part = logger_message;
