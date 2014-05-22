@@ -259,7 +259,7 @@ LOGGER_INLINE void logger_repeat_message(void);
 LOGGER_INLINE void logger_rate_limit_message(logger_bool_t force);
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Format escape sequence for unix consoles.
  *
  * Create a string containing a escape sequence constructed from given
@@ -375,7 +375,7 @@ static logger_return_t logger_color_console_format(char                     *str
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Version of logger.
  *
  * Get the version of logger for which it was compiled. Needed to check for
@@ -389,7 +389,7 @@ logger_version_t logger_version(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Initialize logger.
  *
  * Initialize logger internal structures. Needs to be called once before any
@@ -431,7 +431,7 @@ logger_return_t logger_init(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the current initialization state
  *
  * Query the current initialization state of logger.
@@ -444,7 +444,7 @@ logger_bool_t logger_is_initialized(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable logger.
  *
  * Enable logger globally for all IDs and all outputs.
@@ -459,7 +459,7 @@ logger_return_t logger_enable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable logger.
  *
  * Disable logger globally for all IDs and all outputs.
@@ -480,7 +480,7 @@ logger_return_t logger_disable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the current enable state of logger.
  *
  * Query the current global enable state of logger.
@@ -493,7 +493,7 @@ logger_bool_t logger_is_enabled()
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set global logging prefix.
  *
  * Set the global default prefix. This prefix is used for all IDs without
@@ -523,7 +523,7 @@ logger_return_t logger_prefix_set(const logger_prefix_t prefix)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query global logging prefix,
  *
  * Query the currently set prefix for the given logging ID.
@@ -537,7 +537,7 @@ logger_prefix_t logger_prefix_get(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set message rate limit
  *
  * Set the the limit of messages per second that will be printed to outputs.
@@ -555,7 +555,7 @@ logger_return_t logger_rate_limit_set(const logger_rate_limit_t limit)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query message rate limit
  *
  * Query the currently set limit of messages per second.
@@ -568,7 +568,7 @@ logger_rate_limit_t logger_rate_limit_get(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Unify outputs for IDs
  *
  * Merge all possible outputs of all IDs into one list. During merge make every
@@ -657,7 +657,7 @@ logger_return_t logger_output_common_unify(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Register an output to a list of outputs.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -665,7 +665,7 @@ logger_return_t logger_output_common_unify(void)
  * argument. The default logging level is set to \c LOGGER_UNKNOWN thus no
  * messages will appear on this stream.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -780,12 +780,12 @@ LOGGER_INLINE logger_return_t logger_output_common_register(logger_output_t     
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Deregister an output from a list of outputs.
  *
  * Remove given output from list of outputs.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -872,12 +872,12 @@ LOGGER_INLINE logger_return_t logger_output_common_deregister(logger_output_t   
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Search an output in a list of outputs.
  *
  * The given output is searched in the given list of outputs.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -932,13 +932,13 @@ LOGGER_INLINE logger_bool_t logger_output_common_is_registered(logger_output_t  
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for output in a list of outputs.
  *
  * Set the minimum logging level for given output. Only log messages
  * equal or above the given level will be printed to the given output.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -1015,12 +1015,12 @@ LOGGER_INLINE logger_return_t logger_output_common_level_set(logger_output_t    
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for output stream in a list of outputs.
  *
  * Query the currently set minimum level for the given logging output stream.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -1075,12 +1075,12 @@ LOGGER_INLINE logger_level_t logger_output_common_level_get(logger_output_t     
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Modify the output color setting.
  *
  * Set the color setting for a given output to the given state.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -1141,14 +1141,14 @@ LOGGER_INLINE logger_return_t logger_output_common_color(logger_output_t        
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the output color setting.
  *
  * Query the color setting for a given output.
  *
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
- * \param[inout]  outputs   List of logger outputs.
+ * \param[in,out] outputs   List of logger outputs.
  * \param[in]     size      Number of elements in list.
  * \param[in]     type      Type of output.
  * \param[in]     stream    Opened file stream.
@@ -1203,7 +1203,7 @@ LOGGER_INLINE logger_bool_t logger_output_common_color_is_enabled(logger_output_
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Register a global output stream.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -1232,7 +1232,7 @@ logger_return_t logger_output_register(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Deregister a global output stream.
  *
  * Remove given file stream from list of outputs.
@@ -1259,7 +1259,7 @@ logger_return_t logger_output_deregister(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Search an output stream in list of global outputs.
  *
  * The given file stream is searched in the list of global outputs.
@@ -1279,7 +1279,7 @@ logger_bool_t logger_output_is_registered(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for global output stream.
  *
  * Set the minimum logging level for given output stream. Only log messages
@@ -1309,7 +1309,7 @@ logger_return_t logger_output_level_set(FILE                 *stream,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for global output stream.
  *
  * Query the currently set minimum level for the given logging output stream.
@@ -1334,7 +1334,7 @@ logger_level_t logger_output_level_get(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level mask for global output stream.
  *
  * Set a logging level mask for given output stream. Only log messages with
@@ -1363,7 +1363,7 @@ logger_return_t logger_output_level_mask_set(FILE                 *stream,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level mask for global output stream.
  *
  * Query the currently set level mask for the given logging output stream.
@@ -1387,7 +1387,7 @@ logger_level_t logger_output_level_mask_get(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable the global output stream color setting.
  *
  * Enable the color setting for a given output stream.
@@ -1408,7 +1408,7 @@ logger_return_t logger_output_color_enable(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable the global output stream color setting.
  *
  * Disable the color setting for a given output stream.
@@ -1429,7 +1429,7 @@ logger_return_t logger_output_color_disable(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the global output stream color setting.
  *
  * Query the color setting for a given output stream.
@@ -1449,7 +1449,7 @@ logger_bool_t logger_output_color_is_enabled(FILE *stream)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Flush all output streams.
  *
  * Force a flush of all output streams.
@@ -1487,7 +1487,7 @@ logger_return_t logger_output_flush(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Register a global output function.
  *
  * The user provided function must take a single string argument. The default
@@ -1516,7 +1516,7 @@ logger_return_t logger_output_function_register(logger_output_function_t functio
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Deregister a global output function:
  *
  * Remove given output function from list of outputs.
@@ -1543,7 +1543,7 @@ logger_return_t logger_output_function_deregister(logger_output_function_t funct
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Search a global output function in a list of global outputs.
  *
  * The given file function is searched in the list of global outputs.
@@ -1563,7 +1563,7 @@ logger_bool_t logger_output_function_is_registered(logger_output_function_t func
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for global output function.
  *
  * Set the minimum logging level for given output function. Only for log
@@ -1593,7 +1593,7 @@ logger_return_t logger_output_function_level_set(logger_output_function_t functi
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for global output function.
  *
  * Query the currently set minimum level for the given logging output function.
@@ -1618,7 +1618,7 @@ logger_level_t logger_output_function_level_get(logger_output_function_t functio
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level mask for global output function.
  *
  * Set a logging level mask for given output function. Only for log messages
@@ -1647,7 +1647,7 @@ logger_return_t logger_output_function_level_mask_set(logger_output_function_t f
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level mask for global output function.
  *
  * Query the currently set level mask for the given logging output function.
@@ -1671,7 +1671,7 @@ logger_level_t logger_output_function_level_mask_get(logger_output_function_t fu
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable the global output function color setting.
  *
  * Enable the color setting for a given output function.
@@ -1692,7 +1692,7 @@ logger_return_t logger_output_function_color_enable(logger_output_function_t fun
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable the global output function color setting.
  *
  * Enable the color setting for a given output function.
@@ -1713,7 +1713,7 @@ logger_return_t logger_output_function_color_disable(logger_output_function_t fu
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the global output function color setting.
  *
  * Query the color setting for a given output function.
@@ -1733,7 +1733,7 @@ logger_bool_t logger_output_function_color_is_enabled(logger_output_function_t f
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Request a logging ID.
  *
  * Request a ID for later use with calls to \c logger(). If an ID with the same
@@ -1812,7 +1812,7 @@ logger_id_t logger_id_request(const char *name)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Release a logging ID.
  *
  * Release a ID. After this call logging to this ID is not possible anymore.
@@ -1864,7 +1864,7 @@ logger_return_t logger_id_release(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable a logging ID for output.
  *
  * Enable given logging ID for all outputs.
@@ -1890,7 +1890,7 @@ logger_return_t logger_id_enable(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable a logger ID for output.
  *
  * Disable given logging ID for all outputs.
@@ -1922,7 +1922,7 @@ logger_return_t logger_id_disable(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the current enable state of ID.
  *
  * Query the current enable state of given logging ID.
@@ -1946,7 +1946,7 @@ logger_bool_t logger_id_is_enabled(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query if a given level for a given ID would generate any output
  *
  * Query if a call to logger() for the given ID and level would generate any
@@ -1996,7 +1996,7 @@ logger_bool_t logger_id_generates_output(const logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for ID.
  *
  * Set the minimum logging level for given ID. Only log messages equal or above
@@ -2037,7 +2037,7 @@ logger_return_t logger_id_level_set(const logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for ID.
  *
  * Query the currently set minimum level for the given logging ID.
@@ -2061,7 +2061,7 @@ logger_level_t logger_id_level_get(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level mask for ID.
  *
  * Set a logging level mask for given ID. Only log messages with a level set in
@@ -2101,7 +2101,7 @@ logger_return_t logger_id_level_mask_set(const logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for ID.
  *
  * Query the currently set minimum level for the given logging ID.
@@ -2124,7 +2124,7 @@ logger_level_t logger_id_level_mask_get(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging prefix for ID.
  *
  * Set the prefix for given ID. All messages for this ID will get this prefix
@@ -2159,7 +2159,7 @@ logger_return_t logger_id_prefix_set(const logger_id_t     id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging prefix for ID.
  *
  * Query the currently set prefix for the given logging ID.
@@ -2183,7 +2183,7 @@ logger_prefix_t logger_id_prefix_get(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query name for id.
  *
  * Query the name for the given logging ID.
@@ -2207,7 +2207,7 @@ const char *logger_id_name_get(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Register an id specific output stream.
  *
  * The given file stream may be on of \c stdout, \c stderr or a file stream
@@ -2259,7 +2259,7 @@ logger_return_t logger_id_output_register(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Deregister an id specific output stream.
  *
  * Remove given file stream from list of outputs.
@@ -2303,7 +2303,7 @@ logger_return_t logger_id_output_deregister(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Search an output stream in id specific outputs.
  *
  * The given file stream is searched in of id specific outputs.
@@ -2333,7 +2333,7 @@ logger_bool_t logger_id_output_is_registered(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for id specific output stream.
  *
  * Set the minimum logging level for given output stream. Only log messages
@@ -2373,7 +2373,7 @@ logger_return_t logger_id_output_level_set(const logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for id specific output stream.
  *
  * Query the currently set minimum level for the given logging output stream.
@@ -2408,7 +2408,7 @@ logger_level_t logger_id_output_level_get(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level mask for id specific output stream.
  *
  * Set a logging level mask for given output stream. Only log messages
@@ -2447,7 +2447,7 @@ logger_return_t logger_id_output_level_mask_set(const logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level mask for id specific output stream.
  *
  * Query the currently set level mask for the given logging output stream.
@@ -2481,7 +2481,7 @@ logger_level_t logger_id_output_level_mask_get(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable the id specific output stream color setting.
  *
  * Enable the color setting for a given output stream.
@@ -2512,7 +2512,7 @@ logger_return_t logger_id_output_color_enable(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable the id specific output stream color setting.
  *
  * Disable the color setting for a given output stream.
@@ -2543,7 +2543,7 @@ logger_return_t logger_id_output_color_disable(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the id specific output stream color setting.
  *
  * Query the color setting for a given output stream.
@@ -2565,7 +2565,7 @@ logger_bool_t logger_id_output_color_is_enabled(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Register an id specific output stream.
  *
  * The user provided function must take a single string argument. The default
@@ -2617,7 +2617,7 @@ logger_return_t logger_id_output_function_register(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Deregister an id specific output function.
  *
  * Remove given file function from list of outputs.
@@ -2661,7 +2661,7 @@ logger_return_t logger_id_output_function_deregister(const logger_id_t        id
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Search an output function in id specific outputs.
  *
  * The given output function is searched in of id specific outputs.
@@ -2691,7 +2691,7 @@ logger_bool_t logger_id_output_function_is_registered(const logger_id_t        i
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level for id specific output function.
  *
  * Set the minimum logging level for given output function. Only log messages
@@ -2731,7 +2731,7 @@ logger_return_t logger_id_output_function_level_set(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level for id specific output function.
  *
  * Query the currently set minimum level for the given logging output function.
@@ -2766,7 +2766,7 @@ logger_level_t logger_id_output_function_level_get(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Set logging level mask for id specific output function.
  *
  * Set a logging level mask for given output function. Only for log messages
@@ -2805,7 +2805,7 @@ logger_return_t logger_id_output_function_level_mask_set(const logger_id_t      
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query logging level mask for id specific output function.
  *
  * Query the currently set minimum level for the given logging output function.
@@ -2839,7 +2839,7 @@ logger_level_t logger_id_output_function_level_mask_get(const logger_id_t       
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable the id specific output function color setting.
  *
  * Enable the color setting for a given output function.
@@ -2870,7 +2870,7 @@ logger_return_t logger_id_output_function_color_enable(const logger_id_t        
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable the id specific output function color setting.
  *
  * Disable the color setting for a given output function.
@@ -2901,7 +2901,7 @@ logger_return_t logger_id_output_function_color_disable(const logger_id_t       
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the id specific output function color setting.
  *
  * Query the color setting for a given output function.
@@ -2931,7 +2931,7 @@ logger_bool_t logger_id_output_function_color_is_enabled(const logger_id_t      
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Change terminal text color and attributes.
  *
  * Change text color and attributes for all messages of given ID when they are
@@ -2969,7 +2969,7 @@ logger_return_t logger_id_color_console_set(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Change terminal text color and attributes.
  *
  * Change text color and attributes for all messages of given ID when they are
@@ -3012,7 +3012,7 @@ logger_return_t logger_id_color_string_set(const logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Reset terminal text color and attributes.
  *
  * Reset text color and attributes of given ID back to defaults.
@@ -3040,7 +3040,7 @@ logger_return_t logger_id_color_reset(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable logger prefix colors.
  *
  * Enable logger prefix color output.
@@ -3055,7 +3055,7 @@ logger_return_t logger_color_prefix_enable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable logger prefix colors.
  *
  * Disable logger prefix color output.
@@ -3070,7 +3070,7 @@ logger_return_t logger_color_prefix_disable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the current enable state of logger prefix colors.
  *
  * Query the current prefix color enable state of logger.
@@ -3083,7 +3083,7 @@ logger_bool_t logger_color_prefix_is_enabled(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Change terminal text color and attributes for prefix.
  *
  * Change text color and attributes for message prefix with given level when
@@ -3121,7 +3121,7 @@ logger_return_t logger_color_prefix_console_set(const logger_level_t     level,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Change text color and attributes for prefix.
  *
  * Change text color and attributes for message prefix with given level when
@@ -3164,7 +3164,7 @@ logger_return_t logger_color_prefix_string_set(const logger_level_t level,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Change terminal text color and attributes for prefix.
  *
  * Reset text color and attributes for message prefix to console default escape
@@ -3180,7 +3180,7 @@ logger_return_t logger_color_prefix_reset(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Enable logger message colors.
  *
  * Enable logger message color output.
@@ -3195,7 +3195,7 @@ logger_return_t logger_color_message_enable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Disable logger message colors.
  *
  * Disable logger message color output.
@@ -3210,7 +3210,7 @@ logger_return_t logger_color_message_disable(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query the current enable state of logger message colors.
  *
  * Query the current color message enable state of logger.
@@ -3223,7 +3223,7 @@ logger_bool_t logger_color_message_is_enabled(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Query name for level.
  *
  * Query the name for the given logging level.
@@ -3249,7 +3249,7 @@ const char *logger_level_name_get(const logger_level_t level)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  strip path from file name.
  *
  * Strip path from a fully qualified file name. Returns pointer to string part
@@ -3278,7 +3278,7 @@ LOGGER_INLINE const char *logger_strip_path(const char *file)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Format date string
  *
  * Print date string into provided memory.
@@ -3328,7 +3328,7 @@ LOGGER_INLINE logger_return_t logger_format_date(char   *date,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Format message prefix
  *
  * Print the prefix into provided memory.
@@ -3448,7 +3448,7 @@ LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  String copy
  *
  * Copies string from `src` to `dest` until end od `src` is reached or `n`
@@ -3481,7 +3481,7 @@ LOGGER_INLINE size_t logger_string_copy(char       *dest,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Format log message.
  *
  * Print message into provides memory.
@@ -3543,7 +3543,7 @@ LOGGER_INLINE logger_return_t logger_format_message(logger_id_t id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Output log messages to streams
  *
  * Print the log message to all outputs registered. It is possible to do
@@ -3765,7 +3765,7 @@ LOGGER_INLINE logger_return_t logger_output(logger_id_t     id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Print repeat message.
  *
  * When a message repeats several times the message is only printed once by
@@ -3801,7 +3801,7 @@ LOGGER_INLINE void logger_repeat_message(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Print rate limit message message.
  *
  * When a message is not printed because of a rate limit print the number of
@@ -3838,7 +3838,7 @@ LOGGER_INLINE void logger_rate_limit_message(logger_bool_t force)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Check if rate limit is exceeded.
  *
  * Check if rate limit is exceeded and return `logger_true` in that case.
@@ -3892,7 +3892,7 @@ LOGGER_INLINE logger_bool_t logger_check_rate_limit(void)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all outputs registered using a printf()-like format
@@ -4029,7 +4029,7 @@ LOGGER_INLINE logger_return_t logger_implementation_common(logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Print log message.
  *
  * Print the log message to all outputs registered using a printf()-like format
@@ -4070,7 +4070,7 @@ logger_return_t logger_implementation(logger_id_t    id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Print log message with variable argument list.
  *
  * Print the log message to all outputs registered using a printf()-like format
@@ -4112,7 +4112,7 @@ logger_return_t logger_implementation_va(logger_id_t    id,
 /* helper functions */
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Convert logger levels to index for level arrays.
  *
  * Convert logger levels to an index that can be used to access a level based
@@ -4190,7 +4190,7 @@ size_t logger_level_to_index(const logger_level_t level)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  Convert logger level index to logger level.
  *
  * Convert logger level index to an level that can be used to set a level for
@@ -4267,7 +4267,7 @@ logger_level_t logger_index_to_level(const size_t index)
 /* legacy functions */
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
  *
  * See logger_id_color_console_set().
@@ -4288,7 +4288,7 @@ logger_return_t logger_id_color_set(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  *LEGACY FUNCTION* Change terminal text color and attributes.
  *
  * See logger_id_color_console_set().
@@ -4309,7 +4309,7 @@ logger_return_t logger_color_set(const logger_id_t        id,
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  *LEGACY FUNCTION* Reset terminal text color and attributes.
  *
  * Reset text color and attributes of given ID back to defaults. Use
@@ -4325,7 +4325,7 @@ logger_return_t logger_color_reset(const logger_id_t id)
 }
 
 
-/** ************************************************************************//**
+/***************************************************************************//**
  * \brief  *LEGACY FUNCTION* Change terminal text color and attributes for prefix.
  *
  * See logger_color_prefix_console_set()
