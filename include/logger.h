@@ -28,6 +28,25 @@ extern "C" {
 /** Preprocessor string conversion helper */
 #define LOGGER_STRINGIFY(x)     LOGGER_STRINGIFY_(x)
 
+/** Preprocessor defines for C standard of current compiler */
+#if defined(__STDC__)
+#define LOGGER_STANDARD_C_1989
+#if defined(__STDC_VERSION__)
+#define LOGGER_STANDARD_C_1990
+#if (__STDC_VERSION__ >= 199409L)
+#define LOGGER_STANDARD_C_1994
+#endif /* (__STDC_VERSION__ >= 199409L) */
+#if (__STDC_VERSION__ >= 199901L)
+#define LOGGER_STANDARD_C_1999
+#endif /* (__STDC_VERSION__ >= 199901L) */
+#endif /* defined(__STDC_VERSION__) */
+#endif /* defined(__STDC__) */
+
+/** __FUNCTION__ macro for C99 compilers */
+#ifdef LOGGER_STANDARD_C_1999
+#define __FUNCTION__ __func__
+#endif
+
 /** Deprecation macro */
 #if __GNUC__
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
