@@ -1,8 +1,8 @@
- logger_test_id:    ERR:                          main():   39: id 1 - LOGGER_ERR     in line 39
- logger_test_id:   CRIT:                          main():   40: id 1 - LOGGER_CRIT    in line 40
- logger_test_id:  ALERT:                          main():   41: id 1 - LOGGER_ALERT   in line 41
- logger_test_id:  EMERG:                          main():   42: id 1 - LOGGER_EMERG   in line 42
-logger_test_id2:    ERR:                          main():   47: id 2 - LOGGER_ERR     in line 47
-logger_test_id2:   CRIT:                          main():   48: id 2 - LOGGER_CRIT    in line 48
-logger_test_id2:  ALERT:                          main():   49: id 2 - LOGGER_ALERT   in line 49
-logger_test_id2:  EMERG:                          main():   50: id 2 - LOGGER_EMERG   in line 50
+logger_test_id :ERR    :main                          :39   : id 1 - LOGGER_ERR     in line 39
+logger_test_id :CRIT   :main                          :40   : id 1 - LOGGER_CRIT    in line 40
+logger_test_id :ALERT  :main                          :41   : id 1 - LOGGER_ALERT   in line 41
+logger_test_id :EMERG  :main                          :42   : id 1 - LOGGER_EMERG   in line 42
+logger_test_id2:ERR    :main                          :47   : id 2 - LOGGER_ERR     in line 47
+logger_test_id2:CRIT   :main                          :48   : id 2 - LOGGER_CRIT    in line 48
+logger_test_id2:ALERT  :main                          :49   : id 2 - LOGGER_ALERT   in line 49
+logger_test_id2:EMERG  :main                          :50   : id 2 - LOGGER_EMERG   in line 50

@@ -1,1 +1,1 @@
- logger_test_id:  EMERG:                          main():   22: id 1 - LOGGER_EMERG   in line 22
+logger_test_id :EMERG  :main                          :22   : id 1 - LOGGER_EMERG   in line 22

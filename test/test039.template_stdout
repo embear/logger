@@ -1,11 +1,11 @@
- logger_test_id:  EMERG:                          main():   28: id 1 - LOGGER_EMERG repeated message
-                                                                  -> previous message repeated 1 more time
- logger_test_id:  EMERG:                          main():   32: id 1 - LOGGER_EMERG new message
- logger_test_id:  EMERG:                          main():   36: id 1 - LOGGER_EMERG repeated message
-                                                                  -> previous message repeated 9 more times
- logger_test_id:  EMERG:                          main():   40: id 1 - LOGGER_EMERG new message
- logger_test_id:  EMERG:                          main():   44: LOGGER_EMERG message
-                                                                  -> previous message repeated 9 more times
-logger_test_id2:  EMERG:                          main():   48: LOGGER_EMERG message
- logger_test_id:  EMERG:                          main():   52: id 1 - LOGGER_EMERG repeated message
-                                                                  -> previous message repeated 9 more times
+logger_test_id :EMERG  :main                          :28   : id 1 - LOGGER_EMERG repeated message
+                                                                -> previous message repeated 1 more time
+logger_test_id :EMERG  :main                          :32   : id 1 - LOGGER_EMERG new message
+logger_test_id :EMERG  :main                          :36   : id 1 - LOGGER_EMERG repeated message
+                                                                -> previous message repeated 9 more times
+logger_test_id :EMERG  :main                          :40   : id 1 - LOGGER_EMERG new message
+logger_test_id :EMERG  :main                          :44   : LOGGER_EMERG message
+                                                                -> previous message repeated 9 more times
+logger_test_id2:EMERG  :main                          :48   : LOGGER_EMERG message
+logger_test_id :EMERG  :main                          :52   : id 1 - LOGGER_EMERG repeated message
+                                                                -> previous message repeated 9 more times

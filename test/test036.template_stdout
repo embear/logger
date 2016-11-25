@@ -1,10 +1,10 @@
- logger_test_id:WARNING:                          main():   40: id 1 - LOGGER_WARNING in line 40 - value 32
- logger_test_id:    ERR:                          main():   41: id 1 - LOGGER_ERR     in line 41 - value 32
- logger_test_id:   CRIT:                          main():   42: id 1 - LOGGER_CRIT    in line 42 - value 32
- logger_test_id:  ALERT:                          main():   43: id 1 - LOGGER_ALERT   in line 43 - value 32
- logger_test_id:  EMERG:                          main():   44: id 1 - LOGGER_EMERG   in line 44 - value 32
- logger_test_id:WARNING:                logger_wrapper():   16: id 1 - LOGGER_WARNING in line 49 - value 32
- logger_test_id:    ERR:                logger_wrapper():   16: id 1 - LOGGER_ERR     in line 50 - value 32
- logger_test_id:   CRIT:                logger_wrapper():   16: id 1 - LOGGER_CRIT    in line 51 - value 32
- logger_test_id:  ALERT:                logger_wrapper():   16: id 1 - LOGGER_ALERT   in line 52 - value 32
- logger_test_id:  EMERG:                logger_wrapper():   16: id 1 - LOGGER_EMERG   in line 53 - value 32
+logger_test_id :WARNING:main                          :40   : id 1 - LOGGER_WARNING in line 40 - value 32
+logger_test_id :ERR    :main                          :41   : id 1 - LOGGER_ERR     in line 41 - value 32
+logger_test_id :CRIT   :main                          :42   : id 1 - LOGGER_CRIT    in line 42 - value 32
+logger_test_id :ALERT  :main                          :43   : id 1 - LOGGER_ALERT   in line 43 - value 32
+logger_test_id :EMERG  :main                          :44   : id 1 - LOGGER_EMERG   in line 44 - value 32
+logger_test_id :WARNING:logger_wrapper                :16   : id 1 - LOGGER_WARNING in line 49 - value 32
+logger_test_id :ERR    :logger_wrapper                :16   : id 1 - LOGGER_ERR     in line 50 - value 32
+logger_test_id :CRIT   :logger_wrapper                :16   : id 1 - LOGGER_CRIT    in line 51 - value 32
+logger_test_id :ALERT  :logger_wrapper                :16   : id 1 - LOGGER_ALERT   in line 52 - value 32
+logger_test_id :EMERG  :logger_wrapper                :16   : id 1 - LOGGER_EMERG   in line 53 - value 32

@@ -97,25 +97,25 @@
 #define LOGGER_FORMAT_STRFTIME         "%Y-%m-%d %H:%M:%S"
 
 /** Format string for prefix date string */
-#define LOGGER_FORMAT_STRING_DATE      "%19s"
+#define LOGGER_FORMAT_STRING_DATE_WIDTH (19)
 
 /** Format string for prefix file name */
-#define LOGGER_FORMAT_STRING_FILE      "%30s"
+#define LOGGER_FORMAT_STRING_FILE_WIDTH (30)
 
 /** Format string for prefix function name */
-#define LOGGER_FORMAT_STRING_FUNCTION  "%30s()"
+#define LOGGER_FORMAT_STRING_FUNCTION_WIDTH (30)
 
 /** Format string for prefix line number */
-#define LOGGER_FORMAT_STRING_LINE      "%5d"
+#define LOGGER_FORMAT_STRING_LINE_WIDTH (5)
 
 /** Format string for prefix logger id name */
-#define LOGGER_FORMAT_STRING_NAME      "%15s"
+#define LOGGER_FORMAT_STRING_NAME_WIDTH (15)
 
 /** Format string for prefix logger id level name */
-#define LOGGER_FORMAT_STRING_LEVEL     "%7s"
+#define LOGGER_FORMAT_STRING_LEVEL_WIDTH (7)
 
-/** Format string for field separator */
-#define LOGGER_FORMAT_STRING_SEPARATOR ":"
+/** Format string for field separator (one character!) */
+#define LOGGER_FORMAT_STRING_SEPARATOR ':'
 
 /** Reset attribute string. */
 #define LOGGER_ATTR_STRING_RESET     "0"
@@ -140,6 +140,18 @@
 
 /** Helper for number of elements in an array */
 #define LOGGER_ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
+
+/** Helper for determine the minimum of to numbers */
+#define LOGGER_NUMERIC_MIN(a, b) ((a) < (b) ? (a) : (b))
+
+/** Helper for determine the maximum of to numbers */
+#define LOGGER_NUMERIC_MAX(a, b) ((a) > (b) ? (a) : (b))
+
+/** Helper to limit a number to a given range */
+#define LOGGER_NUMERIC_LIMIT(a, lower, upper) (LOGGER_NUMERIC_MIN(LOGGER_NUMERIC_MAX((a), (lower)), (upper)))
+
+/** Helper to convert a number to its absolute value */
+#define LOGGER_NUMERIC_ABS(a) ((a) < 0 ? (-a) : (a))
 
 /** Logger output type */
 typedef enum logger_output_type_e {
@@ -253,10 +265,13 @@ static logger_color_string_t logger_level_colors_console[LOGGER_MAX] =
   { "\x1B[0;30;41m", "\x1B[0m" }  /* Prefix color string for level "EMERG"   -> LOGGER_BG_RED,     LOGGER_FG_BLACK, LOGGER_ATTR_RESET */
 };
 
+static char logger_int_to_char[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
 /* declarations */
 LOGGER_INLINE void logger_repeat_message(void);
 LOGGER_INLINE void logger_rate_limit_message(logger_bool_t force);
+LOGGER_INLINE size_t logger_string_copy(char *dest, const char *src, size_t n);
+LOGGER_INLINE size_t logger_prefix_concatenate(char *dest, const char *dest_end, const char *src, size_t width);
 
 
 /***************************************************************************//**
@@ -3354,9 +3369,9 @@ LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
   /* do prefix stuff only if needed */
   if ((logger_control[id].append == logger_false) &&
       (logger_control[id].prefix != LOGGER_PFX_EMPTY)) {
-    int16_t         characters = 0;
-    size_t          rev_idx;
     logger_prefix_t local_prefix;
+    char * write_ptr = prefix;
+    char * end_ptr   = prefix + prefix_size;
 
     if (logger_control[id].prefix & LOGGER_PFX_UNSET) {
       local_prefix = logger_prefix_standard;
@@ -3366,77 +3381,88 @@ LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
     }
 
     /* prefix date */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_DATE) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_DATE LOGGER_FORMAT_STRING_SEPARATOR,
-                             logger_date);
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             logger_date,
+                                             LOGGER_FORMAT_STRING_DATE_WIDTH);
     }
 
     /* prefix id name */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_NAME) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_NAME LOGGER_FORMAT_STRING_SEPARATOR,
-                             logger_id_name_get(id));
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             logger_id_name_get(id),
+                                             LOGGER_FORMAT_STRING_NAME_WIDTH);
     }
 
     /* prefix level */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_LEVEL) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_LEVEL LOGGER_FORMAT_STRING_SEPARATOR,
-                             logger_level_name_get(level));
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             logger_level_name_get(level),
+                                             LOGGER_FORMAT_STRING_LEVEL_WIDTH);
     }
 
     /* prefix file name */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_FILE) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_FILE LOGGER_FORMAT_STRING_SEPARATOR,
-                             logger_strip_path(file));
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             logger_strip_path(file),
+                                             LOGGER_FORMAT_STRING_FILE_WIDTH);
     }
 
     /* prefix function name */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_FUNCTION) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_FUNCTION LOGGER_FORMAT_STRING_SEPARATOR,
-                             function);
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             function,
+                                             LOGGER_FORMAT_STRING_FUNCTION_WIDTH);
     }
 
     /* prefix line number */
-    if ((characters < prefix_size) &&
+    if ((write_ptr < end_ptr) &&
         ((local_prefix & LOGGER_PFX_LINE) != 0)) {
-      characters += snprintf(prefix + characters,
-                             prefix_size - characters,
-                             LOGGER_FORMAT_STRING_LINE LOGGER_FORMAT_STRING_SEPARATOR,
-                             line);
+      char linenumber[10];
+      char *ptr = &linenumber[LOGGER_ELEMENTS(linenumber) - 1];
+
+      /* convert line number to string, starting with the lowest digit at the end of the string */
+      *ptr = '\0';
+      while (line > 0) {
+        int idx;
+
+        idx  = line % 10;
+        line = line / 10;
+        *(--ptr) = logger_int_to_char[idx];
+      }
+
+      write_ptr += logger_prefix_concatenate(write_ptr,
+                                             end_ptr,
+                                             ptr,
+                                             LOGGER_FORMAT_STRING_LINE_WIDTH);
     }
 
     /* append ' ' to prefix string */
-    if (characters + 1 < prefix_size) {
-      prefix[characters++] = ' ';
-      prefix[characters++] = '\0';
+    if (write_ptr < end_ptr) {
+      *(write_ptr++) = ' ';
+    }
+    if (write_ptr < end_ptr) {
+      *(write_ptr++) = '\0';
     }
 
-    /* set rev_idx to the last valid character in string */
-    rev_idx = prefix_size - 1;
-
-    /* make sure message is '\0' terminated */
-    prefix[rev_idx--] = '\0';
-
-    /* check if there was enough space in storage */
-    if (characters >= prefix_size) {
-      prefix[rev_idx--] = ' ';
-      prefix[rev_idx--] = '.';
-      prefix[rev_idx--] = '.';
-      prefix[rev_idx--] = '.';
+    /* terminate prefix string if it is too small */
+    if (write_ptr == end_ptr &&
+        *(write_ptr - 1) != '\0') {
+      *(--write_ptr) = '\0';
+      *(--write_ptr) = ' ';
+      *(--write_ptr) = '.';
+      *(--write_ptr) = '.';
+      *(--write_ptr) = '.';
     }
   }
   else {
@@ -3451,15 +3477,16 @@ LOGGER_INLINE logger_return_t logger_format_prefix(logger_id_t    id,
 /***************************************************************************//**
  * \brief  String copy
  *
- * Copies string from `src` to `dest` until end od `src` is reached or `n`
+ * Copies string from `src` to `dest` until end on `src` is reached or `n`
  * characters are copied. The string in `dest` is '\0' terminated if length of
  * string in `src` is less than `n`. Otherwise the string will *not* be
  * terminated. The function returns the number of characters copied to `dest`
  * not including the '\0'.
  *
  * \param[out]    dest  Destination string.
- * \param[in]     src   Source string.
- * \param[in]     n     Maximum amount of characters available in destination string.
+ * \param[in]     src   Source string. Needs to be '\0' terminated.
+ * \param[in]     n     Maximum amount of characters available in destination
+ *                      string.
  *
  * \return     Number of characters written to destination string.
  ******************************************************************************/
@@ -3478,6 +3505,58 @@ LOGGER_INLINE size_t logger_string_copy(char       *dest,
   }
 
   return(index);
+}
+
+
+/***************************************************************************//**
+ * \brief  String copy
+ *
+ * Copies string from `src` to `dest` until end on `src` is reached. Fill the
+ * given width of string with spaces and append the prefix field separator. The
+ * function returns the number of characters copied to `dest.
+ *
+ * This function is used to generate aligned prefixes of logger messages.
+ *
+ * @attention The returned string is not terminated with a '\0' character! This
+ *            needs to be done externally
+ *
+ * \param[out]    dest       Destination string.
+ * \param[in]     dest_end   Pointer to character after the absolute end of
+ *                           destination string. Has nothing to do with width.
+ * \param[in]     src        Source string. Needs to be '\0' terminated.
+ * \param[in]     width      Width of field in destination string.
+ *
+ * \return     Number of characters written to destination string.
+ ******************************************************************************/
+LOGGER_INLINE size_t logger_prefix_concatenate(char       *dest,
+                                               const char *dest_end,
+                                               const char *src,
+                                               size_t     width)
+{
+  size_t characters = 0;
+
+  /* copy src to dest */
+  while (dest != dest_end &&
+         src != NULL &&
+         *src != '\0') {
+    *(dest++) = *(src++);
+    characters++;
+  }
+
+  /* fill string with spaces */
+  while (dest != dest_end &&
+         characters < width) {
+    *(dest++) = ' ';
+    characters++;
+  }
+
+  /* append separator */
+  if (dest != dest_end) {
+    *(dest++) = LOGGER_FORMAT_STRING_SEPARATOR;
+    characters++;
+  }
+
+  return characters;
 }
 
 
@@ -3780,7 +3859,7 @@ LOGGER_INLINE void logger_repeat_message(void)
 
     /* generate an empty prefix */
     memset(repeat_prefix, ' ', logger_repeat.prefix_length);
-    repeat_prefix[logger_repeat.prefix_length] = 0;
+    repeat_prefix[logger_repeat.prefix_length] = '\0';
 
     /* generate string that contains number of repeats */
     if (logger_repeat.count == 1) {
