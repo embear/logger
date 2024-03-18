@@ -157,7 +157,7 @@ with:
 `gcc -DLOGGER_ENABLE -Iinclude -o main main.c src/logger.c`
 
 
-~~~~~~~~~~~~~~~~~~~~ {.c}
+```c
 #include "logger.h"
 #include <time.h>
 #include <stdio.h>
@@ -235,7 +235,7 @@ int main(void)
 
   return(0);
 }
-~~~~~~~~~~~~~~~~~~~~
+```
 
 Version history
 ---------------
